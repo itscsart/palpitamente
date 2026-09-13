@@ -11,261 +11,303 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   /* ============================================================
-     HERO — recorte verde oficial (Fundo da Hero.png)
+     GRADE OFICIAL — 1920 x 4400
+     1rem = 16px quando a tela tem 1920px. Todas as medidas são
+     px_do_design / 16, então a página inteira escala junto com a
+     largura da janela e mantém as proporções do PDF.
      ============================================================ */
+  html{ font-size:clamp(8px, 0.8333vw, 18px); }
+
+  /* Alturas medidas no PDF (px em 1920 → rem)
+     header 400 | hero 616 | sobre 1566 | diário 732
+     respiro 553 | rodapé 533                                   */
+
+  /* ---------- HEADER (400px) ---------- */
+  .navbar{
+    height:25rem;                 /* 400 */
+    padding:9.25rem 12.5rem 0 6.125rem;   /* topo 148 | dir 200 | esq 98 */
+    align-items:flex-start;
+  }
+  .logo{ height:2.625rem; }       /* 42 */
+  .nav-links{ gap:4rem; margin-top:0.15rem; }
+  .nav-links li a{
+    font-size:1.55rem;            /* ~25 */
+    padding-bottom:0.85rem;
+  }
+  .nav-links li a .marca-ativa{ max-width:4.4rem; }
+  .nav-social{ gap:1.1rem; margin-top:0.1rem; }
+  .nav-social img{ height:1.45rem; }
+
+  /* ---------- HERO (616px) ---------- */
   .hero{
-    position:relative;
-    padding:0 6vw;
-    margin-top:-10px;
-    min-height:clamp(460px, 44vw, 620px);
-    display:flex; align-items:center;
+    height:38.5rem;               /* 616 */
   }
   .hero-recorte{
     position:absolute; left:0; right:0; top:0; bottom:0;
     background-image:url('assets/partes/hero-bg.png');
-    background-size:100% 100%;
-    background-repeat:no-repeat;
+    background-size:100% 100%; background-repeat:no-repeat;
     z-index:0;
   }
-  .hero-inner{
-    position:relative; z-index:2;
-    max-width:1180px; margin:0 auto; width:100%;
-    display:grid; grid-template-columns:1.05fr 1fr;
-    gap:clamp(30px, 5vw, 70px);
-    align-items:center;
-    padding:clamp(60px, 7vw, 90px) 0;
-  }
-
-  /* imagem da esquerda (placeholder até receber a foto oficial) */
+  /* foto: esquerda 174, largura 778, topo 144 dentro do hero */
   .hero-foto{
-    position:relative;
+    position:absolute; z-index:2;
+    left:10.875rem; top:9rem;
+    width:48.625rem;
     transform:rotate(-3deg);
-    box-shadow:6px 8px 14px rgba(0,0,0,0.18);
+    box-shadow:0.5rem 0.7rem 1.1rem rgba(0,0,0,0.2);
   }
   .hero-foto-inner{
-    aspect-ratio:16/10;
-    background:linear-gradient(#BEE2F4 0%, #D9EEF8 52%, #EAF6D8 52%, #EAF6D8 100%);
+    aspect-ratio:778/470;
+    background:linear-gradient(#BEE2F4 0%, #D9EEF8 56%, #EAF6D8 56%, #EAF6D8 100%);
     position:relative; overflow:hidden;
   }
-  .hero-foto .nuvem{ position:absolute; background:#fff; border-radius:60px; }
+  .hero-foto .nuvem{ position:absolute; background:#fff; border-radius:5rem; }
   .hero-foto .morro{ position:absolute; border-radius:50%; }
 
-  .hero-copy{ position:relative; }
+  /* texto: esquerda 1174, topo 180 dentro do hero */
+  .hero-copy{
+    position:absolute; z-index:2;
+    left:73.375rem; top:11.25rem;
+    width:34.5rem;
+  }
   .hero-seta{
-    position:absolute;
-    top:clamp(-104px, -8.2vw, -66px); left:clamp(-30px, -1vw, 6px);
-    width:clamp(118px, 13vw, 186px);
-    pointer-events:none;
+    position:absolute; z-index:3;
+    left:-6.5rem; top:-7.4rem;
+    width:11.5rem;
   }
   .hero-titulo{
     font-family:var(--font-title);
-    font-size:clamp(25px, 2.85vw, 40px);
-    line-height:1.14;
-    color:#fff;
-    text-transform:uppercase;
+    font-size:3.3rem;             /* ~53 */
+    line-height:1.07;
+    color:#fff; text-transform:uppercase;
   }
   .grifo-reais{
-    position:relative;
-    display:inline-block;
-    padding:0 9px 2px;
+    position:relative; display:inline-block;
+    padding:0 0.55rem 0.1rem;
     color:var(--tinta);
   }
   .grifo-reais::before{
-    content:"";
-    position:absolute; inset:1px -4px -3px;
+    content:""; position:absolute; inset:0.1rem -0.25rem -0.2rem;
     background-image:url('assets/partes/reais-bg.png');
-    background-size:100% 100%;
-    background-repeat:no-repeat;
+    background-size:100% 100%; background-repeat:no-repeat;
     z-index:-1;
   }
   .hero-sub{
-    margin-top:clamp(16px, 1.8vw, 24px);
-    font-size:clamp(13.5px, 1.05vw, 15.5px);
-    font-weight:400; line-height:1.6;
-    color:#F2F3E6; max-width:34ch;
+    margin-top:1.4rem;
+    font-size:1.4rem; font-weight:400; line-height:1.5;
+    color:#F2F3E6;
   }
-  .hero-cta{
-    margin-top:clamp(24px, 2.6vw, 36px);
-    display:flex; align-items:center; gap:14px;
-  }
+  .hero-cta{ margin-top:2.1rem; display:flex; align-items:center; gap:1.1rem; }
   .play-circulo{
-    width:clamp(42px, 3.4vw, 50px); height:clamp(42px, 3.4vw, 50px);
-    border-radius:50%; background:var(--amarelo);
+    width:4.1rem; height:4.1rem; border-radius:50%;
+    background:var(--amarelo);
     display:flex; align-items:center; justify-content:center;
     border:none; cursor:pointer; flex-shrink:0;
     transition:transform .15s ease;
   }
   .play-circulo:hover{ transform:scale(1.05); }
-  .play-circulo svg{ width:15px; height:15px; margin-left:3px; fill:#fff; }
+  .play-circulo svg{ width:1.3rem; height:1.3rem; margin-left:0.25rem; fill:#fff; }
+  .hero .btn-play{ font-size:1.35rem; padding:1.15rem 2.4rem; }
 
-  /* ============================================================
-     SOBRE NÓS — fundo texturizado da página, recorte rosa oficial
-     ============================================================ */
-  .sobre{
-    padding:clamp(80px, 10vw, 150px) 6vw clamp(90px, 11vw, 160px);
-  }
-  .sobre-inner{
-    max-width:1180px; margin:0 auto;
-    display:grid; grid-template-columns:1fr 0.92fr;
-    gap:clamp(40px, 6vw, 90px);
-    align-items:start;
-  }
+  /* ---------- SOBRE NÓS (1566px de respiro) ---------- */
+  .sobre{ height:97.875rem; }     /* 1566 */
+  /* badge: esquerda 154, 262 dentro da seção, 468x120 */
   .sobre-titulo-wrap{
-    position:relative; display:inline-block;
-    margin-bottom:clamp(30px, 4vw, 52px);
+    position:absolute; left:9.625rem; top:16.375rem;
   }
   .sobre-titulo{
-    position:relative;
-    display:inline-block;
-    padding:clamp(16px, 1.9vw, 24px) clamp(34px, 4vw, 52px);
+    position:relative; display:flex;
+    align-items:center; justify-content:center;
+    width:29.25rem; height:7.5rem;
     font-family:var(--font-title);
-    font-size:clamp(20px, 2.1vw, 29px);
-    letter-spacing:0.6px;
-    color:var(--verde-escuro);
-    text-transform:uppercase;
+    font-size:2.5rem; letter-spacing:0.03em;
+    color:var(--verde-escuro); text-transform:uppercase;
+    padding-bottom:0.3rem;
   }
   .sobre-titulo::before{
-    content:"";
-    position:absolute; inset:0;
+    content:""; position:absolute; inset:0;
     background-image:url('assets/partes/sobre-badge.png');
-    background-size:100% 100%;
-    background-repeat:no-repeat;
+    background-size:100% 100%; background-repeat:no-repeat;
     z-index:-1;
   }
   .sobre-detalhe{
-    position:absolute;
-    right:clamp(-58px, -4vw, -44px); top:clamp(-6px, 0vw, 4px);
-    width:clamp(30px, 3.1vw, 42px);
-    pointer-events:none;
+    position:absolute; right:-4.4rem; top:0.2rem;
+    width:3.1rem;
+  }
+  /* texto: esquerda 118, 506 dentro da seção, largura 788 */
+  .sobre-texto{
+    position:absolute; left:7.375rem; top:31.625rem;
+    width:49.25rem;
   }
   .sobre-texto p{
-    font-size:clamp(13.5px, 1.03vw, 15px);
-    line-height:1.82;
-    color:#37372A;
-    margin-bottom:clamp(16px, 1.7vw, 22px);
-    max-width:52ch;
+    font-size:1.42rem; line-height:1.72;
+    color:#37372A; margin-bottom:1.75rem;
   }
+  .sobre-texto p:last-child{ margin-bottom:0; }
+  /* foto: esquerda 1028, 482 dentro da seção, 766 de largura */
   .sobre-foto{
-    aspect-ratio:1/1;
-    background:linear-gradient(#B9DFF2 0%, #DCEFF7 55%, #EAF6D8 55%, #EAF6D8 100%);
-    position:relative; overflow:hidden;
-    margin-top:clamp(40px, 5vw, 78px);
+    position:absolute; left:64.25rem; top:30.125rem;
+    width:47.875rem; aspect-ratio:766/615;
+    background:linear-gradient(#B9DFF2 0%, #DCEFF7 58%, #EAF6D8 58%, #EAF6D8 100%);
+    overflow:hidden;
   }
-  .sobre-foto .nuvem{ position:absolute; background:#fff; border-radius:80px; }
+  .sobre-foto .nuvem{ position:absolute; background:#fff; border-radius:6rem; }
   .sobre-foto .morro{ position:absolute; border-radius:50%; }
 
-  /* ============================================================
-     DIÁRIO DIGITAL — recorte azul oficial + colagem
-     ============================================================ */
-  .diario{
-    position:relative;
-    padding:0 6vw;
-    min-height:clamp(560px, 52vw, 760px);
-    display:flex; align-items:center;
-    margin-top:clamp(-10px, -1vw, 0px);
-  }
+  /* ---------- DIÁRIO DIGITAL (732px) ---------- */
+  .diario{ height:45.75rem; }     /* 732 */
   .diario-recorte{
     position:absolute; left:0; right:0; top:0; bottom:0;
     background-image:url('assets/partes/diario-bg.png');
-    background-size:100% 100%;
-    background-repeat:no-repeat;
+    background-size:100% 100%; background-repeat:no-repeat;
     z-index:0;
   }
-  .diario-inner{
-    position:relative; z-index:2;
-    max-width:1180px; margin:0 auto; width:100%;
-    display:grid; grid-template-columns:1fr 1.05fr;
-    gap:clamp(30px, 4vw, 60px);
-    align-items:center;
-    padding:clamp(90px, 11vw, 150px) 0 clamp(100px, 12vw, 160px);
+  /* texto: esquerda 220, 116 dentro da seção */
+  .diario-texto-col{
+    position:absolute; z-index:2;
+    left:13.75rem; top:7.25rem;
+    width:41rem;
   }
   .diario-eyebrow-wrap{ position:relative; display:inline-block; }
   .diario-eyebrow{
     font-family:var(--font-title);
-    font-size:clamp(19px, 1.95vw, 27px);
-    color:#fff; letter-spacing:0.5px;
-    text-transform:uppercase;
+    font-size:2.35rem; color:#fff;
+    letter-spacing:0.03em; text-transform:uppercase;
   }
-  .det-esq, .det-dir{ position:absolute; width:clamp(22px, 2.3vw, 32px); pointer-events:none; }
-  .det-esq{ left:clamp(-46px, -3.4vw, -34px); top:-4px; }
-  .det-dir{ right:clamp(-46px, -3.4vw, -34px); top:-4px; }
+  .det-esq, .det-dir{ position:absolute; width:2.3rem; top:-0.2rem; }
+  .det-esq{ left:-3.6rem; }
+  .det-dir{ right:-3.6rem; }
+  /* badge amarelo: 484x108, 66 abaixo do eyebrow */
   .diario-badge{
-    position:relative; display:inline-block;
-    margin-top:clamp(6px, 0.8vw, 12px);
-    padding:clamp(9px, 1.1vw, 14px) clamp(26px, 3vw, 40px) clamp(11px, 1.3vw, 16px);
+    position:relative; display:flex;
+    align-items:center; justify-content:center;
+    width:30.25rem; height:6.75rem;
+    margin-top:0.7rem;
     font-family:var(--font-title);
-    font-size:clamp(21px, 2.25vw, 31px);
-    color:var(--verde-escuro);
-    letter-spacing:0.5px;
-    text-transform:uppercase;
+    font-size:2.7rem; color:var(--verde-escuro);
+    letter-spacing:0.03em; text-transform:uppercase;
+    padding-bottom:0.25rem;
   }
   .diario-badge::before{
-    content:"";
-    position:absolute; inset:0;
+    content:""; position:absolute; inset:0;
     background-image:url('assets/partes/diario-badge.png');
-    background-size:100% 100%;
-    background-repeat:no-repeat;
+    background-size:100% 100%; background-repeat:no-repeat;
     z-index:-1;
   }
   .diario-lead{
-    margin-top:clamp(22px, 2.6vw, 34px);
-    font-size:clamp(13.5px, 1.05vw, 15.5px);
-    font-weight:700; line-height:1.6; color:#fff; max-width:34ch;
+    margin-top:2.3rem;
+    font-size:1.45rem; font-weight:700; line-height:1.55;
+    color:#fff; max-width:26rem;
   }
   .diario-texto{
-    margin-top:clamp(10px, 1.2vw, 16px);
-    font-size:clamp(13px, 1vw, 14.5px);
-    font-weight:400; line-height:1.65; color:#EEF3F7; max-width:36ch;
+    margin-top:0.9rem;
+    font-size:1.38rem; font-weight:400; line-height:1.6;
+    color:#EEF3F7; max-width:27rem;
   }
   .diario-frase{
-    margin-top:clamp(16px, 1.8vw, 24px);
-    font-size:clamp(13px, 1vw, 14.5px);
-    font-style:italic; font-weight:700; color:#fff;
+    margin-top:1.5rem;
+    font-size:1.38rem; font-style:italic; font-weight:700; color:#fff;
   }
-  .diario-cta{ margin-top:clamp(20px, 2.4vw, 32px); }
-
-  /* colagem do lado direito */
+  .diario .diario-cta{
+    margin-top:2rem; font-size:1.2rem; padding:1.1rem 2.2rem;
+  }
+  /* colagem à direita */
   .colagem{
-    position:relative;
-    width:100%;
-    aspect-ratio:1/0.92;
-    min-height:280px;
-    max-width:100%;
+    position:absolute; z-index:2;
+    left:57rem; top:1rem;
+    width:56rem; height:44rem;
   }
   .colagem img{ position:absolute; }
-  .colagem .folha-1{ width:38%; left:4%;  top:36%; }
-  .colagem .folha-2{ width:32%; right:8%; top:52%; }
-  .colagem .rabisco{ width:42%; right:-6%; top:48%; }
-  .colagem .notebook{ width:68%; left:10%; top:36%; }
-  .colagem .olho{ width:42%; right:4%; top:15%; }
+  .colagem .folha-1{ width:40%; left:6%;  top:36%; }
+  .colagem .folha-2{ width:33%; right:14%; top:54%; }
+  .colagem .rabisco{ width:40%; right:2%;  top:48%; }
+  .colagem .notebook{ width:64%; left:12%; top:36%; }
+  .colagem .olho{ width:40%; right:10%; top:11%; }
+
+  /* ---------- RESPIRO ANTES DO RODAPÉ (553px) ---------- */
+  .respiro{ height:34.5625rem; }  /* 553 */
+
+  /* ---------- RODAPÉ (533px) ---------- */
+  footer{ height:33.3125rem; padding:8.5rem 12rem 0 12rem; }
+  .footer-grid{ max-width:none; gap:3rem; padding-bottom:0; }
+  .footer-logo{ height:2.9rem; }
+  .footer-col h4{ font-size:1.25rem; margin-bottom:1.5rem; }
+  .footer-col ul li{ margin-bottom:0.85rem; }
+  .footer-col ul li a, .footer-col ul li{ font-size:1.3rem; }
+  .footer-social{ gap:1rem; margin-bottom:1.2rem; }
+  .footer-social img{ height:1.6rem; }
+  .pagamento-linha{ font-size:1.3rem; gap:1rem; margin-bottom:0.9rem; }
+  .pagamento-linha img{ width:2.2rem; }
+  .footer-bottom{
+    position:absolute; left:12rem; right:12rem; bottom:2rem;
+    max-width:none; font-size:1.15rem; padding-top:1.5rem;
+  }
 
   /* ============================================================
-     RESPONSIVO
+     TABLET E MOBILE — a grade fixa é abandonada e os mesmos
+     elementos são reorganizados em uma coluna.
      ============================================================ */
   @media (max-width:900px){
-    .hero{ min-height:auto; }
-    .hero-inner{ grid-template-columns:1fr; gap:38px; padding:90px 0 100px; }
+    html{ font-size:16px; }
+
+    .navbar{
+      height:auto; padding:26px 22px 18px;
+      flex-wrap:wrap; gap:16px; justify-content:center; align-items:center;
+    }
+    .logo{ height:26px; }
+    .nav-links{ order:3; width:100%; justify-content:center; flex-wrap:wrap; gap:18px; margin-top:0; }
+    .nav-links li a{ font-size:14px; padding-bottom:10px; }
+    .nav-links li a .marca-ativa{ max-width:58px; }
+    .nav-social{ gap:12px; }
+    .nav-social img{ height:18px; }
+
+    .hero{ height:auto; padding:70px 22px 90px; }
+    .hero-recorte{ background-size:200% 100%; background-position:center; }
+    .hero-foto{ position:relative; left:auto; top:auto; width:100%; transform:rotate(-2deg); margin-bottom:38px; }
+    .hero-copy{ position:relative; left:auto; top:auto; width:100%; }
     .hero-seta{ display:none; }
-    .hero-titulo{ font-size:clamp(24px, 6.4vw, 34px); }
-    .hero-sub{ max-width:44ch; }
-    .hero-recorte{ background-size:180% 100%; background-position:center; }
+    .hero-titulo{ font-size:clamp(22px, 5.6vw, 32px); }
+    .hero-sub{ font-size:15px; margin-top:14px; }
+    .hero-cta{ margin-top:24px; gap:12px; }
+    .play-circulo{ width:46px; height:46px; }
+    .play-circulo svg{ width:15px; height:15px; }
+    .hero .btn-play{ font-size:13px; padding:14px 26px; }
 
-    .sobre-inner{ grid-template-columns:1fr; gap:44px; }
-    .sobre-foto{ margin-top:0; aspect-ratio:4/3; }
+    .sobre{ height:auto; padding:80px 22px 90px; }
+    .sobre-titulo-wrap{ position:relative; left:auto; top:auto; display:inline-block; margin-bottom:36px; }
+    .sobre-titulo{ width:240px; height:64px; font-size:22px; }
+    .sobre-detalhe{ right:-38px; width:26px; }
+    .sobre-texto{ position:relative; left:auto; top:auto; width:100%; }
+    .sobre-texto p{ font-size:14.5px; margin-bottom:16px; }
+    .sobre-foto{ position:relative; left:auto; top:auto; width:100%; aspect-ratio:4/3; margin-top:40px; }
 
-    .diario{ min-height:auto; }
-    .diario-inner{ grid-template-columns:1fr; gap:16px; padding:120px 0 130px; }
-    .diario-recorte{ background-size:200% 100%; background-position:center; }
-    .diario-lead, .diario-texto{ max-width:46ch; }
-    .colagem{ aspect-ratio:1/0.8; margin-top:20px; }
-    .colagem .rabisco{ width:40%; right:0; }
-    .colagem .olho{ width:40%; right:2%; }
+    .diario{ height:auto; padding:110px 22px 120px; }
+    .diario-recorte{ background-size:230% 100%; background-position:center; }
+    .diario-texto-col{ position:relative; left:auto; top:auto; width:100%; }
+    .diario-eyebrow{ font-size:20px; }
     .det-esq, .det-dir{ display:none; }
+    .diario-badge{ width:230px; height:52px; font-size:21px; }
+    .diario-lead, .diario-texto, .diario-frase{ font-size:14.5px; max-width:46ch; }
+    .diario .diario-cta{ font-size:13px; padding:14px 26px; }
+    .colagem{ position:relative; left:auto; top:auto; width:100%; height:auto; aspect-ratio:1/0.78; margin-top:30px; }
+    .colagem .rabisco{ width:38%; right:0; }
+    .colagem .olho{ width:38%; right:4%; }
+
+    .respiro{ height:70px; }
+
+    footer{ height:auto; padding:70px 22px 26px; }
+    .footer-grid{ grid-template-columns:1fr 1fr; gap:32px; padding-bottom:36px; }
+    .footer-logo{ height:26px; }
+    .footer-col h4{ font-size:13px; margin-bottom:14px; }
+    .footer-col ul li a, .footer-col ul li{ font-size:14px; }
+    .footer-social img{ height:18px; }
+    .pagamento-linha{ font-size:14px; }
+    .pagamento-linha img{ width:24px; }
+    .footer-bottom{ position:relative; left:auto; right:auto; bottom:auto; font-size:12px; flex-direction:column; }
+    .footer-bottom span a{ margin-left:0; margin-right:16px; }
   }
   @media (max-width:560px){
-    .hero-inner{ padding:70px 0 80px; }
-    .diario-inner{ padding:100px 0 110px; }
-    .sobre-titulo{ padding:16px 30px; }
+    .footer-grid{ grid-template-columns:1fr; }
   }
 </style>
 </head>
@@ -298,82 +340,85 @@
 <!-- ============ HERO ============ -->
 <section id="inicio" class="hero">
   <div class="hero-recorte"></div>
-  <div class="hero-inner">
-    <div class="hero-foto">
-      <div class="hero-foto-inner">
-        <div class="nuvem" style="width:15%; height:9%;  top:18%; left:12%;"></div>
-        <div class="nuvem" style="width:22%; height:13%; top:12%; left:38%;"></div>
-        <div class="nuvem" style="width:11%; height:7%;  top:20%; left:76%;"></div>
-        <div class="morro" style="width:58%; height:34%; bottom:-6%;  left:-8%;  background:#89B33F;"></div>
-        <div class="morro" style="width:62%; height:26%; bottom:-8%;  left:24%;  background:#AFD26A;"></div>
-        <div class="morro" style="width:46%; height:32%; bottom:-6%;  right:-6%; background:#7CA836;"></div>
-      </div>
+
+  <div class="hero-foto">
+    <div class="hero-foto-inner">
+      <div class="nuvem" style="width:14%; height:10%; top:19%; left:11%;"></div>
+      <div class="nuvem" style="width:21%; height:14%; top:12%; left:37%;"></div>
+      <div class="nuvem" style="width:10%; height:8%;  top:20%; left:77%;"></div>
+      <div class="morro" style="width:56%; height:36%; bottom:-8%; left:-9%;  background:#89B33F;"></div>
+      <div class="morro" style="width:64%; height:27%; bottom:-9%; left:23%;  background:#AFD26A;"></div>
+      <div class="morro" style="width:45%; height:34%; bottom:-7%; right:-7%; background:#7CA836;"></div>
     </div>
-    <div class="hero-copy">
-      <img src="assets/partes/seta.png" alt="" class="hero-seta">
-      <h1 class="hero-titulo">
-        Conversas <span class="grifo-reais">reais</span><br>
-        sobre tudo o que<br>
-        passa pela nossa cabeça
-      </h1>
-      <p class="hero-sub">Um podcast para quem pensa demais,<br>mas não pensa sozinha.</p>
-      <div class="hero-cta">
-        <button class="play-circulo" id="btnPlay" aria-label="Tocar episódio">
-          <svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg>
-        </button>
-        <button class="btn-play" id="btnPlayLabel">DÁ O PLAY</button>
-      </div>
+  </div>
+
+  <div class="hero-copy">
+    <img src="assets/partes/seta.png" alt="" class="hero-seta">
+    <h1 class="hero-titulo">
+      Conversas <span class="grifo-reais">reais</span><br>
+      sobre tudo o que<br>
+      passa pela nossa cabeça
+    </h1>
+    <p class="hero-sub">Um podcast para quem pensa demais,<br>mas não pensa sozinha.</p>
+    <div class="hero-cta">
+      <button class="play-circulo" id="btnPlay" aria-label="Tocar episódio">
+        <svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg>
+      </button>
+      <button class="btn-play" id="btnPlayLabel">DÁ O PLAY</button>
     </div>
   </div>
 </section>
 
 <!-- ============ SOBRE NÓS ============ -->
 <section id="sobre" class="sobre">
-  <div class="sobre-inner">
-    <div class="sobre-texto">
-      <div class="sobre-titulo-wrap">
-        <span class="sobre-titulo">Sobre nós</span>
-        <img src="assets/partes/sobre-detalhe.png" alt="" class="sobre-detalhe">
-      </div>
-      <p>O Palpitamente nasceu da amizade entre cinco mulheres, de idades e vivências diferentes, com uma vontade em comum, criar um espaço onde mulheres possam conversar sobre tudo aquilo que faz parte da vida.</p>
-      <p>Por aqui, falamos sobre saúde mental no dia a dia, carreira, relacionamentos, família, amizades, cultura pop, músicas, filmes, séries e tantos outros assuntos que passam pela nossa cabeça.</p>
-      <p>A ideia é simples: falar sobre a vida como ela é. Dos assuntos mais leves aos mais sérios, sempre com bom humor, troca, acolhimento e espaço para diferentes opiniões.</p>
-      <p>Mais do que um podcast, queremos construir uma comunidade onde toda mulher possa se identificar, participar e também dar o seu palpite.</p>
-    </div>
-    <div class="sobre-foto">
-      <div class="nuvem" style="width:44%; height:16%; top:22%; left:28%;"></div>
-      <div class="nuvem" style="width:26%; height:11%; top:30%; left:56%;"></div>
-      <div class="morro" style="width:96%; height:26%; bottom:-4%; left:-14%; background:#AFD26A;"></div>
-      <div class="morro" style="width:90%; height:22%; bottom:-6%; right:-16%; background:#7CA836;"></div>
-    </div>
+  <div class="sobre-titulo-wrap">
+    <span class="sobre-titulo">Sobre nós</span>
+    <img src="assets/partes/sobre-detalhe.png" alt="" class="sobre-detalhe">
+  </div>
+
+  <div class="sobre-texto">
+    <p>O Palpitamente nasceu da amizade entre cinco mulheres, de idades e vivências diferentes, com uma vontade em comum, criar um espaço onde mulheres possam conversar sobre tudo aquilo que faz parte da vida.</p>
+    <p>Por aqui, falamos sobre saúde mental no dia a dia, carreira, relacionamentos, família, amizades, cultura pop, músicas, filmes, séries e tantos outros assuntos que passam pela nossa cabeça.</p>
+    <p>A ideia é simples: falar sobre a vida como ela é. Dos assuntos mais leves aos mais sérios, sempre com bom humor, troca, acolhimento e espaço para diferentes opiniões.</p>
+    <p>Mais do que um podcast, queremos construir uma comunidade onde toda mulher possa se identificar, participar e também dar o seu palpite.</p>
+  </div>
+
+  <div class="sobre-foto">
+    <div class="nuvem" style="width:42%; height:15%; top:26%; left:27%;"></div>
+    <div class="nuvem" style="width:25%; height:10%; top:33%; left:55%;"></div>
+    <div class="morro" style="width:98%; height:24%; bottom:-3%; left:-16%; background:#AFD26A;"></div>
+    <div class="morro" style="width:92%; height:20%; bottom:-5%; right:-18%; background:#7CA836;"></div>
   </div>
 </section>
 
 <!-- ============ DIÁRIO DIGITAL ============ -->
 <section id="diario" class="diario">
   <div class="diario-recorte"></div>
-  <div class="diario-inner">
-    <div class="diario-texto-col">
-      <div class="diario-eyebrow-wrap">
-        <img src="assets/partes/det-esq.png" alt="" class="det-esq">
-        <span class="diario-eyebrow">Conheça o</span>
-        <img src="assets/partes/det-dir.png" alt="" class="det-dir">
-      </div>
-      <div><span class="diario-badge">Diário Digital</span></div>
-      <p class="diario-lead">Um espaço para escrever, se conhecer e criar novos hábitos.</p>
-      <p class="diario-texto">Escreva sobre seus dias, acompanhe sua evolução e transforme pequenos momentos de reflexão em uma jornada só sua.</p>
-      <p class="diario-frase">A sua história também importa.</p>
-      <a href="produtos.html" class="btn-primary diario-cta">CONHEÇA O DIÁRIO</a>
+
+  <div class="diario-texto-col">
+    <div class="diario-eyebrow-wrap">
+      <img src="assets/partes/det-esq.png" alt="" class="det-esq">
+      <span class="diario-eyebrow">Conheça o</span>
+      <img src="assets/partes/det-dir.png" alt="" class="det-dir">
     </div>
-    <div class="colagem">
-      <img src="assets/partes/folha1.png" alt="" class="folha-1">
-      <img src="assets/partes/folha2.png" alt="" class="folha-2">
-      <img src="assets/partes/rabisco.png" alt="" class="rabisco">
-      <img src="assets/partes/notebook.png" alt="" class="notebook">
-      <img src="assets/partes/olho.png" alt="" class="olho">
-    </div>
+    <span class="diario-badge">Diário Digital</span>
+    <p class="diario-lead">Um espaço para escrever, se conhecer e criar novos hábitos.</p>
+    <p class="diario-texto">Escreva sobre seus dias, acompanhe sua evolução e transforme pequenos momentos de reflexão em uma jornada só sua.</p>
+    <p class="diario-frase">A sua história também importa.</p>
+    <a href="produtos.html" class="btn-primary diario-cta">CONHEÇA O DIÁRIO</a>
+  </div>
+
+  <div class="colagem">
+    <img src="assets/partes/folha1.png" alt="" class="folha-1">
+    <img src="assets/partes/folha2.png" alt="" class="folha-2">
+    <img src="assets/partes/rabisco.png" alt="" class="rabisco">
+    <img src="assets/partes/notebook.png" alt="" class="notebook">
+    <img src="assets/partes/olho.png" alt="" class="olho">
   </div>
 </section>
+
+<!-- ============ RESPIRO (553px no design) ============ -->
+<div class="respiro"></div>
 
 <!-- ============ RODAPÉ ============ -->
 <footer id="contato">
@@ -418,7 +463,6 @@
 
 <script src="assets/supabase-client.js"></script>
 <script>
-  // Play do podcast (mantém o comportamento anterior de alternar play/pause)
   let tocando = false;
   const btnPlay = document.getElementById('btnPlay');
   const iconePlay = btnPlay.querySelector('svg path');
@@ -429,7 +473,6 @@
   btnPlay.addEventListener('click', alternarPlay);
   document.getElementById('btnPlayLabel').addEventListener('click', alternarPlay);
 
-  // Troca "Entrar" por "Minha conta" quando existe sessão
   (async () => {
     const user = await getUsuarioLogado();
     if (user) {
