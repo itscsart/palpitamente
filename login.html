@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palpitamente — Entrar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  .auth-wrap{
+    min-height:calc(100vh - 90px);
+    display:flex; align-items:center; justify-content:center;
+    background:var(--verde-claro);
+    padding:60px 6vw;
+  }
+  .auth-card{
+    position:relative; z-index:2;
+    background:var(--creme);
+    width:100%; max-width:420px;
+    padding:44px 38px;
+    border-radius:6px;
+    box-shadow:12px 16px 0 rgba(0,0,0,0.14);
+  }
+  .auth-tabs{ display:flex; gap:8px; margin-bottom:28px; }
+  .auth-tab{
+    flex:1; text-align:center; padding:12px; border-radius:30px;
+    font-weight:700; font-size:14px; cursor:pointer; border:none;
+    background:transparent; color:var(--tinta); transition:all .2s ease;
+  }
+  .auth-tab.active{ background:var(--verde-escuro); color:#fff; }
+  .auth-title{ font-size:26px; text-transform:uppercase; margin-bottom:6px; }
+  .auth-sub{ font-size:13.5px; color:#5a5a48; margin-bottom:24px; }
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:13px; font-weight:700; margin-bottom:6px; }
+  .field input{
+    width:100%; padding:13px 14px; border-radius:8px; border:1.5px solid #ddd4c2;
+    font-family:inherit; font-size:14px; background:#fff;
+  }
+  .field input:focus{ outline:none; border-color:var(--verde-escuro); }
+  .auth-submit{ width:100%; margin-top:8px; text-align:center; }
+  .auth-msg{ margin-top:14px; font-size:13px; text-align:center; min-height:18px; }
+  .auth-msg.error{ color:#b5473c; }
+  .auth-msg.ok{ color:var(--verde-escuro); }
+  .back-home{ display:block; text-align:center; margin-top:20px; font-size:13px; font-weight:600; color:var(--verde-escuro); }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html"><img src="assets/logo-cor.png" alt="Palpitamente" class="logo"></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Início</a></li>
+    <li><a href="sobre.html">Sobre nós</a></li>
+    <li><a href="produtos.html">Produtos</a></li>
+    <li><a href="login.html" class="active">Entrar
+      <svg class="squiggle" viewBox="0 0 100 8" preserveAspectRatio="none"><path d="M2 5 Q 20 1, 35 5 T 70 4 T 98 5" stroke="#DABC38" stroke-width="3.2" fill="none" stroke-linecap="round"/></svg>
+    </a></li>
+  </ul>
+</nav>
+
+<div class="auth-wrap">
+  <div class="grain"></div>
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabEntrar">Entrar</button>
+      <button class="auth-tab" id="tabCadastrar">Criar conta</button>
+    </div>
+
+    <div id="painelEntrar">
+      <h1 class="auth-title">Bem-vinda de volta</h1>
+      <p class="auth-sub">Entre para continuar escrevendo o seu diário.</p>
+      <div class="field">
+        <label>E-mail</label>
+        <input type="email" id="emailEntrar" placeholder="voce@email.com">
+      </div>
+      <div class="field">
+        <label>Senha</label>
+        <input type="password" id="senhaEntrar" placeholder="••••••••">
+      </div>
+      <button class="btn-primary auth-submit" id="btnEntrar">Entrar</button>
+      <p class="auth-msg" id="msgEntrar"></p>
+    </div>
+
+    <div id="painelCadastrar" style="display:none;">
+      <h1 class="auth-title">Criar sua conta</h1>
+      <p class="auth-sub">Leva menos de um minuto.</p>
+      <div class="field">
+        <label>Nome</label>
+        <input type="text" id="nomeCadastro" placeholder="Seu nome">
+      </div>
+      <div class="field">
+        <label>E-mail</label>
+        <input type="email" id="emailCadastro" placeholder="voce@email.com">
+      </div>
+      <div class="field">
+        <label>Senha</label>
+        <input type="password" id="senhaCadastro" placeholder="mínimo 6 caracteres">
+      </div>
+      <button class="btn-primary auth-submit" id="btnCadastrar">Criar conta</button>
+      <p class="auth-msg" id="msgCadastrar"></p>
+    </div>
+
+    <a href="index.html" class="back-home">← Voltar para o início</a>
+  </div>
+</div>
+
+<script src="assets/supabase-client.js"></script>
+<script>
+  const tabEntrar = document.getElementById('tabEntrar');
+  const tabCadastrar = document.getElementById('tabCadastrar');
+  const painelEntrar = document.getElementById('painelEntrar');
+  const painelCadastrar = document.getElementById('painelCadastrar');
+
+  tabEntrar.addEventListener('click', () => {
+    tabEntrar.classList.add('active'); tabCadastrar.classList.remove('active');
+    painelEntrar.style.display = 'block'; painelCadastrar.style.display = 'none';
+  });
+  tabCadastrar.addEventListener('click', () => {
+    tabCadastrar.classList.add('active'); tabEntrar.classList.remove('active');
+    painelCadastrar.style.display = 'block'; painelEntrar.style.display = 'none';
+  });
+
+  document.getElementById('btnEntrar').addEventListener('click', async () => {
+    const email = document.getElementById('emailEntrar').value.trim();
+    const senha = document.getElementById('senhaEntrar').value;
+    const msg = document.getElementById('msgEntrar');
+    msg.textContent = 'Entrando...'; msg.className = 'auth-msg';
+
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password: senha });
+    if (error) {
+      msg.textContent = 'E-mail ou senha incorretos.';
+      msg.className = 'auth-msg error';
+      return;
+    }
+    window.location.href = 'diario.html';
+  });
+
+  document.getElementById('btnCadastrar').addEventListener('click', async () => {
+    const nome = document.getElementById('nomeCadastro').value.trim();
+    const email = document.getElementById('emailCadastro').value.trim();
+    const senha = document.getElementById('senhaCadastro').value;
+    const msg = document.getElementById('msgCadastrar');
+
+    if (senha.length < 6) {
+      msg.textContent = 'A senha precisa ter no mínimo 6 caracteres.';
+      msg.className = 'auth-msg error';
+      return;
+    }
+    msg.textContent = 'Criando conta...'; msg.className = 'auth-msg';
+
+    const { data, error } = await supabaseClient.auth.signUp({
+      email, password: senha,
+      options: { data: { nome } }
+    });
+    if (error) {
+      msg.textContent = error.message;
+      msg.className = 'auth-msg error';
+      return;
+    }
+    // Se a confirmação de e-mail estiver desativada no Supabase, já loga direto
+    if (data.session) {
+      window.location.href = 'produtos.html';
+    } else {
+      msg.textContent = 'Conta criada! Verifique seu e-mail para confirmar.';
+      msg.className = 'auth-msg ok';
+    }
+  });
+</script>
+
+</body>
+</html>
