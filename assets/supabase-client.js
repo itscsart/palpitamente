@@ -2,8 +2,8 @@
 // CONFIGURAÇÃO DO SUPABASE
 // Troque as duas linhas abaixo pelas suas chaves (Settings > API no Supabase)
 // ============================================================
-const SUPABASE_URL = "COLE_AQUI_SUA_SUPABASE_URL";
-const SUPABASE_ANON_KEY = "COLE_AQUI_SUA_ANON_KEY";
+const SUPABASE_URL = "https://nziohpkjubndecqoeofw.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56aW9ocGtqdWJuZGVjcW9lb2Z3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMjQ4NDMsImV4cCI6MjEwNDkwMDg0M30.QAL_6u5MMOX3luQX7sQnW-Voe6jf55AaGUwMGeca1_0";
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
