@@ -16,7 +16,10 @@
 }
 
 *{ box-sizing:border-box; margin:0; padding:0; }
-html{ scroll-behavior:smooth; }
+/* O design do Canva tem 1920 de largura; o site roda em 1440.
+   1rem = 12px  ->  1920 x 0.75 = 1440. */
+html{ scroll-behavior:smooth; font-size:clamp(7px, 0.8333vw, 12px); overflow-x:hidden; }
+.container{ width:96rem; max-width:calc(100% - 4rem); margin:0 auto; }
 html{ overflow-x:hidden; }
 html, body{ max-width:100%; }
 body{
@@ -41,14 +44,17 @@ section, footer, nav, main{ position:relative; }
 /* ============ HEADER ============ */
 .navbar{
   position:relative; z-index:60;
-  display:flex; align-items:flex-start; justify-content:space-between;
-  gap:24px; background:transparent;
+  padding:5rem 0 0;
+  background:transparent;
+}
+.navbar .container{
+  display:flex; align-items:flex-start; justify-content:space-between; gap:2rem;
 }
 .logo{ height:2.625rem; width:auto; }
-.nav-links{ display:flex; align-items:center; }
+.nav-links{ display:flex; align-items:center; gap:3.4rem; margin-top:0.35rem; }
 .nav-links li a{
   font-family:var(--font-body);
-  font-size:1.55rem; font-weight:500; color:var(--tinta);
+  font-size:1.65rem; font-weight:500; color:var(--tinta);
   position:relative; display:inline-block;
   padding-bottom:1.5rem;
   transition:opacity .2s ease;
@@ -62,7 +68,10 @@ section, footer, nav, main{ position:relative; }
   opacity:0; pointer-events:none; transition:opacity .2s ease;
 }
 .nav-links li a.active .marca-ativa{ opacity:1; }
-.nav-social{ display:flex; align-items:center; }
+.nav-social{ display:flex; align-items:center; gap:1.15rem; margin-top:0.4rem; }
+.nav-social a{ width:2.1rem; height:2.1rem; display:flex; align-items:center; justify-content:center; }
+.nav-social a.ic-wide{ width:2.9rem; }
+.nav-social img{ max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; }
 .nav-social a{ display:flex; align-items:center; }
 
 /* ============ BOTÕES ============ */
@@ -134,10 +143,15 @@ footer::before{
 
 /* ============ MOBILE ============ */
 @media (max-width:900px){
-  .navbar{ flex-wrap:wrap; gap:16px; justify-content:center; align-items:center; }
+  .container{ width:100%; max-width:none; padding:0 22px; }
+  .navbar{ padding:26px 0 18px; }
+  .navbar .container{ flex-wrap:wrap; gap:16px; justify-content:center; align-items:center; }
   .logo{ height:26px; }
-  .nav-links{ order:3; width:100%; justify-content:center; flex-wrap:wrap; gap:18px; }
+  .nav-links{ order:3; width:100%; justify-content:center; flex-wrap:wrap; gap:18px; margin-top:0; }
   .nav-links li a{ font-size:14px; padding-bottom:14px; }
+  .nav-social{ gap:14px; margin-top:0; }
+  .nav-social a{ width:24px; height:24px; }
+  .nav-social a.ic-wide{ width:32px; }
   footer{ padding:70px 0 26px; margin-top:50px; }
   footer::before{ height:46px; transform:translateY(-90%); }
   .footer-grid{ grid-template-columns:1fr 1fr; gap:32px; padding-bottom:36px; }

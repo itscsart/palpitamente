@@ -17,9 +17,6 @@
   /* O design do Canva tem 1920 de largura, mas o site roda em 1440.
      1rem = 12px  ->  1920 x 0.75 = 1440. Acima de 1440 o conteúdo
      para de crescer e fica centralizado; abaixo, reduz junto. */
-  html{ font-size:clamp(7px, 0.8333vw, 12px); }
-  .container{ width:96rem; max-width:calc(100% - 4rem); margin:0 auto; }
-
   /* ---------------- HEADER ---------------- */
   .navbar{ height:30.375rem; padding:7.75rem 0 0; align-items:flex-start; }
   .navbar .container{ display:flex; align-items:flex-start; justify-content:space-between; gap:2rem; }
