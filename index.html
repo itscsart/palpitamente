@@ -14,7 +14,10 @@
      Grade do HOME.pdf — 1920 de tela, conteúdo em 1536px
      1rem = 16px a 1920. Contêiner padrão: 96rem (1536px).
      ============================================================ */
-  html{ font-size:clamp(8px, 0.8333vw, 18px); }
+  /* O design do Canva tem 1920 de largura, mas o site roda em 1440.
+     1rem = 12px  ->  1920 x 0.75 = 1440. Acima de 1440 o conteúdo
+     para de crescer e fica centralizado; abaixo, reduz junto. */
+  html{ font-size:clamp(7px, 0.8333vw, 12px); }
   .container{ width:96rem; max-width:calc(100% - 4rem); margin:0 auto; }
 
   /* ---------------- HEADER ---------------- */
