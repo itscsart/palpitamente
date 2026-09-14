@@ -5,444 +5,239 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Palpitamente — Início</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  /* Grade oficial: 1rem = 16px a 1920px de largura */
-  html{ font-size:clamp(8px, 0.8333vw, 18px); }
+  .hero{ background:var(--verde-claro); padding:88px 6vw 150px; }
+  .hero-grid{ max-width:1200px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:50px; align-items:center; position:relative; z-index:2; }
+  .hero-art{
+    background:linear-gradient(#BFE3F5 0%, #BFE3F5 60%, #EAF6D8 60%, #EAF6D8 100%);
+    border-radius:2px; aspect-ratio:4/3; position:relative; overflow:hidden;
+    box-shadow:10px 14px 0 rgba(0,0,0,0.12); transform:rotate(-4deg);
+  }
+  .hero-art .hill{ position:absolute; bottom:8%; left:-12%; width:75%; height:42%; background:#A9CE7A; border-radius:50%; }
+  .hero-art .hill.two{ left:auto; right:-18%; width:60%; height:34%; background:#8FBF63; bottom:8%; }
+  .hero-art .cloud{ position:absolute; background:#fff; border-radius:50px; }
+  .hero-arrow{ position:absolute; top:-52px; right:22%; width:76px; height:64px; z-index:3; }
+  .reais-wrap{ position:relative; display:inline-block; }
+  .reais-wrap .mark{
+    position:absolute; left:-6%; right:-6%; top:6%; bottom:2%; background:var(--rosa); transform:rotate(-2deg);
+    clip-path:polygon(1% 20%,10% 4%,30% 12%,55% 2%,80% 14%,98% 6%,100% 55%,94% 92%,70% 100%,45% 90%,20% 100%,2% 82%);
+    z-index:-1;
+  }
+  .hero-title{ font-size:clamp(30px, 3.3vw, 43px); color:var(--tinta); margin-top:16px; text-transform:uppercase; }
+  .hero-sub{ margin-top:18px; font-size:16px; font-weight:500; max-width:36ch; color:#fff; }
+  .hero-play{ margin-top:32px; display:flex; align-items:center; gap:16px; }
+  .play-btn{ width:50px; height:50px; border-radius:50%; background:var(--amarelo); display:flex; align-items:center; justify-content:center; border:none; cursor:pointer; flex-shrink:0; transition:transform .15s ease; }
+  .play-btn:hover{ transform:scale(1.06); }
+  .play-btn svg{ width:16px; height:16px; margin-left:3px; fill:#fff; }
+  .play-label{ background:#fff; font-weight:700; font-size:13.5px; letter-spacing:0.3px; color:var(--rosa); padding:15px 28px; border-radius:30px; cursor:pointer; border:none; transition:transform .15s ease, box-shadow .15s ease; }
+  .play-label:hover{ transform:translateY(-2px); box-shadow:0 8px 16px rgba(0,0,0,0.15); }
+  .podcast-strip{ max-width:1200px; margin:60px auto 0; position:relative; z-index:2; background:rgba(255,255,255,0.55); border-radius:40px; padding:10px 18px; display:flex; align-items:center; gap:14px; }
+  .podcast-strip .mini-play{ width:34px; height:34px; border-radius:50%; background:var(--verde-escuro); color:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer; border:none; }
+  .podcast-strip .mini-play svg{ width:12px; height:12px; fill:#fff; margin-left:2px;}
+  .podcast-bars{ display:flex; align-items:center; gap:3px; height:20px; flex:1; }
+  .podcast-bars span{ width:3px; background:var(--verde-escuro); border-radius:2px; opacity:0.55; }
+  .podcast-text{ font-size:12.5px; font-weight:600; color:var(--verde-escuro); white-space:nowrap;}
 
-  /* ---------------- HEADER ---------------- */
-  .navbar{ padding:9.25rem 12.5rem 0 6.125rem; }
-  .nav-links{ gap:4rem; margin-top:0.15rem; }
-  .nav-social{ gap:1.15rem; margin-top:0.1rem; }
-  .nav-social img{ width:auto; }
-  .nav-social .ic-instagram{ height:1.6rem; }
-  .nav-social .ic-youtube{ height:1.25rem; }
-  .nav-social .ic-tiktok{ height:1.6rem; }
-  .nav-social .ic-spotify{ height:1.6rem; }
-  .nav-social .ic-soundcloud{ height:1.15rem; }
+  .sobre{ background:var(--creme); padding:150px 6vw 140px; }
+  .sobre-grid{ max-width:1200px; margin:0 auto; position:relative; z-index:2; display:grid; grid-template-columns:0.9fr 1fr; gap:70px; align-items:center; }
+  .badge-wrap{ position:relative; display:inline-block; margin-bottom:30px; }
+  .sparks{ position:absolute; width:60px; height:60px; }
+  .sparks.right-of-badge{ top:-14px; right:-56px; }
+  .sobre-text p{ font-size:15.5px; line-height:1.85; color:#3a3a2c; margin-bottom:18px; max-width:52ch; }
+  .sobre-text p strong{ color:var(--verde-escuro); }
+  .sobre-art{ background:linear-gradient(#CFE7F2 0%, #CFE7F2 55%, #E8F2D6 55%, #E8F2D6 100%); border-radius:2px; aspect-ratio:4/3; position:relative; overflow:hidden; box-shadow:10px 14px 0 rgba(0,0,0,0.08); }
+  .sobre-art .hill{ position:absolute; bottom:-8%; left:10%; width:85%; height:46%; background:#A9CE7A; border-radius:50%; }
+  .sobre-art .hill2{ position:absolute; bottom:-14%; left:-5%; width:70%; height:30%; background:#8FBF63; border-radius:50%; }
+  .sobre-art .cloud{ position:absolute; top:22%; left:14%; width:120px; height:48px; background:#fff; border-radius:60px; }
+  .sobre-art .cloud::before, .sobre-art .cloud::after{ content:""; position:absolute; background:#fff; border-radius:50%; }
+  .sobre-art .cloud::before{ width:60px; height:60px; top:-28px; left:14px; }
+  .sobre-art .cloud::after{ width:46px; height:46px; top:-18px; left:62px; }
+  .sobre-cta{ margin-top:8px; }
 
-  /* ---------------- PODCAST (hero) ----------------
-     Recorte verde oficial. Altura folgada para caber
-     foto + seta + título + botão sem apertar.            */
-  .podcast{
-    min-height:55rem;
-    display:flex; align-items:center;
-    padding:0 6.125rem;
-    margin-top:-1rem;
-  }
-  .podcast-recorte{
-    position:absolute; inset:0;
-    background-image:url('assets/partes/podcast-fundo-verde.png');
-    background-size:100% 100%; background-repeat:no-repeat;
-    z-index:0;
-  }
-  .podcast-inner{
-    position:relative; z-index:2; width:100%;
-    display:grid; grid-template-columns:1.02fr 1fr;
-    gap:4.5rem; align-items:center;
-    padding:9rem 0 8rem;
-  }
-  .podcast-foto{ transform:rotate(-3deg); box-shadow:0.5rem 0.7rem 1.2rem rgba(0,0,0,0.22); }
-  .podcast-foto-inner{
-    aspect-ratio:16/10; position:relative; overflow:hidden;
-    background:linear-gradient(#BEE2F4 0%, #D9EEF8 56%, #EAF6D8 56%, #EAF6D8 100%);
-  }
-  .podcast-foto .nuvem{ position:absolute; background:#fff; border-radius:5rem; }
-  .podcast-foto .morro{ position:absolute; border-radius:50%; }
-
-  .podcast-copy{ position:relative; }
-  .podcast-seta{
-    position:absolute; top:-7rem; left:0.5rem;
-    width:12rem; pointer-events:none;
-  }
-  .podcast-titulo{
-    font-family:var(--font-title);
-    font-size:3.35rem; line-height:1.1;
-    color:#fff; text-transform:uppercase;
-  }
-  /* grifado rosa oficial atrás de REAIS */
-  .grifo-reais{ position:relative; display:inline-block; padding:0 0.6rem 0.1rem; color:var(--tinta); }
-  .grifo-reais::before{
-    content:""; position:absolute; inset:0.05rem -0.3rem -0.25rem;
-    background-image:url('assets/partes/podcast-destaque-reais.png');
-    background-size:100% 100%; background-repeat:no-repeat; z-index:-1;
-  }
-  .podcast-sub{ margin-top:1.5rem; font-size:1.42rem; line-height:1.55; color:#F3F4E8; }
-  .podcast-cta{ margin-top:2.3rem; display:flex; align-items:center; gap:1.1rem; }
-  .play-circulo{
-    width:4.2rem; height:4.2rem; border-radius:50%; background:var(--amarelo);
-    display:flex; align-items:center; justify-content:center;
-    border:none; cursor:pointer; flex-shrink:0; transition:transform .15s ease;
-  }
-  .play-circulo:hover{ transform:scale(1.05); }
-  .play-circulo svg{ width:1.35rem; height:1.35rem; margin-left:0.25rem; fill:#fff; }
-
-  /* ---------------- ÚLTIMOS PALPITES ---------------- */
-  .palpites{ padding:11rem 6.125rem 7rem; }
-  .palpites-titulo-wrap{ position:relative; display:inline-block; margin-bottom:5.5rem; }
-  .palpites-titulo{
-    position:relative; display:flex; align-items:center; justify-content:center;
-    padding:1.5rem 3.4rem 1.9rem;
-    font-family:var(--font-title); font-size:2.5rem;
-    letter-spacing:0.03em; color:var(--verde-escuro); text-transform:uppercase;
-  }
-  .palpites-titulo::before{
-    content:""; position:absolute; inset:0;
-    background-image:url('assets/partes/ultimos-palpites-grifado.png');
-    background-size:100% 100%; background-repeat:no-repeat; z-index:-1;
-  }
-  .palpites-lista{
-    display:grid; grid-template-columns:repeat(3,1fr); gap:5rem;
-    align-items:start;
-  }
-  .palpite{ position:relative; }
-  /* número grande como elemento gráfico, com o grifado oficial atrás */
-  .palpite-num{
-    position:relative; display:inline-block;
-    font-family:var(--font-title); font-size:4.4rem; line-height:1;
-    color:var(--verde-escuro); padding:0.5rem 1.3rem 0.7rem;
-    margin-bottom:1.6rem;
-  }
-  .palpite-num::before{
-    content:""; position:absolute; inset:0;
-    background-size:100% 100%; background-repeat:no-repeat; z-index:-1;
-  }
-  .palpite-num.n1::before{ background-image:url('assets/partes/numero-01-grifado.png'); }
-  .palpite-num.n2::before{ background-image:url('assets/partes/numero-01-grifado.png'); transform:scaleX(-1); }
-  .palpite-num.n3::before{ background-image:url('assets/partes/numero-03-grifado.png'); }
-  .palpite h3{
-    font-family:var(--font-title); font-size:1.85rem;
-    text-transform:uppercase; color:var(--tinta); line-height:1.15;
-    margin-bottom:0.9rem;
-  }
-  .palpite p{ font-size:1.35rem; line-height:1.7; color:#43432F; }
-  .palpite a{
-    display:inline-block; margin-top:1.2rem;
-    font-size:1.25rem; font-weight:700; color:var(--verde-escuro);
-    border-bottom:2px solid var(--amarelo); padding-bottom:0.15rem;
-  }
-
-  /* ---------------- VER, LER E PENSAR ---------------- */
-  .verler{ padding:6rem 6.125rem 9rem; }
-  .verler-inner{ position:relative; }
-  .verler-titulo-wrap{ position:relative; display:inline-block; margin-bottom:4.5rem; }
-  .verler-titulo{
-    position:relative; display:flex; align-items:center; justify-content:center;
-    padding:1.4rem 3.2rem 1.8rem;
-    font-family:var(--font-title); font-size:2.5rem;
-    letter-spacing:0.03em; color:var(--verde-escuro); text-transform:uppercase;
-  }
-  .verler-titulo::before{
-    content:""; position:absolute; inset:0;
-    background-image:url('assets/partes/ver-ler-pensar-fundo-grifado.png');
-    background-size:100% 100%; background-repeat:no-repeat; z-index:-1;
-  }
-  .verler-grid{
-    display:grid; grid-template-columns:1fr 1fr; gap:7rem; align-items:center;
-  }
-  .verler-item{ display:flex; align-items:flex-start; gap:2.6rem; }
-  .verler-item img{ width:11rem; flex-shrink:0; }
-  .verler-item:nth-child(2){ margin-top:3.5rem; }
-  .verler-item h3{
-    font-family:var(--font-title); font-size:1.95rem;
-    text-transform:uppercase; color:var(--tinta); margin-bottom:0.8rem;
-  }
-  .verler-item p{ font-size:1.35rem; line-height:1.7; color:#43432F; }
-
-  /* ---------------- DIÁRIO DIGITAL ---------------- */
-  .diario{
-    min-height:48rem; display:flex; align-items:center;
-    padding:0 6.125rem; margin-top:2rem;
-  }
-  .diario-recorte{
-    position:absolute; inset:0;
-    background-image:url('assets/partes/diario-titulo-amarelo.png');
-    background-size:100% 100%; background-repeat:no-repeat; z-index:0;
-  }
-  .diario-inner{
-    position:relative; z-index:2; width:100%;
-    display:grid; grid-template-columns:1fr 1.05fr; gap:4rem;
-    align-items:center; padding:9rem 0 10rem;
-  }
-  .diario-eyebrow{
-    font-family:var(--font-title); font-size:2.35rem;
-    color:#fff; letter-spacing:0.03em; text-transform:uppercase;
-  }
-  /* recorte amarelo oficial */
+  .diario{ background:var(--azul-claro); color:#fff; padding:150px 6vw 160px; }
+  .diario-grid{ max-width:1200px; margin:0 auto; position:relative; z-index:2; display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; }
+  .diario-eyebrow-wrap{ position:relative; display:inline-block; }
+  .diario-eyebrow{ font-family:'Anton', sans-serif; font-size:22px; color:#fff; letter-spacing:0.4px; }
+  .diario-sparks{ position:absolute; width:56px; height:44px; }
+  .diario-sparks.left{ left:-64px; top:-6px; }
+  .diario-sparks.right{ right:-64px; top:-6px; transform:scaleX(-1); }
   .diario-badge{
-    position:relative; display:flex; align-items:center; justify-content:center;
-    width:30rem; height:6.9rem; margin-top:0.7rem;
-    font-family:var(--font-title); font-size:2.7rem;
-    color:var(--verde-escuro); letter-spacing:0.03em; text-transform:uppercase;
-    padding-bottom:0.3rem;
+    position:relative; display:inline-block; background:var(--amarelo); color:var(--verde-escuro);
+    font-family:'Anton', sans-serif; font-size:clamp(26px,3vw,36px); padding:10px 28px; margin-top:10px; transform:rotate(-1.4deg);
+    clip-path:polygon(1% 14%,5% 2%,20% 8%,38% 0%,55% 9%,72% 1%,90% 10%,99% 20%,100% 55%,96% 85%,99% 98%,80% 92%,64% 100%,48% 90%,30% 100%,12% 92%,2% 100%,0% 60%);
   }
-  .diario-badge::before{
-    content:""; position:absolute; inset:0;
-    background-image:url('assets/partes/diario-fundo-azul.png');
-    background-size:100% 100%; background-repeat:no-repeat; z-index:-1;
-  }
-  .diario-lead{ margin-top:2.3rem; font-size:1.45rem; font-weight:700; line-height:1.55; color:#fff; max-width:26rem; }
-  .diario-texto{ margin-top:0.9rem; font-size:1.38rem; line-height:1.6; color:#EEF3F7; max-width:27rem; }
-  .diario-frase{ margin-top:1.5rem; font-size:1.38rem; font-style:italic; font-weight:700; color:#fff; }
-  .diario .diario-cta{ margin-top:2rem; }
-  /* colagem: recortes atrás, olho no alto, notebook principal, rabisco leve */
-  .colagem{ position:relative; width:100%; height:42rem; }
-  .colagem img{ position:absolute; }
-  .colagem .papel-1{ width:36%; left:4%;  top:34%; }
-  .colagem .papel-2{ width:30%; right:16%; top:52%; }
-  .colagem .rabisco{ width:38%; right:0;  top:46%; opacity:0.95; }
-  .colagem .notebook{ width:62%; left:12%; top:32%; }
-  .colagem .olho{ width:38%; right:8%; top:6%; }
+  .diario-text p{ margin-top:26px; font-size:15.5px; line-height:1.85; color:#F2F6F9; max-width:42ch; font-weight:500; }
+  .diario-text .italic-line{ margin-top:20px; font-style:italic; font-weight:700; color:#fff; }
+  .diario-art{ position:relative; display:flex; align-items:center; justify-content:center; min-height:340px; }
+  .diario-art svg{ width:100%; max-width:440px; }
 
-  /* ---------------- MOBILE ---------------- */
-  @media (max-width:900px){
-    html{ font-size:16px; }
-    .navbar{ padding:26px 22px 18px; }
-    .nav-links{ gap:18px; margin-top:0; }
-    .nav-links li a .marca-ativa{ bottom:4px; }
-    .nav-social{ gap:14px; }
-    .nav-social .ic-instagram,.nav-social .ic-tiktok,.nav-social .ic-spotify{ height:20px; }
-    .nav-social .ic-youtube{ height:15px; }
-    .nav-social .ic-soundcloud{ height:13px; }
-
-    .podcast{ min-height:auto; padding:0 22px; margin-top:0; }
-    .podcast-recorte{ background-size:230% 100%; background-position:center; }
-    .podcast-inner{ grid-template-columns:1fr; gap:32px; padding:80px 0 90px; }
-    .podcast-seta{ display:none; }
-    .podcast-titulo{ font-size:clamp(24px,6.4vw,34px); }
-    .podcast-sub{ font-size:15px; margin-top:14px; }
-    .podcast-cta{ margin-top:24px; gap:12px; }
-    .play-circulo{ width:46px; height:46px; }
-    .play-circulo svg{ width:15px; height:15px; }
-    .btn-play{ font-size:13px; padding:14px 26px; }
-
-    .palpites{ padding:70px 22px 50px; }
-    .palpites-titulo{ font-size:22px; padding:14px 28px 17px; }
-    .palpites-titulo-wrap{ margin-bottom:36px; }
-    .palpites-lista{ grid-template-columns:1fr; gap:40px; }
-    .palpite-num{ font-size:40px; padding:6px 14px 8px; margin-bottom:14px; }
-    .palpite h3{ font-size:18px; }
-    .palpite p, .palpite a{ font-size:14.5px; }
-
-    .verler{ padding:40px 22px 70px; }
-    .verler-titulo{ font-size:22px; padding:14px 26px 17px; }
-    .verler-titulo-wrap{ margin-bottom:32px; }
-    .verler-grid{ grid-template-columns:1fr; gap:36px; }
-    .verler-item{ gap:18px; }
-    .verler-item img{ width:86px; }
-    .verler-item:nth-child(2){ margin-top:0; }
-    .verler-item h3{ font-size:18px; }
-    .verler-item p{ font-size:14.5px; }
-
-    .diario{ min-height:auto; padding:0 22px; margin-top:0; }
-    .diario-recorte{ background-size:260% 100%; background-position:center; }
-    .diario-inner{ grid-template-columns:1fr; gap:16px; padding:100px 0 110px; }
-    .diario-eyebrow{ font-size:20px; }
-    .diario-badge{ width:230px; height:53px; font-size:21px; }
-    .diario-lead,.diario-texto,.diario-frase{ font-size:14.5px; max-width:46ch; }
-    .btn-primary{ font-size:13px; padding:14px 26px; }
-    .colagem{ height:auto; aspect-ratio:1/0.78; margin-top:28px; }
-    .colagem .rabisco{ width:36%; right:0; }
-    .colagem .olho{ width:36%; right:4%; }
-  }
+  @media (max-width:900px){ .hero-grid, .sobre-grid, .diario-grid{ grid-template-columns:1fr; } .sobre-art{ order:-1; } .diario-sparks{ display:none; } }
 </style>
 </head>
 <body>
 
-<!-- ============ HEADER ============ -->
 <nav class="navbar">
-  <a href="index.html"><img src="assets/partes/header-logo-colorido.png" alt="Palpitamente" class="logo"></a>
+  <a href="index.html"><img src="assets/logo-cor.png" alt="Palpitamente" class="logo"></a>
   <ul class="nav-links">
     <li><a href="index.html" class="active">Início
-      <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
-    <li><a href="sobre.html">Sobre nós
-      <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
-    <li><a href="produtos.html">Diário Digital
-      <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
-    <li><a href="#contato">Contato
-      <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
-    <li><a href="login.html" id="navEntrar">Entrar
-      <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+      <svg class="squiggle" viewBox="0 0 100 8" preserveAspectRatio="none"><path d="M2 5 Q 20 1, 35 5 T 70 4 T 98 5" stroke="#DABC38" stroke-width="3.2" fill="none" stroke-linecap="round"/></svg>
+    </a></li>
+    <li><a href="sobre.html">Sobre nós</a></li>
+    <li><a href="produtos.html">Produtos</a></li>
+    <li><a href="login.html" id="navEntrar">Entrar</a></li>
   </ul>
-  <div class="nav-social">
-    <a href="#" aria-label="Instagram"><img src="assets/partes/header-instagram-colorido.png" alt="Instagram" class="ic-instagram"></a>
-    <a href="#" aria-label="YouTube"><img src="assets/partes/header-youtube-colorido.png" alt="YouTube" class="ic-youtube"></a>
-    <a href="#" aria-label="TikTok"><img src="assets/partes/header-tiktok-colorido.png" alt="TikTok" class="ic-tiktok"></a>
-    <a href="#" aria-label="Spotify"><img src="assets/partes/header-spotify-colorido.png" alt="Spotify" class="ic-spotify"></a>
-    <a href="#" aria-label="SoundCloud"><img src="assets/partes/header-soundcloud-colorido.png" alt="SoundCloud" class="ic-soundcloud"></a>
-  </div>
 </nav>
 
-<!-- ============ PODCAST ============ -->
-<section id="inicio" class="podcast">
-  <div class="podcast-recorte"></div>
-  <div class="podcast-inner">
-    <div class="podcast-foto">
-      <div class="podcast-foto-inner">
-        <div class="nuvem" style="width:14%; height:10%; top:19%; left:11%;"></div>
-        <div class="nuvem" style="width:21%; height:14%; top:12%; left:37%;"></div>
-        <div class="nuvem" style="width:10%; height:8%;  top:20%; left:77%;"></div>
-        <div class="morro" style="width:56%; height:36%; bottom:-8%; left:-9%;  background:#89B33F;"></div>
-        <div class="morro" style="width:64%; height:27%; bottom:-9%; left:23%;  background:#AFD26A;"></div>
-        <div class="morro" style="width:45%; height:34%; bottom:-7%; right:-7%; background:#7CA836;"></div>
+<section id="inicio" class="hero">
+  <div class="grain"></div>
+  <div class="hero-grid">
+    <div class="hero-art">
+      <div class="cloud" style="width:64px;height:26px; top:14%; left:12%;"></div>
+      <div class="cloud" style="width:46px;height:18px; top:24%; left:32%;"></div>
+      <div class="hill"></div>
+      <div class="hill two"></div>
+    </div>
+    <div class="hero-copy">
+      <svg class="hero-arrow" viewBox="0 0 76 64" fill="none">
+        <path d="M6 6 C 22 4, 58 6, 62 42" stroke="#2E2E1E" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M50 36 L63 47 L67 32" stroke="#2E2E1E" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h1 class="hero-title">Conversas
+        <span class="reais-wrap"><span class="mark"></span>reais</span>
+        sobre tudo o que passa pela nossa cabeça</h1>
+      <p class="hero-sub">Um podcast para quem pensa demais, mas não pensa sozinha.</p>
+      <div class="hero-play">
+        <button class="play-btn" aria-label="Tocar episódio"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg></button>
+        <button class="play-label">DÁ O PLAY</button>
       </div>
     </div>
-    <div class="podcast-copy">
-      <img src="assets/partes/podcast-seta.png" alt="" class="podcast-seta">
-      <h1 class="podcast-titulo">
-        Conversas <span class="grifo-reais">reais</span><br>
-        sobre tudo o que<br>
-        passa pela nossa cabeça
-      </h1>
-      <p class="podcast-sub">Um podcast para quem pensa demais,<br>mas não pensa sozinha.</p>
-      <div class="podcast-cta">
-        <button class="play-circulo" id="btnPlay" aria-label="Tocar episódio">
-          <svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg>
-        </button>
-        <button class="btn-play" id="btnPlayLabel">DÁ O PLAY</button>
+  </div>
+  <div class="podcast-strip">
+    <button class="mini-play" aria-label="Tocar podcast"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg></button>
+    <div class="podcast-bars" id="podcastBars"></div>
+    <span class="podcast-text">EP. 24 — Ansiedade e autocobrança</span>
+  </div>
+  <div class="torn-edge">
+    <svg viewBox="0 0 1440 90" preserveAspectRatio="none">
+      <path fill="#F6F0E9" d="M0,55 L40,20 L95,48 L150,10 L210,50 L270,15 L330,52 L390,8 L455,46 L510,18
+        L575,54 L630,12 L695,50 L750,20 L815,58 L870,14 L935,48 L995,22 L1060,55 L1115,10
+        L1180,50 L1240,16 L1300,52 L1360,18 L1440,46 L1440,90 L0,90 Z"/>
+    </svg>
+  </div>
+</section>
+
+<section id="sobre" class="sobre">
+  <div class="grain"></div>
+  <div class="sobre-grid">
+    <div class="sobre-text">
+      <div class="badge-wrap">
+        <span class="badge-torn">Sobre nós</span>
+        <svg class="sparks right-of-badge" viewBox="0 0 60 60" fill="none">
+          <path d="M6 8 L16 18" stroke="var(--verde-escuro)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M4 26 L20 28" stroke="var(--verde-escuro)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M8 40 L20 36" stroke="var(--verde-escuro)" stroke-width="3" stroke-linecap="round"/>
+        </svg>
       </div>
+      <p>O Palpitamente nasceu da amizade entre cinco mulheres, de idades e vivências diferentes, com uma vontade em comum: criar um espaço onde mulheres possam conversar sobre tudo aquilo que faz parte da vida.</p>
+      <p>Mais do que um podcast, queremos construir uma comunidade onde <strong>toda mulher possa se identificar, participar e também dar o seu palpite.</strong></p>
+      <a href="sobre.html" class="btn-secondary sobre-cta">Conheça nossa história</a>
+    </div>
+    <div class="sobre-art">
+      <div class="cloud"></div>
+      <div class="hill2"></div>
+      <div class="hill"></div>
     </div>
   </div>
 </section>
 
-<!-- ============ ÚLTIMOS PALPITES ============ -->
-<section id="palpites" class="palpites">
-  <div class="palpites-titulo-wrap">
-    <span class="palpites-titulo">Últimos Palpites</span>
-  </div>
-  <div class="palpites-lista">
-    <article class="palpite">
-      <span class="palpite-num n1">01</span>
-      <h3>Ansiedade e autocobrança</h3>
-      <p>A gente conversa sobre a voz interna que nunca acha que é o bastante, e sobre o que ajuda a baixar o volume dela.</p>
-      <a href="#">Ouvir episódio</a>
-    </article>
-    <article class="palpite">
-      <span class="palpite-num n2">02</span>
-      <h3>Amizade na vida adulta</h3>
-      <p>Manter amizade depois dos trinta dá trabalho. Falamos sobre distância, rotina e o que faz um vínculo durar.</p>
-      <a href="#">Ouvir episódio</a>
-    </article>
-    <article class="palpite">
-      <span class="palpite-num n3">03</span>
-      <h3>Carreira sem roteiro</h3>
-      <p>Mudar de área, recomeçar, não saber o próximo passo. Um papo honesto sobre construir caminho fora do script.</p>
-      <a href="#">Ouvir episódio</a>
-    </article>
-  </div>
-</section>
-
-<!-- ============ VER, LER E PENSAR ============ -->
-<section id="verler" class="verler">
-  <div class="verler-inner">
-    <div class="verler-titulo-wrap">
-      <span class="verler-titulo">Ver, Ler e Pensar</span>
-    </div>
-    <div class="verler-grid">
-      <div class="verler-item">
-        <img src="assets/partes/ver-ler-pensar-camera.png" alt="">
-        <div>
-          <h3>Para ver</h3>
-          <p>Filmes, séries e documentários que apareceram nas nossas conversas e continuaram na cabeça depois que acabaram.</p>
-        </div>
-      </div>
-      <div class="verler-item">
-        <img src="assets/partes/ver-ler-pensar-livro.png" alt="">
-        <div>
-          <h3>Para ler</h3>
-          <p>Livros que a gente indicou, emprestou e discutiu. Alguns leves, outros nem tanto, todos com algo para dizer.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ DIÁRIO DIGITAL ============ -->
 <section id="diario" class="diario">
-  <div class="diario-recorte"></div>
-  <div class="diario-inner">
-    <div class="diario-texto-col">
-      <span class="diario-eyebrow">Conheça o</span>
+  <div class="grain"></div>
+  <div class="diario-grid">
+    <div class="diario-text">
+      <div class="diario-eyebrow-wrap">
+        <svg class="diario-sparks left" viewBox="0 0 56 44" fill="none"><path d="M6 6 L16 16" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><path d="M4 22 L18 24" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><path d="M8 34 L18 30" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>
+        <span class="diario-eyebrow">Conheça o</span>
+        <svg class="diario-sparks right" viewBox="0 0 56 44" fill="none"><path d="M6 6 L16 16" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><path d="M4 22 L18 24" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><path d="M8 34 L18 30" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>
+      </div>
       <div><span class="diario-badge">Diário Digital</span></div>
-      <p class="diario-lead">Um espaço para escrever, se conhecer e criar novos hábitos.</p>
-      <p class="diario-texto">Escreva sobre seus dias, acompanhe sua evolução e transforme pequenos momentos de reflexão em uma jornada só sua.</p>
-      <p class="diario-frase">A sua história também importa.</p>
-      <a href="produtos.html" class="btn-primary diario-cta">CONHEÇA O DIÁRIO</a>
+      <p>Um espaço para escrever, se conhecer e criar novos hábitos. Escreva sobre seus dias, acompanhe sua evolução e transforme pequenos momentos de reflexão em uma jornada só sua.</p>
+      <p class="italic-line">A sua história também importa.</p>
+      <a href="produtos.html" class="btn-primary" style="margin-top:34px;">CONHEÇA O DIÁRIO</a>
     </div>
-    <div class="colagem">
-      <img src="assets/partes/diario-recorte-papel-01.png" alt="" class="papel-1">
-      <img src="assets/partes/diario-recorte-papel-02.png" alt="" class="papel-2">
-      <img src="assets/partes/diario-rabisco.png" alt="" class="rabisco">
-      <img src="assets/partes/diario-notebook.png" alt="" class="notebook">
-      <img src="assets/partes/diario-olho.png" alt="" class="olho">
+    <div class="diario-art">
+      <svg viewBox="0 0 420 340" fill="none">
+        <path d="M330 40 L390 70 L400 150 L370 250 L300 235 L280 130 Z" fill="#DDD6C4" opacity="0.85"/>
+        <rect x="80" y="150" width="220" height="130" rx="4" fill="#EFE8D8"/>
+        <rect x="92" y="160" width="196" height="98" rx="2" fill="#161616"/>
+        <rect x="65" y="278" width="250" height="14" rx="4" fill="#D8D2BC"/>
+        <path d="M60 100 L118 132" stroke="#DABC38" stroke-width="6" stroke-linecap="round"/>
+        <path d="M52 122 L114 140" stroke="#DABC38" stroke-width="6" stroke-linecap="round"/>
+        <path d="M58 144 L118 152" stroke="#DABC38" stroke-width="6" stroke-linecap="round"/>
+        <g>
+          <path d="M170 78 C155 55, 195 42, 205 68 C 225 55, 248 78, 228 96 C 248 112, 228 138, 202 128 C198 152, 162 148, 162 122 C138 130, 126 98, 150 88 C 134 72, 154 50, 170 78Z" fill="#F3E9D4" stroke="#2E2E1E" stroke-width="2"/>
+          <circle cx="195" cy="98" r="17" fill="#1a1a1a"/>
+          <circle cx="200" cy="92" r="4.5" fill="#fff"/>
+        </g>
+      </svg>
     </div>
+  </div>
+  <div class="torn-edge">
+    <svg viewBox="0 0 1440 90" preserveAspectRatio="none">
+      <path fill="#F6F0E9" d="M0,50 L45,15 L100,52 L155,12 L215,48 L275,18 L335,55 L395,10 L460,50
+        L515,20 L580,56 L635,14 L700,52 L755,22 L820,58 L875,16 L940,50 L1000,24 L1065,52 L1120,12
+        L1185,50 L1245,18 L1305,55 L1365,20 L1440,48 L1440,90 L0,90 Z"/>
+    </svg>
   </div>
 </section>
 
-<!-- ============ RODAPÉ ============ -->
 <footer id="contato">
+  <div class="grain"></div>
   <div class="footer-grid">
-    <div class="footer-col">
-      <img src="assets/partes/footer-logo-branco.png" alt="Palpitamente" class="footer-logo">
-    </div>
+    <div class="footer-col"><img src="assets/logo-branco.png" alt="Palpitamente" class="footer-logo"></div>
     <div class="footer-col">
       <h4>Navegação</h4>
       <ul>
         <li><a href="index.html">Início</a></li>
         <li><a href="sobre.html">Sobre nós</a></li>
-        <li><a href="produtos.html">Diário Digital</a></li>
-        <li><a href="#contato">Contato</a></li>
+        <li><a href="produtos.html">Produtos</a></li>
+        <li><a href="login.html">Entrar</a></li>
       </ul>
     </div>
-    <div class="footer-col">
-      <h4>Siga-Nos</h4>
-      <div class="footer-social">
-        <a href="#" aria-label="Instagram"><img src="assets/partes/footer-instagram-branco.png" alt="Instagram" class="ic-instagram"></a>
-        <a href="#" aria-label="YouTube"><img src="assets/partes/footer-youtube-branco.png" alt="YouTube" class="ic-youtube"></a>
-        <a href="#" aria-label="TikTok"><img src="assets/partes/footer-tiktok-branco.png" alt="TikTok" class="ic-tiktok"></a>
-        <a href="#" aria-label="Spotify"><img src="assets/partes/footer-spotify-branco.png" alt="Spotify" class="ic-spotify"></a>
-        <a href="#" aria-label="SoundCloud"><img src="assets/partes/footer-soundcloud-branco.png" alt="SoundCloud" class="ic-soundcloud"></a>
-      </div>
-      <ul><li><a href="#">@palpitamente</a></li></ul>
-    </div>
-    <div class="footer-col">
-      <h4>Formas de Pagamento</h4>
-      <div class="footer-pagamento">
-        <div class="pagamento-linha"><img src="assets/partes/pag-boleto.png" alt=""> Boleto</div>
-        <div class="pagamento-linha"><img src="assets/partes/pag-pix.png" alt=""> PIX</div>
-        <div class="pagamento-linha"><img src="assets/partes/pag-cartao.png" alt=""> Cartão</div>
-      </div>
-    </div>
+    <div class="footer-col"><h4>Siga-nos</h4><ul><li><a href="#">@palpitamente</a></li></ul></div>
+    <div class="footer-col"><h4>Formas de pagamento</h4><ul><li>Boleto</li><li>PIX</li><li>Cartão</li></ul></div>
   </div>
   <div class="footer-bottom">
     <span>© 2024 Palpitamente. Todos os direitos reservados.</span>
-    <span><a href="#">Política de Privacidade</a><a href="#">Termos de Uso</a></span>
   </div>
 </footer>
 
 <script src="assets/supabase-client.js"></script>
 <script>
-  let tocando = false;
-  const btnPlay = document.getElementById('btnPlay');
-  const iconePlay = btnPlay.querySelector('svg path');
-  function alternarPlay(){
-    tocando = !tocando;
-    iconePlay.setAttribute('d', tocando ? 'M6 4h4v16H6zM14 4h4v16h-4z' : 'M6 4l14 8-14 8V4z');
-  }
-  btnPlay.addEventListener('click', alternarPlay);
-  document.getElementById('btnPlayLabel').addEventListener('click', alternarPlay);
+  const barsContainer = document.getElementById('podcastBars');
+  for(let i=0;i<40;i++){ const bar = document.createElement('span'); bar.style.height = (4 + Math.random()*16)+'px'; barsContainer.appendChild(bar); }
+  let bars = barsContainer.querySelectorAll('span');
+  let playing = false;
+  function animateBars(){ if(!playing) return; bars.forEach(b=>{ b.style.height = (4 + Math.random()*16)+'px'; }); setTimeout(animateBars, 220); }
+  document.querySelectorAll('.mini-play, .play-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      playing = !playing;
+      const svg = btn.querySelector('svg path');
+      if(playing){ svg.setAttribute('d','M6 4h4v16H6zM14 4h4v16h-4z'); animateBars(); }
+      else{ svg.setAttribute('d','M6 4l14 8-14 8V4z'); }
+    });
+  });
 
   (async () => {
     const user = await getUsuarioLogado();
     if (user) {
-      const link = document.getElementById('navEntrar');
-      link.childNodes[0].nodeValue = 'Minha conta';
-      link.href = 'diario.html';
+      document.getElementById('navEntrar').textContent = 'Minha conta';
+      document.getElementById('navEntrar').href = 'diario.html';
     }
   })();
 </script>
+
 </body>
 </html>
