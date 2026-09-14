@@ -5,30 +5,116 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Palpitamente — Sobre nós</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  .sobre-hero{ background:var(--verde-escuro); color:#fff; padding:90px 6vw 130px; text-align:center; }
-  .sobre-hero h1{ font-size:clamp(32px,4vw,52px); text-transform:uppercase; }
-  .sobre-hero p{ margin-top:14px; font-size:15.5px; color:#e7e5d5; max-width:50ch; margin-inline:auto; }
+  /* ---------- FAIXA VERDE DE ABERTURA ---------- */
+  .capa{
+    position:relative; height:42rem;
+    display:flex; align-items:center; justify-content:center;
+    margin-top:2rem;
+  }
+  .capa-recorte{
+    position:absolute; inset:0;
+    background-image:url('assets/partes/podcast-fundo-verde.png');
+    background-size:100% 100%; background-repeat:no-repeat; z-index:0;
+  }
+  .capa-conteudo{ position:relative; z-index:2; text-align:center; padding:0 6rem; }
+  .capa h1{
+    font-family:var(--font-title); font-size:3.1rem; line-height:1.15;
+    color:#fff; text-transform:uppercase;
+  }
+  .capa p{
+    margin-top:1.6rem; font-size:1.45rem; line-height:1.5;
+    color:#EFF1E2; max-width:44rem; margin-inline:auto;
+  }
 
-  .conteudo{ padding:120px 6vw; }
-  .conteudo-grid{ max-width:1000px; margin:0 auto; display:grid; grid-template-columns:0.9fr 1.1fr; gap:60px; align-items:start; }
-  .conteudo-grid p{ font-size:15.5px; line-height:1.9; color:#3a3a2c; margin-bottom:20px; }
-  .conteudo-grid p strong{ color:var(--verde-escuro); }
-  .valores{ background:#fff; border-radius:10px; padding:30px; box-shadow:0 8px 24px rgba(0,0,0,0.06); }
-  .valores h3{ font-size:14px; text-transform:uppercase; letter-spacing:0.4px; color:var(--rosa); margin-bottom:18px; }
-  .valores li{ padding:12px 0; border-bottom:1px dashed #ddd4c2; font-size:14.5px; }
-  .valores li:last-child{ border-bottom:none; }
+  /* ---------- SOBRE NÓS ---------- */
+  .sobre{ padding:12rem 0 10rem; }
+  .sobre-titulo-wrap{ position:relative; display:inline-block; margin-bottom:4.5rem; }
+  .sobre-titulo{
+    position:relative; display:flex; align-items:center; justify-content:center;
+    padding:1.3rem 3.2rem 1.6rem;
+    font-family:var(--font-title); font-size:2.4rem; letter-spacing:0.03em;
+    color:var(--verde-escuro); text-transform:uppercase;
+  }
+  .sobre-titulo::before{
+    content:""; position:absolute; inset:0;
+    background-image:url('assets/partes/ultimos-palpites-grifado.png');
+    background-size:100% 100%; background-repeat:no-repeat; z-index:-1;
+  }
+  .sobre-detalhe{ position:absolute; right:-4.2rem; top:0; width:3rem; }
+  .sobre-grid{ display:grid; grid-template-columns:1.15fr 1fr; gap:6rem; align-items:start; }
+  .sobre-texto p{ font-size:1.4rem; line-height:1.8; color:#3A3A2C; margin-bottom:1.7rem; }
+  .sobre-texto p:last-child{ margin-bottom:0; }
 
-  .equipe{ background:var(--rosa); padding:100px 6vw; text-align:center; }
-  .equipe h2{ font-size:clamp(26px,3vw,36px); color:#fff; text-transform:uppercase; margin-bottom:14px; }
-  .equipe p{ color:#fff; max-width:56ch; margin:0 auto 40px; font-size:15px; line-height:1.8; }
-  .equipe-fotos{ display:flex; justify-content:center; gap:22px; flex-wrap:wrap; }
-  .foto-placeholder{ width:110px; height:110px; border-radius:50%; background:#fff; opacity:0.85; }
+  /* cartão "O que nos guia" */
+  .guia{
+    background:#FBF7F1; border-radius:1.2rem;
+    padding:2.8rem 3rem 2.4rem; margin-top:0.8rem;
+    box-shadow:0 0.6rem 2rem rgba(0,0,0,0.06);
+  }
+  .guia h3{
+    font-family:var(--font-body); font-size:1.3rem; font-weight:700;
+    color:var(--rosa); text-transform:uppercase; letter-spacing:0.06em;
+    margin-bottom:1.6rem;
+  }
+  .guia li{
+    font-size:1.35rem; color:#3A3A2C;
+    padding:1.15rem 0; border-bottom:1px solid #E7DDD2;
+  }
+  .guia li:last-child{ border-bottom:none; padding-bottom:0; }
 
-  @media(max-width:900px){ .conteudo-grid{ grid-template-columns:1fr; } }
+  /* ---------- QUEM FAZ PARTE (faixa rosa) ---------- */
+  .equipe{
+    position:relative; height:56rem; margin-top:6rem;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .equipe-recorte{
+    position:absolute; inset:0;
+    background-image:url('assets/partes/ver-ler-pensar-fundo.png');
+    background-size:100% 100%; background-repeat:no-repeat; z-index:0;
+  }
+  .equipe-conteudo{ position:relative; z-index:2; width:100%; text-align:center; }
+  .equipe h2{
+    font-family:var(--font-title); font-size:2.9rem;
+    color:#fff; text-transform:uppercase; margin-bottom:4.5rem;
+  }
+  .equipe-lista{ display:flex; justify-content:center; gap:3.2rem; flex-wrap:wrap; }
+  .integrante{ text-align:center; }
+  .integrante .foto{
+    width:11rem; height:11rem; border-radius:50%;
+    background:#FBF7F1; margin:0 auto 1.4rem;
+    box-shadow:0 0.4rem 1.4rem rgba(0,0,0,0.1);
+  }
+  .integrante span{
+    font-family:var(--font-title); font-size:1.5rem;
+    color:var(--verde-escuro); text-transform:uppercase; letter-spacing:0.02em;
+  }
+
+  @media (max-width:900px){
+    .capa{ height:auto; padding:70px 22px 80px; margin-top:10px; }
+    .capa-recorte{ background-size:250% 100%; background-position:center; }
+    .capa h1{ font-size:clamp(22px,5.6vw,30px); }
+    .capa p{ font-size:14.5px; margin-top:14px; }
+    .sobre{ padding:50px 0 40px; }
+    .sobre-titulo{ font-size:21px; padding:12px 26px 15px; }
+    .sobre-titulo-wrap{ margin-bottom:28px; }
+    .sobre-detalhe{ right:-34px; width:24px; }
+    .sobre-grid{ grid-template-columns:1fr; gap:32px; }
+    .sobre-texto p{ font-size:14.5px; margin-bottom:14px; }
+    .guia{ padding:22px 22px 18px; margin-top:0; }
+    .guia h3{ font-size:12.5px; margin-bottom:12px; }
+    .guia li{ font-size:14px; padding:11px 0; }
+    .equipe{ height:auto; padding:70px 22px 80px; margin-top:30px; }
+    .equipe-recorte{ background-size:260% 100%; background-position:center; }
+    .equipe h2{ font-size:clamp(20px,5.6vw,28px); margin-bottom:30px; }
+    .equipe-lista{ gap:22px; }
+    .integrante .foto{ width:82px; height:82px; margin-bottom:10px; }
+    .integrante span{ font-size:14px; }
+  }
 </style>
 </head>
 <body>
@@ -58,43 +144,52 @@
   </div>
 </nav>
 
-<section class="sobre-hero">
-  <div class="grain"></div>
-  <h1>Cinco mulheres, uma conversa sem fim</h1>
-  <p>Conheça a história por trás do Palpitamente e o que nos move todos os dias.</p>
+<section class="capa">
+  <div class="capa-recorte"></div>
+  <div class="capa-conteudo">
+    <h1>Cinco mulheres, uma conversa, vários pontos</h1>
+    <p>Conheça a história por trás do Palpitamente e o que nos move todos os dias.</p>
+  </div>
 </section>
 
-<section class="conteudo">
-  <div class="conteudo-grid">
-    <div>
-      <p>O Palpitamente nasceu da amizade entre cinco mulheres, de idades e vivências diferentes, com uma vontade em comum: criar um espaço onde mulheres possam conversar sobre tudo aquilo que faz parte da vida.</p>
-      <p>Por aqui, falamos sobre saúde mental no dia a dia, carreira, relacionamentos, família, amizades, cultura pop, músicas, filmes, séries e tantos outros assuntos que passam pela nossa cabeça.</p>
-      <p>A ideia é simples: falar sobre a vida como ela é. Dos assuntos mais leves aos mais sérios, sempre com bom humor, troca, acolhimento e espaço para diferentes opiniões.</p>
-      <p>Mais do que um podcast, queremos construir <strong>uma comunidade onde toda mulher possa se identificar, participar e também dar o seu palpite.</strong></p>
+<section class="sobre">
+  <div class="container">
+    <div class="sobre-titulo-wrap">
+      <span class="sobre-titulo">Sobre nós</span>
+      <img src="assets/partes/ver-ler-pensar-fundo-grifado.png" alt="" class="sobre-detalhe" style="display:none">
     </div>
-    <div class="valores">
-      <h3>O que nos guia</h3>
-      <ul>
-        <li>Conversas reais, sem filtro</li>
-        <li>Acolhimento acima de julgamento</li>
-        <li>Espaço para todas as opiniões</li>
-        <li>Saúde mental no centro</li>
-        <li>Comunidade antes de audiência</li>
-      </ul>
+    <div class="sobre-grid">
+      <div class="sobre-texto">
+        <p>O Palpitamente nasceu da amizade entre cinco mulheres, de idades e vivências diferentes, com uma vontade em comum, criar um espaço onde mulheres possam conversar sobre tudo aquilo que faz parte da vida.</p>
+        <p>Por aqui, falamos sobre saúde mental no dia a dia, carreira, relacionamentos, família, amizades, cultura pop, músicas, filmes, séries e tantos outros assuntos que passam pela nossa cabeça.</p>
+        <p>A ideia é simples: falar sobre a vida como ela é. Dos assuntos mais leves aos mais sérios, sempre com bom humor, troca, acolhimento e espaço para diferentes opiniões.</p>
+        <p>Mais do que um podcast, queremos construir uma comunidade onde toda mulher possa se identificar, participar e também dar o seu palpite.</p>
+      </div>
+      <div class="guia">
+        <h3>O que nos guia</h3>
+        <ul>
+          <li>Conversas reais, sem filtro</li>
+          <li>Acolhimento acima de julgamento</li>
+          <li>Espaço para todas as opiniões</li>
+          <li>Comunidade antes de audiência</li>
+          <li>Saúde mental feminina no centro</li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
 
 <section class="equipe">
-  <div class="grain"></div>
-  <h2>Quem palpita com a gente</h2>
-  <p>Somos cinco amigas com histórias diferentes e a mesma vontade de criar um espaço de troca real entre mulheres.</p>
-  <div class="equipe-fotos">
-    <div class="foto-placeholder"></div>
-    <div class="foto-placeholder"></div>
-    <div class="foto-placeholder"></div>
-    <div class="foto-placeholder"></div>
-    <div class="foto-placeholder"></div>
+  <div class="equipe-recorte"></div>
+  <div class="equipe-conteudo">
+    <h2>Que faz parte do Palpitamente?</h2>
+    <div class="equipe-lista">
+      <div class="integrante"><div class="foto"></div><span>Camila</span></div>
+      <div class="integrante"><div class="foto"></div><span>Laura</span></div>
+      <div class="integrante"><div class="foto"></div><span>Livia</span></div>
+      <div class="integrante"><div class="foto"></div><span>Mara</span></div>
+      <div class="integrante"><div class="foto"></div><span>Vitória</span></div>
+    </div>
   </div>
 </section>
 
@@ -146,11 +241,11 @@
   (async () => {
     const user = await getUsuarioLogado();
     if (user) {
-      document.getElementById('navEntrar').textContent = 'Minha conta';
-      document.getElementById('navEntrar').href = 'diario.html';
+      const link = document.getElementById('navEntrar');
+      link.childNodes[0].nodeValue = 'Minha conta';
+      link.href = 'diario.html';
     }
   })();
 </script>
-
 </body>
 </html>

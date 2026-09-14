@@ -97,8 +97,8 @@ footer{
   position:relative;
   background:var(--verde-escuro);
   color:#EFE8D8;
-  padding:12rem 0 2.5rem;
-  margin-top:24rem;
+  padding:10rem 0 2.5rem;
+  margin-top:14rem;
 }
 /* recorte de papel verde texturizado, asset oficial */
 footer::before{

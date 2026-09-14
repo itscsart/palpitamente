@@ -3,42 +3,91 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Palpitamente — Produtos</title>
+<title>Palpitamente — Diário Digital</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  .produto-hero{ background:var(--rosa); padding:90px 6vw 150px; }
-  .produto-grid{
-    max-width:1200px; margin:0 auto; position:relative; z-index:2;
-    display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center;
+  /* ---------- FAIXA ROSA DE VENDA ---------- */
+  .venda{
+    position:relative; height:72rem;
+    display:flex; align-items:center;
+    margin-top:2rem;
   }
-  .produto-eyebrow{ font-family:'Anton',sans-serif; font-size:20px; color:#fff; }
-  .produto-title{ font-size:clamp(30px,3.3vw,42px); color:#fff; margin-top:10px; text-transform:uppercase; }
-  .produto-price{ margin-top:24px; font-size:36px; font-family:'Anton',sans-serif; color:var(--verde-escuro); }
-  .produto-price small{ display:block; font-family:'Montserrat',sans-serif; font-size:13px; font-weight:600; color:#fff; text-decoration:line-through; }
-  .produto-desc{ margin-top:18px; font-size:15.5px; line-height:1.8; color:#fff; max-width:42ch; }
-  .produto-card{
-    background:var(--creme); border-radius:6px; padding:34px; box-shadow:12px 16px 0 rgba(0,0,0,0.12);
+  .venda-recorte{
+    position:absolute; inset:0;
+    background-image:url('assets/partes/ver-ler-pensar-fundo.png');
+    background-size:100% 100%; background-repeat:no-repeat; z-index:0;
   }
-  .produto-card ul{ margin:20px 0; }
-  .produto-card ul li{ padding:9px 0; font-size:14.5px; display:flex; gap:10px; border-bottom:1px dashed #ddd4c2; }
-  .produto-card ul li:last-child{ border-bottom:none; }
-  .produto-card ul li::before{ content:"✓"; color:var(--verde-escuro); font-weight:800; }
-  .produto-status{ margin-top:14px; font-size:13px; font-weight:600; text-align:center; min-height:18px; }
-  .produto-status.error{ color:#b5473c; }
-  .produto-status.ok{ color:var(--verde-escuro); }
+  .venda .container{ position:relative; z-index:2; }
+  .venda-grid{ display:grid; grid-template-columns:1.05fr 1fr; gap:5rem; align-items:center; }
+  .venda-eyebrow{
+    font-family:var(--font-title); font-size:1.65rem;
+    color:#fff; text-transform:uppercase; letter-spacing:0.04em;
+  }
+  .venda h1{
+    font-family:var(--font-title); font-size:3.2rem; line-height:1.12;
+    color:#fff; text-transform:uppercase; margin-top:0.7rem;
+  }
+  .venda-desc{
+    margin-top:1.8rem; font-size:1.4rem; line-height:1.65;
+    color:#FBF1ED; max-width:34rem;
+  }
 
-  .beneficios{ padding:100px 6vw; }
-  .beneficios-grid{
-    max-width:1100px; margin:0 auto; display:grid; grid-template-columns:repeat(3,1fr); gap:30px;
+  /* cartão de preço */
+  .cartao{
+    background:#FBF7F1; border-radius:1.6rem;
+    padding:3.2rem 3rem 3rem;
+    box-shadow:0 1.2rem 3rem rgba(0,0,0,0.12);
   }
-  .beneficio{ text-align:left; }
-  .beneficio-num{ font-family:'Anton',sans-serif; font-size:30px; color:var(--rosa); }
-  .beneficio h3{ font-size:18px; text-transform:uppercase; margin:10px 0 8px; color:var(--verde-escuro); }
-  .beneficio p{ font-size:14px; line-height:1.7; color:#4a4a3a; }
-  @media(max-width:900px){ .produto-grid{ grid-template-columns:1fr; } .beneficios-grid{ grid-template-columns:1fr; } }
+  .cartao-preco{
+    font-family:var(--font-title); font-size:3.1rem;
+    color:var(--verde-escuro); line-height:1;
+  }
+  .cartao ul{ margin:2.4rem 0 2.6rem; }
+  .cartao li{
+    font-size:1.35rem; color:#3A3A2C;
+    padding:1.1rem 0; border-bottom:1px solid #E7DDD2;
+  }
+  .cartao li:last-child{ border-bottom:none; }
+  .cartao .btn-primary{ width:100%; text-align:center; font-size:1.4rem; padding:1.3rem 2rem; }
+  .cartao-status{ margin-top:1.2rem; font-size:1.2rem; text-align:center; min-height:1.5rem; }
+  .cartao-status.erro{ color:#B5473C; }
+  .cartao-status.ok{ color:var(--verde-escuro); }
+
+  /* ---------- BENEFÍCIOS ---------- */
+  .beneficios{ padding:12rem 0 5rem; }
+  .beneficios-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:5rem; }
+  .beneficio-num{
+    font-family:var(--font-title); font-size:2.9rem;
+    color:var(--rosa); line-height:1; margin-bottom:1.4rem; display:block;
+  }
+  .beneficio h3{
+    font-family:var(--font-title); font-size:1.7rem;
+    color:var(--verde-escuro); text-transform:uppercase; margin-bottom:1rem;
+  }
+  .beneficio p{ font-size:1.35rem; line-height:1.7; color:#3A3A2C; }
+
+  @media (max-width:900px){
+    .venda{ height:auto; padding:70px 0 80px; margin-top:10px; }
+    .venda-recorte{ background-size:260% 100%; background-position:center; }
+    .venda-grid{ grid-template-columns:1fr; gap:30px; }
+    .venda-eyebrow{ font-size:15px; }
+    .venda h1{ font-size:clamp(24px,6.2vw,32px); }
+    .venda-desc{ font-size:14.5px; margin-top:14px; }
+    .cartao{ padding:24px 22px 22px; }
+    .cartao-preco{ font-size:28px; }
+    .cartao ul{ margin:18px 0 20px; }
+    .cartao li{ font-size:14px; padding:10px 0; }
+    .cartao .btn-primary{ font-size:13px; padding:14px 20px; }
+    .beneficios{ padding:50px 0 20px; }
+    .beneficios-grid{ grid-template-columns:1fr; gap:30px; }
+    .beneficio-num{ font-size:26px; margin-bottom:10px; }
+    .beneficio h3{ font-size:16px; }
+    .beneficio p{ font-size:14px; }
+  }
 </style>
 </head>
 <body>
@@ -68,52 +117,49 @@
   </div>
 </nav>
 
-<section class="produto-hero">
-  <div class="grain"></div>
-  <div class="produto-grid">
-    <div>
-      <div class="produto-eyebrow">Diário Digital</div>
-      <h1 class="produto-title">Um espaço só seu para escrever</h1>
-      <p class="produto-desc">Frases motivacionais, stickers, área de rabisco livre e um sistema de recompensas que te incentiva a criar o hábito de escrever sobre a sua vida.</p>
+<section class="venda">
+  <div class="venda-recorte"></div>
+  <div class="container">
+    <div class="venda-grid">
+      <div>
+        <span class="venda-eyebrow">Diário Digital</span>
+        <h1>Um espaço só seu para escrever</h1>
+        <p class="venda-desc">Frases motivacionais, stickers, área de rabisco livre e um sistema de recompensas que te incentiva a criar o hábito de escrever sobre a sua vida.</p>
+      </div>
+      <div class="cartao">
+        <div class="cartao-preco">R$ 0,00</div>
+        <ul>
+          <li>Diário digital personalizável</li>
+          <li>Cartela de stickers para usar nas páginas</li>
+          <li>Área de desenhos para criadoras</li>
+          <li>Recompensas a cada 5 páginas escritas</li>
+          <li>Modo privado ou público para compartilhar</li>
+        </ul>
+        <button class="btn-primary" id="btnComprar">Quero meu diário</button>
+        <p class="cartao-status" id="statusCompra"></p>
+      </div>
     </div>
-    <div class="produto-card">
-      <div class="produto-price"><small>R$ 79,90</small>R$ 0,00 <span style="font-size:14px; font-weight:600; font-family:'Montserrat',sans-serif; color:#5a5a48;">(demonstração)</span></div>
-      <ul>
-        <li>Diário digital personalizável</li>
-        <li>Cartela de stickers para usar nas páginas</li>
-        <li>Área de rabisco com canetas e cores</li>
-        <li>Recompensas a cada 5 páginas escritas</li>
-        <li>Modo privado ou público para compartilhar</li>
-      </ul>
-      <button class="btn-primary" id="btnComprar" style="width:100%; text-align:center;">Quero meu diário</button>
-      <p class="produto-status" id="statusCompra"></p>
-    </div>
-  </div>
-  <div class="torn-edge">
-    <svg viewBox="0 0 1440 90" preserveAspectRatio="none">
-      <path fill="#F6F0E9" d="M0,55 L40,20 L95,48 L150,10 L210,50 L270,15 L330,52 L390,8 L455,46 L510,18
-        L575,54 L630,12 L695,50 L750,20 L815,58 L870,14 L935,48 L995,22 L1060,55 L1115,10
-        L1180,50 L1240,16 L1300,52 L1360,18 L1440,46 L1440,90 L0,90 Z"/>
-    </svg>
   </div>
 </section>
 
 <section class="beneficios">
-  <div class="beneficios-grid">
-    <div class="beneficio">
-      <div class="beneficio-num">01</div>
-      <h3>Escreva no seu ritmo</h3>
-      <p>Sem pressão, sem regras rígidas — o diário se adapta ao seu momento e ao seu jeito de contar sua história.</p>
-    </div>
-    <div class="beneficio">
-      <div class="beneficio-num">02</div>
-      <h3>Desbloqueie recompensas</h3>
-      <p>A cada 5 páginas escritas, uma nova recompensa é liberada: aulas exclusivas, conteúdos e experiências.</p>
-    </div>
-    <div class="beneficio">
-      <div class="beneficio-num">03</div>
-      <h3>Faça parte da comunidade</h3>
-      <p>Torne suas reflexões públicas se quiser e troque vivências com outras mulheres da comunidade Palpitamente.</p>
+  <div class="container">
+    <div class="beneficios-grid">
+      <div class="beneficio">
+        <span class="beneficio-num">01</span>
+        <h3>Escreva no seu ritmo</h3>
+        <p>Sem pressão, sem regras rígidas, o diário se adapta ao seu momento e ao seu jeito de contar sua história.</p>
+      </div>
+      <div class="beneficio">
+        <span class="beneficio-num">02</span>
+        <h3>Desbloqueie recompensas</h3>
+        <p>A cada 5 páginas escritas, uma nova recompensa é liberada.</p>
+      </div>
+      <div class="beneficio">
+        <span class="beneficio-num">03</span>
+        <h3>Faça parte da comunidade</h3>
+        <p>Torne suas reflexões públicas se quiser e troque vivências com outras mulheres da comunidade Palpitamente.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -166,40 +212,33 @@
   (async () => {
     const user = await getUsuarioLogado();
     if (user) {
-      document.getElementById('navEntrar').textContent = 'Minha conta';
-      document.getElementById('navEntrar').href = 'diario.html';
+      const link = document.getElementById('navEntrar');
+      link.childNodes[0].nodeValue = 'Minha conta';
+      link.href = 'diario.html';
     }
   })();
 
   document.getElementById('btnComprar').addEventListener('click', async () => {
     const status = document.getElementById('statusCompra');
     const user = await getUsuarioLogado();
-
     if (!user) {
       status.textContent = 'Você precisa entrar ou criar uma conta primeiro.';
-      status.className = 'produto-status error';
+      status.className = 'cartao-status erro';
       setTimeout(() => window.location.href = 'login.html', 1400);
       return;
     }
-
     status.textContent = 'Liberando seu diário...';
-    status.className = 'produto-status';
-
-    const { error } = await supabaseClient
-      .from('profiles')
-      .update({ has_diary: true })
-      .eq('id', user.id);
-
+    status.className = 'cartao-status';
+    const { error } = await supabaseClient.from('profiles').update({ has_diary: true }).eq('id', user.id);
     if (error) {
       status.textContent = 'Algo deu errado, tenta de novo.';
-      status.className = 'produto-status error';
+      status.className = 'cartao-status erro';
       return;
     }
     status.textContent = 'Prontinho! Redirecionando para o seu diário...';
-    status.className = 'produto-status ok';
+    status.className = 'cartao-status ok';
     setTimeout(() => window.location.href = 'diario.html', 1000);
   });
 </script>
-
 </body>
 </html>
