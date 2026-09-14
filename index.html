@@ -10,141 +10,140 @@
 <link rel="stylesheet" href="assets/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  /* Grade oficial do HOME.pdf: 1920 x 4471 (1rem = 16px a 1920) */
+  /* ============================================================
+     Grade do HOME.pdf — 1920 de tela, conteúdo em 1536px
+     1rem = 16px a 1920. Contêiner padrão: 96rem (1536px).
+     ============================================================ */
   html{ font-size:clamp(8px, 0.8333vw, 18px); }
+  .container{ width:96rem; max-width:calc(100% - 4rem); margin:0 auto; }
 
-  /* ---------- HEADER (486px) ---------- */
-  .navbar{ height:30.375rem; padding:7.75rem 12rem 0 13.375rem; align-items:flex-start; }
+  /* ---------------- HEADER ---------------- */
+  .navbar{ height:30.375rem; padding:7.75rem 0 0; align-items:flex-start; }
+  .navbar .container{ display:flex; align-items:flex-start; justify-content:space-between; gap:2rem; }
   .logo{ height:3.125rem; }
-  .nav-links{ gap:3.5rem; margin-top:0.2rem; }
-  .nav-links li a{ font-size:1.5rem; padding-bottom:1.4rem; }
-  .nav-links li a .marca-ativa{ bottom:0.4rem; width:108%; }
-  .nav-social{ gap:1.05rem; margin-top:0.25rem; }
-  .nav-social img{ width:auto; }
-  .nav-social .ic-instagram{ height:1.5rem; }
-  .nav-social .ic-youtube{ height:1.2rem; }
-  .nav-social .ic-tiktok{ height:1.5rem; }
-  .nav-social .ic-spotify{ height:1.5rem; }
-  .nav-social .ic-soundcloud{ height:1.1rem; }
+  .nav-links{ gap:3.4rem; margin-top:0.35rem; }
+  .nav-links li a{ font-size:1.65rem; padding-bottom:1.4rem; }
+  .nav-links li a .marca-ativa{ bottom:0.35rem; width:110%; }
+  /* ícones sociais: mesma caixa para todos */
+  .nav-social{ gap:1.15rem; margin-top:0.4rem; }
+  .nav-social a{ width:2.1rem; height:2.1rem; display:flex; align-items:center; justify-content:center; }
+  .nav-social a.ic-wide{ width:2.9rem; }
+  .nav-social img{ max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; }
 
-  /* ---------- CARROSSEL (slide 843px + pontos) ---------- */
-  .carrossel{ position:relative; margin-top:-30.375rem; padding-top:30.375rem; }
-  .slide{ display:none; position:relative; height:52.7rem; }
-  .slide.ativo{ display:block; }
+  /* ---------------- CARROSSEL ---------------- */
+  .carrossel{ position:relative; margin-top:-30.375rem; padding-top:30.375rem; overflow:hidden; }
+  .slides{ position:relative; height:59rem; }
+  .slide{
+    position:absolute; inset:0;
+    opacity:0; visibility:hidden;
+    transition:opacity .9s ease;
+  }
+  .slide.ativo{ opacity:1; visibility:visible; }
   .slide-recorte{
     position:absolute; inset:0;
     background-size:100% 100%; background-repeat:no-repeat; z-index:0;
   }
   .slide-podcast .slide-recorte{ background-image:url('assets/partes/podcast-fundo-verde.png'); }
   .slide-diario  .slide-recorte{ background-image:url('assets/partes/diario-titulo-amarelo.png'); }
+  .slide .container{ position:relative; z-index:2; height:100%; }
 
-  /* slide 1 */
+  /* --- slide 1 --- */
   .podcast-foto{
-    position:absolute; z-index:2; left:7.5rem; top:12rem; width:31rem;
-    transform:rotate(-2.5deg); box-shadow:0.4rem 0.6rem 1rem rgba(0,0,0,0.2);
+    position:absolute; left:0; top:11.5rem; width:48.5rem;
+    transform:rotate(-2deg); box-shadow:0.4rem 0.6rem 1rem rgba(0,0,0,0.18);
+    overflow:hidden;
   }
   .podcast-foto-inner{
-    aspect-ratio:31/15.5; position:relative; overflow:hidden;
-    background:linear-gradient(#BEE2F4 0%, #D9EEF8 62%, #EAF6D8 62%, #EAF6D8 100%);
+    aspect-ratio:774/355; position:relative; overflow:hidden; isolation:isolate;
+    background:linear-gradient(#BEE2F4 0%, #DBEFF8 60%, #E9F5D7 60%, #E9F5D7 100%);
   }
   .podcast-foto .nuvem{ position:absolute; background:#fff; border-radius:5rem; }
   .podcast-foto .morro{ position:absolute; border-radius:50%; }
-  .podcast-copy{ position:absolute; z-index:2; left:47.25rem; top:16.5rem; width:34rem; }
-  .podcast-seta{ position:absolute; top:-7.3rem; left:-2.5rem; width:12.5rem; }
+  .podcast-copy{ position:absolute; left:61.75rem; top:12.2rem; width:34rem; }
+  .podcast-seta{ position:absolute; top:-9.6rem; left:-3rem; width:19.9rem; }
   .podcast-titulo{
-    font-family:var(--font-title); font-size:2.35rem; line-height:1.32;
+    font-family:var(--font-title); font-size:4.25rem; line-height:1.02;
     color:#fff; text-transform:uppercase;
   }
-  .grifo-reais{ position:relative; display:inline-block; padding:0 0.55rem; color:var(--tinta); }
+  .grifo-reais{ position:relative; display:inline-block; padding:0 0.6rem; color:var(--tinta); }
   .grifo-reais::before{
-    content:""; position:absolute; inset:0.1rem -0.2rem -0.15rem;
+    content:""; position:absolute; inset:0.2rem -0.25rem -0.05rem;
     background-image:url('assets/partes/podcast-destaque-reais.png');
     background-size:100% 100%; background-repeat:no-repeat; z-index:-1;
   }
-  .podcast-sub{ margin-top:1.4rem; font-size:1.3rem; line-height:1.5; color:#F1F2E4; }
-  .podcast-cta{ margin-top:2.6rem; display:flex; align-items:center; gap:0.9rem; }
+  .podcast-sub{ margin-top:1.7rem; font-size:1.6rem; line-height:1.5; color:#F2F3E5; }
+  .podcast-cta{ margin-top:3.2rem; display:flex; align-items:center; gap:1.1rem; }
   .play-circulo{
-    width:3.3rem; height:3.3rem; border-radius:50%; background:var(--amarelo);
+    width:3.9rem; height:3.9rem; border-radius:50%; background:var(--amarelo);
     display:flex; align-items:center; justify-content:center;
     border:none; cursor:pointer; flex-shrink:0; transition:transform .15s ease;
   }
   .play-circulo:hover{ transform:scale(1.06); }
-  .play-circulo svg{ width:1.1rem; height:1.1rem; margin-left:0.2rem; fill:#fff; }
-  .btn-play{ font-size:1.15rem; padding:0.95rem 1.9rem; }
+  .play-circulo svg{ width:1.25rem; height:1.25rem; margin-left:0.2rem; fill:#fff; }
+  .btn-play{ font-size:1.5rem; padding:1.15rem 2.4rem; }
 
-  /* slide 2 */
-  .diario-copy{ position:absolute; z-index:2; left:7.5rem; top:11.5rem; width:32rem; }
+  /* --- slide 2 --- */
+  .diario-copy{ position:absolute; left:0; top:11.5rem; width:46rem; }
   .diario-eyebrow{
-    font-family:var(--font-title); font-size:1.75rem; color:#fff;
+    font-family:var(--font-title); font-size:2.35rem; color:#fff;
     letter-spacing:0.03em; text-transform:uppercase;
   }
   .diario-badge{
     position:relative; display:flex; align-items:center; justify-content:center;
-    width:20.5rem; height:4.6rem; margin-top:0.5rem;
-    font-family:var(--font-title); font-size:1.9rem;
+    width:27rem; height:5.6rem; margin-top:0.7rem;
+    font-family:var(--font-title); font-size:2.5rem;
     color:var(--verde-escuro); letter-spacing:0.03em; text-transform:uppercase;
-    padding-bottom:0.2rem;
+    padding-bottom:0.25rem;
   }
   .diario-badge::before{
     content:""; position:absolute; inset:0;
     background-image:url('assets/partes/diario-fundo-azul.png');
     background-size:100% 100%; background-repeat:no-repeat; z-index:-1;
   }
-  .diario-lead{ margin-top:1.7rem; font-size:1.15rem; font-weight:700; line-height:1.5; color:#fff; max-width:22rem; }
-  .diario-texto{ margin-top:0.8rem; font-size:1.1rem; line-height:1.55; color:#EDF2F6; max-width:22rem; }
-  .diario-frase{ margin-top:1.1rem; font-size:1.1rem; font-style:italic; font-weight:700; color:#fff; }
-  .diario-cta{ margin-top:1.6rem; font-size:1.05rem; padding:0.9rem 1.8rem; }
-  .colagem{ position:absolute; z-index:2; right:6rem; top:6rem; width:47rem; height:33rem; }
+  .diario-lead{ margin-top:2.2rem; font-size:1.55rem; font-weight:700; line-height:1.5; color:#fff; max-width:26rem; }
+  .diario-texto{ margin-top:1rem; font-size:1.5rem; line-height:1.55; color:#EDF2F6; max-width:27rem; }
+  .diario-frase{ margin-top:1.4rem; font-size:1.5rem; font-style:italic; font-weight:700; color:#fff; }
+  .diario-cta{ margin-top:1.9rem; font-size:1.4rem; padding:1.05rem 2.1rem; }
+  .colagem{ position:absolute; right:0; top:6.5rem; width:52rem; height:42rem; }
   .colagem img{ position:absolute; }
-  .colagem .papel-1{ width:30%; left:10%; top:36%; }
-  .colagem .papel-2{ width:26%; right:20%; top:52%; }
-  .colagem .rabisco{ width:33%; right:0;  top:44%; }
-  .colagem .notebook{ width:56%; left:18%; top:30%; }
-  .colagem .olho{ width:34%; right:14%; top:2%; }
+  .colagem .papel-1{ width:26%; left:8%;  top:36%; }
+  .colagem .papel-2{ width:22%; right:20%; top:52%; }
+  .colagem .rabisco{ width:30%; right:0;  top:42%; }
+  .colagem .notebook{ width:54%; left:16%; top:30%; }
+  .colagem .olho{ width:32%; right:12%; top:2%; }
 
-  /* pontos, no creme abaixo do recorte */
-  .carrossel-pontos{
-    display:flex; justify-content:center; gap:1rem;
-    padding:1.6rem 0 0;
-  }
+  .carrossel-pontos{ display:flex; justify-content:center; gap:1.1rem; padding:1.8rem 0 0; }
   .ponto{
-    width:2.5rem; height:2.5rem; border-radius:50%; cursor:pointer;
+    width:2.4rem; height:2.4rem; border-radius:50%; cursor:pointer;
     background:transparent; border:0.18rem solid var(--verde-escuro);
-    transition:background .2s ease;
+    transition:background .3s ease;
   }
   .ponto.ativo{ background:var(--verde-escuro); }
 
-  /* ---------- ÚLTIMOS PALPITES ---------- */
-  .palpites{ padding:15.5rem 11.75rem 0 12.375rem; }
-  .palpites-topo{
-    display:flex; align-items:flex-end; justify-content:space-between;
-    margin-bottom:7.25rem;
-  }
+  /* ---------------- ÚLTIMOS PALPITES ---------------- */
+  .palpites{ padding:15.5rem 0 0; }
+  .palpites-topo{ display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:7rem; }
   .palpites-titulo{
-    font-family:var(--font-title); font-size:3.4rem;
-    color:var(--tinta); text-transform:uppercase; letter-spacing:0.01em;
+    font-family:var(--font-title); font-size:4.1rem;
+    color:var(--tinta); text-transform:uppercase;
   }
-  .palpites-titulo .grifado{ position:relative; display:inline-block; padding:0 0.5rem; }
+  .palpites-titulo .grifado{ position:relative; display:inline-block; padding:0 0.55rem; }
   .palpites-titulo .grifado::before{
-    content:""; position:absolute; inset:0.3rem -0.4rem -0.3rem;
+    content:""; position:absolute; inset:0.35rem -0.35rem -0.15rem;
     background-image:url('assets/partes/ultimos-palpites-grifado.png');
     background-size:100% 100%; background-repeat:no-repeat; z-index:-1;
   }
   .palpites-link{
-    font-size:1.3rem; font-weight:700; color:var(--tinta);
-    text-transform:uppercase; letter-spacing:0.02em;
-    border-bottom:0.15rem solid var(--tinta); padding-bottom:0.2rem;
+    font-size:1.55rem; font-weight:700; color:var(--tinta);
+    text-transform:uppercase; letter-spacing:0.01em;
+    border-bottom:0.16rem solid var(--tinta); padding-bottom:0.25rem;
   }
   .palpites-lista{ display:grid; grid-template-columns:repeat(3,1fr); gap:3rem; }
-  .palpite-capa{
-    display:block; width:100%; aspect-ratio:480/224;
-    background:var(--amarelo); border-radius:0.9rem;
-  }
+  .palpite-capa{ display:block; width:100%; aspect-ratio:480/224; background:var(--amarelo); border-radius:0.9rem; }
   .palpite-tag{
-    position:relative; display:inline-block; margin-top:1.6rem;
-    padding:0.45rem 0.9rem 0.55rem;
-    font-family:var(--font-title); font-size:1.35rem;
-    color:var(--tinta); letter-spacing:0.02em;
+    position:relative; display:inline-block; margin-top:1.7rem;
+    padding:0.5rem 1rem 0.6rem;
+    font-family:var(--font-title); font-size:1.6rem; color:var(--tinta);
   }
   .palpite-tag::before{
     content:""; position:absolute; inset:0;
@@ -153,25 +152,21 @@
   .palpite-tag.t1::before{ background-image:url('assets/partes/numero-01-grifado.png'); }
   .palpite-tag.t2::before{ background-image:url('assets/partes/numero-01-grifado.png'); transform:scaleX(-1); }
   .palpite-tag.t3::before{ background-image:url('assets/partes/numero-03-grifado.png'); }
-  .palpite-rodape{
-    display:flex; align-items:center; justify-content:space-between;
-    margin-top:2.9rem;
-  }
-  .palpite-duracao{ display:flex; align-items:center; gap:0.6rem; font-size:1.2rem; color:var(--tinta); }
-  .palpite-duracao svg{ width:1.3rem; height:1.3rem; stroke:var(--tinta); fill:none; stroke-width:1.6; }
+  .palpite-rodape{ display:flex; align-items:center; justify-content:space-between; margin-top:2.9rem; }
+  .palpite-duracao{ display:flex; align-items:center; gap:0.65rem; font-size:1.4rem; color:var(--tinta); }
+  .palpite-duracao svg{ width:1.6rem; height:1.6rem; stroke:var(--tinta); fill:none; stroke-width:1.7; }
   .palpite-play{
-    width:2.3rem; height:2.3rem; border-radius:50%; background:var(--amarelo);
+    width:2.6rem; height:2.6rem; border-radius:50%; background:var(--amarelo);
     display:flex; align-items:center; justify-content:center; border:none; cursor:pointer;
     transition:transform .15s ease;
   }
   .palpite-play:hover{ transform:scale(1.08); }
-  .palpite-play svg{ width:0.75rem; height:0.75rem; fill:#fff; margin-left:0.12rem; }
+  .palpite-play svg{ width:0.85rem; height:0.85rem; fill:#fff; margin-left:0.12rem; }
 
-  /* ---------- PARA VER, LER E PENSAR (recorte rosa) ---------- */
+  /* ---------------- PARA VER, LER E PENSAR ---------------- */
   .verler{
-    position:relative; height:63rem;
+    position:relative; height:63rem; margin-top:20rem;
     display:flex; align-items:center; justify-content:center;
-    margin-top:20rem;
   }
   .verler-recorte{
     position:absolute; inset:0;
@@ -180,156 +175,169 @@
   }
   .verler-conteudo{ position:relative; z-index:2; text-align:center; width:100%; }
   .verler-titulo{
-    font-family:var(--font-title); font-size:4.1rem; line-height:1.1;
+    font-family:var(--font-title); font-size:5.25rem; line-height:1.05;
     color:#fff; text-transform:uppercase;
   }
-  .verler-titulo .grifado{ position:relative; display:inline-block; padding:0 0.55rem; }
+  .verler-titulo .grifado{ position:relative; display:inline-block; padding:0 0.6rem; }
   .verler-titulo .grifado::before{
-    content:""; position:absolute; inset:0.25rem -0.3rem -0.25rem;
+    content:""; position:absolute; inset:0.4rem -0.3rem 0rem;
     background-image:url('assets/partes/ver-ler-pensar-fundo-grifado.png');
     background-size:100% 100%; background-repeat:no-repeat; z-index:-1;
   }
   .verler-sub{
-    margin-top:2.2rem; font-size:1.55rem; line-height:1.55;
-    color:#FBF4F0; max-width:38rem; margin-inline:auto;
+    margin-top:2.4rem; font-size:2rem; line-height:1.5;
+    color:#FBF3EF; max-width:57rem; margin-inline:auto;
   }
-  .verler-btn{ margin-top:5.5rem; font-size:1.25rem; padding:1.15rem 2.4rem; }
+  .verler-btn{ margin-top:5rem; font-size:1.5rem; padding:1.3rem 2.8rem; }
   .verler-livro, .verler-camera{ position:absolute; z-index:2; }
-  .verler-livro{ left:5rem; top:44%; width:21rem; }
-  .verler-camera{ right:5rem; top:47%; width:19rem; }
+  .verler-livro{ left:3rem; top:42%; width:23rem; }
+  .verler-camera{ right:3rem; top:45%; width:21rem; }
 
-  /* ---------- MOBILE ---------- */
+  /* ---------------- MOBILE ---------------- */
   @media (max-width:900px){
     html{ font-size:16px; }
-    .navbar{ height:auto; padding:26px 22px 18px; flex-wrap:wrap; justify-content:center; gap:16px; }
+    .container{ width:100%; max-width:none; padding:0 22px; }
+    .navbar{ height:auto; padding:26px 0 18px; }
+    .navbar .container{ flex-wrap:wrap; justify-content:center; gap:16px; }
     .logo{ height:26px; }
     .nav-links{ order:3; width:100%; justify-content:center; flex-wrap:wrap; gap:18px; margin-top:0; }
     .nav-links li a{ font-size:14px; padding-bottom:14px; }
     .nav-links li a .marca-ativa{ bottom:4px; }
     .nav-social{ gap:14px; margin-top:0; }
-    .nav-social .ic-instagram,.nav-social .ic-tiktok,.nav-social .ic-spotify{ height:20px; }
-    .nav-social .ic-youtube{ height:15px; }
-    .nav-social .ic-soundcloud{ height:13px; }
+    .nav-social a{ width:24px; height:24px; }
+    .nav-social a.ic-wide{ width:32px; }
 
     .carrossel{ margin-top:0; padding-top:0; }
-    .slide{ height:auto; padding:70px 22px 90px; }
+    .slides{ height:auto; overflow:hidden; }
+    .slide{ position:relative; inset:auto; display:none; opacity:1; visibility:visible; }
+    .slide.ativo{ display:block; }
     .slide-podcast .slide-recorte{ background-size:250% 100%; background-position:center; }
     .slide-diario  .slide-recorte{ background-size:280% 100%; background-position:center; }
-    .podcast-foto{ position:relative; left:auto; top:auto; width:100%; margin-bottom:30px; }
+    .slide .container{ padding:70px 22px 90px; height:auto; overflow:hidden; }
+    .podcast-foto{ position:relative; left:auto; top:auto; width:95%; margin:0 auto 28px; overflow:hidden; transform:rotate(-1.5deg); }
     .podcast-copy{ position:relative; left:auto; top:auto; width:100%; }
     .podcast-seta{ display:none; }
-    .podcast-titulo{ font-size:clamp(22px,5.8vw,30px); line-height:1.3; }
-    .podcast-sub{ font-size:14.5px; }
-    .btn-play{ font-size:13px; padding:13px 24px; }
+    .podcast-titulo{ font-size:clamp(26px,6.6vw,34px); line-height:1.1; }
+    .podcast-sub{ font-size:15px; margin-top:14px; }
+    .podcast-cta{ margin-top:24px; }
     .play-circulo{ width:42px; height:42px; }
     .play-circulo svg{ width:14px; height:14px; }
+    .btn-play{ font-size:13px; padding:13px 24px; }
     .diario-copy{ position:relative; left:auto; top:auto; width:100%; }
-    .diario-eyebrow{ font-size:19px; }
-    .diario-badge{ width:215px; height:48px; font-size:19px; }
-    .diario-lead,.diario-texto,.diario-frase{ font-size:14px; max-width:46ch; }
+    .diario-eyebrow{ font-size:20px; }
+    .diario-badge{ width:225px; height:50px; font-size:20px; }
+    .diario-lead,.diario-texto,.diario-frase{ font-size:14.5px; max-width:46ch; }
     .diario-cta{ font-size:13px; padding:13px 24px; }
-    .colagem{ position:relative; right:auto; top:auto; width:100%; height:auto; aspect-ratio:1/0.72; margin-top:26px; }
+    .colagem{ position:relative; right:auto; top:auto; width:100%; height:auto; aspect-ratio:1/0.74; margin-top:24px; }
     .carrossel-pontos{ padding:16px 0 0; gap:10px; }
-    .ponto{ width:14px; height:14px; border-width:2px; }
+    .ponto{ width:13px; height:13px; border-width:2px; }
 
-    .palpites{ padding:60px 22px 0; }
-    .palpites-topo{ flex-direction:column; align-items:flex-start; gap:16px; margin-bottom:36px; }
-    .palpites-titulo{ font-size:clamp(24px,6.6vw,32px); }
+    .palpites{ padding:60px 0 0; }
+    .palpites-topo{ flex-direction:column; align-items:flex-start; gap:14px; margin-bottom:34px; }
+    .palpites-titulo{ font-size:clamp(26px,7vw,34px); }
     .palpites-link{ font-size:12.5px; }
     .palpites-lista{ grid-template-columns:1fr; gap:34px; }
-    .palpite-tag{ margin-top:12px; font-size:14px; }
+    .palpite-tag{ margin-top:12px; font-size:15px; }
     .palpite-rodape{ margin-top:18px; }
-    .palpite-duracao{ font-size:13px; }
-    .palpite-duracao svg{ width:15px; height:15px; }
-    .palpite-play{ width:26px; height:26px; }
+    .palpite-duracao{ font-size:13.5px; }
+    .palpite-duracao svg{ width:16px; height:16px; }
+    .palpite-play{ width:28px; height:28px; }
     .palpite-play svg{ width:9px; height:9px; }
 
     .verler{ height:auto; padding:80px 22px 90px; margin-top:60px; }
     .verler-recorte{ background-size:260% 100%; background-position:center; }
-    .verler-titulo{ font-size:clamp(26px,7vw,36px); }
-    .verler-sub{ font-size:14.5px; margin-top:16px; }
+    .verler-titulo{ font-size:clamp(28px,7.4vw,38px); }
+    .verler-sub{ font-size:15px; margin-top:16px; }
     .verler-btn{ margin-top:30px; font-size:13px; padding:13px 24px; }
-    .verler-livro{ position:relative; left:auto; top:auto; width:120px; margin:30px auto 0; }
-    .verler-camera{ position:relative; right:auto; top:auto; width:110px; margin:18px auto 0; }
+    .verler-livro{ position:relative; left:auto; top:auto; width:130px; margin:28px auto 0; }
+    .verler-camera{ position:relative; right:auto; top:auto; width:120px; margin:16px auto 0; }
   }
 </style>
 </head>
 <body>
 
 <nav class="navbar">
-  <a href="index.html"><img src="assets/partes/header-logo-colorido.png" alt="Palpitamente" class="logo"></a>
-  <ul class="nav-links">
-    <li><a href="index.html" class="active">Início
-      <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
-    <li><a href="sobre.html">Sobre nós
-      <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
-    <li><a href="produtos.html">Diário Digital
-      <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
-    <li><a href="#contato">Contato
-      <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
-    <li><a href="login.html" id="navEntrar">Entrar
-      <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
-  </ul>
-  <div class="nav-social">
-    <a href="#" aria-label="Instagram"><img src="assets/partes/header-instagram-colorido.png" alt="Instagram" class="ic-instagram"></a>
-    <a href="#" aria-label="YouTube"><img src="assets/partes/header-youtube-colorido.png" alt="YouTube" class="ic-youtube"></a>
-    <a href="#" aria-label="TikTok"><img src="assets/partes/header-tiktok-colorido.png" alt="TikTok" class="ic-tiktok"></a>
-    <a href="#" aria-label="Spotify"><img src="assets/partes/header-spotify-colorido.png" alt="Spotify" class="ic-spotify"></a>
-    <a href="#" aria-label="SoundCloud"><img src="assets/partes/header-soundcloud-colorido.png" alt="SoundCloud" class="ic-soundcloud"></a>
+  <div class="container">
+    <a href="index.html"><img src="assets/partes/header-logo-colorido.png" alt="Palpitamente" class="logo"></a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Início
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+      <li><a href="sobre.html">Sobre nós
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+      <li><a href="produtos.html">Diário Digital
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+      <li><a href="#contato">Contato
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+      <li><a href="login.html" id="navEntrar">Entrar
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+    </ul>
+    <div class="nav-social">
+      <a href="#" aria-label="Instagram"><img src="assets/partes/header-instagram-colorido.png" alt="Instagram"></a>
+      <a href="#" aria-label="YouTube"><img src="assets/partes/header-youtube-colorido.png" alt="YouTube"></a>
+      <a href="#" aria-label="TikTok"><img src="assets/partes/header-tiktok-colorido.png" alt="TikTok"></a>
+      <a href="#" aria-label="Spotify"><img src="assets/partes/header-spotify-colorido.png" alt="Spotify"></a>
+      <a href="#" class="ic-wide" aria-label="SoundCloud"><img src="assets/partes/header-soundcloud-colorido.png" alt="SoundCloud"></a>
+    </div>
   </div>
 </nav>
 
 <!-- ============ CARROSSEL ============ -->
 <section id="inicio" class="carrossel">
+  <div class="slides">
 
-  <div class="slide slide-podcast ativo" data-slide="0">
-    <div class="slide-recorte"></div>
-    <div class="podcast-foto">
-      <div class="podcast-foto-inner">
-        <div class="nuvem" style="width:13%; height:11%; top:22%; left:12%;"></div>
-        <div class="nuvem" style="width:19%; height:15%; top:15%; left:36%;"></div>
-        <div class="nuvem" style="width:9%;  height:8%;  top:23%; left:78%;"></div>
-        <div class="morro" style="width:54%; height:34%; bottom:-9%; left:-10%; background:#89B33F;"></div>
-        <div class="morro" style="width:62%; height:25%; bottom:-10%; left:22%; background:#AFD26A;"></div>
-        <div class="morro" style="width:46%; height:32%; bottom:-8%; right:-8%; background:#7CA836;"></div>
+    <div class="slide slide-podcast ativo" data-slide="0">
+      <div class="slide-recorte"></div>
+      <div class="container">
+        <div class="podcast-foto">
+          <div class="podcast-foto-inner">
+            <div class="nuvem" style="width:12%; height:12%; top:24%; left:11%;"></div>
+            <div class="nuvem" style="width:17%; height:16%; top:16%; left:33%;"></div>
+            <div class="nuvem" style="width:8%;  height:9%;  top:25%; left:72%;"></div>
+            <div class="morro" style="width:50%; height:36%; bottom:-10%; left:0; transform:translateX(-16%); background:#8BB446;"></div>
+            <div class="morro" style="width:58%; height:26%; bottom:-11%; left:20%; background:#AFD26A;"></div>
+            <div class="morro" style="width:44%; height:34%; bottom:-9%; right:0; transform:translateX(14%); background:#7CA836;"></div>
+          </div>
+        </div>
+        <div class="podcast-copy">
+          <img src="assets/partes/podcast-seta.png" alt="" class="podcast-seta">
+          <h1 class="podcast-titulo">
+            Conversas <span class="grifo-reais">reais</span><br>
+            sobre tudo o que<br>
+            passa pela nossa cabeça
+          </h1>
+          <p class="podcast-sub">Um podcast para quem pensa demais,<br>mas não pensa sozinha.</p>
+          <div class="podcast-cta">
+            <button class="play-circulo" id="btnPlay" aria-label="Tocar episódio">
+              <svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg>
+            </button>
+            <button class="btn-play" id="btnPlayLabel">DÁ O PLAY</button>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="podcast-copy">
-      <img src="assets/partes/podcast-seta.png" alt="" class="podcast-seta">
-      <h1 class="podcast-titulo">
-        Conversas <span class="grifo-reais">reais</span><br>
-        sobre tudo o que<br>
-        passa pela nossa cabeça
-      </h1>
-      <p class="podcast-sub">Um podcast para quem pensa demais,<br>mas não pensa sozinha.</p>
-      <div class="podcast-cta">
-        <button class="play-circulo" id="btnPlay" aria-label="Tocar episódio">
-          <svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg>
-        </button>
-        <button class="btn-play" id="btnPlayLabel">DÁ O PLAY</button>
+
+    <div class="slide slide-diario" data-slide="1">
+      <div class="slide-recorte"></div>
+      <div class="container">
+        <div class="diario-copy">
+          <span class="diario-eyebrow">Conheça o</span>
+          <div><span class="diario-badge">Diário Digital</span></div>
+          <p class="diario-lead">Um espaço para escrever, se conhecer e criar novos hábitos.</p>
+          <p class="diario-texto">Escreva sobre seus dias, acompanhe sua evolução e transforme pequenos momentos de reflexão em uma jornada só sua.</p>
+          <p class="diario-frase">A sua história também importa.</p>
+          <a href="produtos.html" class="btn-primary diario-cta">CONHEÇA O DIÁRIO</a>
+        </div>
+        <div class="colagem">
+          <img src="assets/partes/diario-recorte-papel-01.png" alt="" class="papel-1">
+          <img src="assets/partes/diario-recorte-papel-02.png" alt="" class="papel-2">
+          <img src="assets/partes/diario-rabisco.png" alt="" class="rabisco">
+          <img src="assets/partes/diario-notebook.png" alt="" class="notebook">
+          <img src="assets/partes/diario-olho.png" alt="" class="olho">
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="slide slide-diario" data-slide="1">
-    <div class="slide-recorte"></div>
-    <div class="diario-copy">
-      <span class="diario-eyebrow">Conheça o</span>
-      <div><span class="diario-badge">Diário Digital</span></div>
-      <p class="diario-lead">Um espaço para escrever, se conhecer e criar novos hábitos.</p>
-      <p class="diario-texto">Escreva sobre seus dias, acompanhe sua evolução e transforme pequenos momentos de reflexão em uma jornada só sua.</p>
-      <p class="diario-frase">A sua história também importa.</p>
-      <a href="produtos.html" class="btn-primary diario-cta">CONHEÇA O DIÁRIO</a>
-    </div>
-    <div class="colagem">
-      <img src="assets/partes/diario-recorte-papel-01.png" alt="" class="papel-1">
-      <img src="assets/partes/diario-recorte-papel-02.png" alt="" class="papel-2">
-      <img src="assets/partes/diario-rabisco.png" alt="" class="rabisco">
-      <img src="assets/partes/diario-notebook.png" alt="" class="notebook">
-      <img src="assets/partes/diario-olho.png" alt="" class="olho">
-    </div>
   </div>
-
   <div class="carrossel-pontos">
     <button class="ponto ativo" data-ir="0" aria-label="Slide 1"></button>
     <button class="ponto" data-ir="1" aria-label="Slide 2"></button>
@@ -338,44 +346,37 @@
 
 <!-- ============ ÚLTIMOS PALPITES ============ -->
 <section id="palpites" class="palpites">
-  <div class="palpites-topo">
-    <h2 class="palpites-titulo">Últimos <span class="grifado">Palpites</span></h2>
-    <a href="#" class="palpites-link">Ver todos os episódios</a>
-  </div>
-  <div class="palpites-lista">
-    <article class="palpite">
-      <a href="#" class="palpite-capa" aria-label="Episódio 01"></a>
-      <span class="palpite-tag t1">#01</span>
-      <div class="palpite-rodape">
-        <span class="palpite-duracao">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-          30 Min
-        </span>
-        <button class="palpite-play" aria-label="Tocar episódio 01"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg></button>
-      </div>
-    </article>
-    <article class="palpite">
-      <a href="#" class="palpite-capa" aria-label="Episódio 02"></a>
-      <span class="palpite-tag t2">#02</span>
-      <div class="palpite-rodape">
-        <span class="palpite-duracao">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-          30 Min
-        </span>
-        <button class="palpite-play" aria-label="Tocar episódio 02"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg></button>
-      </div>
-    </article>
-    <article class="palpite">
-      <a href="#" class="palpite-capa" aria-label="Episódio 03"></a>
-      <span class="palpite-tag t3">#03</span>
-      <div class="palpite-rodape">
-        <span class="palpite-duracao">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-          30 Min
-        </span>
-        <button class="palpite-play" aria-label="Tocar episódio 03"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg></button>
-      </div>
-    </article>
+  <div class="container">
+    <div class="palpites-topo">
+      <h2 class="palpites-titulo">Últimos <span class="grifado">Palpites</span></h2>
+      <a href="#" class="palpites-link">Ver todos os episódios</a>
+    </div>
+    <div class="palpites-lista">
+      <article class="palpite">
+        <a href="#" class="palpite-capa" aria-label="Episódio 01"></a>
+        <span class="palpite-tag t1">#01</span>
+        <div class="palpite-rodape">
+          <span class="palpite-duracao"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> 30 Min</span>
+          <button class="palpite-play" aria-label="Tocar episódio 01"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg></button>
+        </div>
+      </article>
+      <article class="palpite">
+        <a href="#" class="palpite-capa" aria-label="Episódio 02"></a>
+        <span class="palpite-tag t2">#02</span>
+        <div class="palpite-rodape">
+          <span class="palpite-duracao"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> 30 Min</span>
+          <button class="palpite-play" aria-label="Tocar episódio 02"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg></button>
+        </div>
+      </article>
+      <article class="palpite">
+        <a href="#" class="palpite-capa" aria-label="Episódio 03"></a>
+        <span class="palpite-tag t3">#03</span>
+        <div class="palpite-rodape">
+          <span class="palpite-duracao"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> 30 Min</span>
+          <button class="palpite-play" aria-label="Tocar episódio 03"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg></button>
+        </div>
+      </article>
+    </div>
   </div>
 </section>
 
@@ -393,48 +394,51 @@
 
 <!-- ============ RODAPÉ ============ -->
 <footer id="contato">
-  <div class="footer-grid">
-    <div class="footer-col">
-      <img src="assets/partes/footer-logo-branco.png" alt="Palpitamente" class="footer-logo">
-    </div>
-    <div class="footer-col">
-      <h4>Navegação</h4>
-      <ul>
-        <li><a href="index.html">Início</a></li>
-        <li><a href="sobre.html">Sobre nós</a></li>
-        <li><a href="produtos.html">Diário digital</a></li>
-        <li><a href="tel:+5511957895463">(11) 95789-5463</a></li>
-        <li><a href="mailto:contato@palpitamente.com">contato@palpitamente.com</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Siga-Nos</h4>
-      <div class="footer-social">
-        <a href="#" aria-label="Instagram"><img src="assets/partes/footer-instagram-branco.png" alt="Instagram" class="ic-instagram"></a>
-        <a href="#" aria-label="YouTube"><img src="assets/partes/footer-youtube-branco.png" alt="YouTube" class="ic-youtube"></a>
-        <a href="#" aria-label="TikTok"><img src="assets/partes/footer-tiktok-branco.png" alt="TikTok" class="ic-tiktok"></a>
-        <a href="#" aria-label="Spotify"><img src="assets/partes/footer-spotify-branco.png" alt="Spotify" class="ic-spotify"></a>
-        <a href="#" aria-label="SoundCloud"><img src="assets/partes/footer-soundcloud-branco.png" alt="SoundCloud" class="ic-soundcloud"></a>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <img src="assets/partes/footer-logo-branco.png" alt="Palpitamente" class="footer-logo">
       </div>
-      <ul><li><a href="#">@palpitamente</a></li></ul>
-    </div>
-    <div class="footer-col">
-      <h4>Formas de Pagamento</h4>
-      <div class="footer-pagamento">
-        <div class="pagamento-linha"><img src="assets/partes/pag-boleto.png" alt=""> Boleto</div>
-        <div class="pagamento-linha"><img src="assets/partes/pag-pix.png" alt=""> PIX</div>
-        <div class="pagamento-linha"><img src="assets/partes/pag-cartao.png" alt=""> Cartão</div>
+      <div class="footer-col">
+        <h4>Navegação</h4>
+        <ul>
+          <li><a href="index.html">Início</a></li>
+          <li><a href="sobre.html">Sobre nós</a></li>
+          <li><a href="produtos.html">Diário digital</a></li>
+          <li><a href="tel:+5511957895463">(11) 95789-5463</a></li>
+          <li><a href="mailto:contato@palpitamente.com">contato@palpitamente.com</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Siga-Nos</h4>
+        <div class="footer-social">
+          <a href="#" aria-label="Instagram"><img src="assets/partes/footer-instagram-branco.png" alt="Instagram"></a>
+          <a href="#" aria-label="YouTube"><img src="assets/partes/footer-youtube-branco.png" alt="YouTube"></a>
+          <a href="#" aria-label="TikTok"><img src="assets/partes/footer-tiktok-branco.png" alt="TikTok"></a>
+          <a href="#" aria-label="Spotify"><img src="assets/partes/footer-spotify-branco.png" alt="Spotify"></a>
+          <a href="#" class="ic-wide" aria-label="SoundCloud"><img src="assets/partes/footer-soundcloud-branco.png" alt="SoundCloud"></a>
+        </div>
+        <ul><li><a href="#">@palpitamente</a></li></ul>
+      </div>
+      <div class="footer-col">
+        <h4>Formas de Pagamento</h4>
+        <div class="footer-pagamento">
+          <div class="pagamento-linha"><img src="assets/partes/pag-boleto.png" alt=""> Boleto</div>
+          <div class="pagamento-linha"><img src="assets/partes/pag-pix.png" alt=""> PIX</div>
+          <div class="pagamento-linha"><img src="assets/partes/pag-cartao.png" alt=""> Cartão</div>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="footer-bottom">
-    <span>© 2024 Palpitamente. Todos os direitos reservados.</span>
-    <span><a href="#">Política de Privacidade</a><a href="#">Termos de Uso</a></span>
+    <div class="footer-bottom">
+      <span>© 2024 Palpitamente. Todos os direitos reservados.</span>
+      <span><a href="#">Política de Privacidade</a><a href="#">Termos de Uso</a></span>
+    </div>
   </div>
 </footer>
 
 <script src="assets/supabase-client.js"></script>
 <script>
+  // carrossel infinito: roda sozinho, sem precisar clicar
   const slides = document.querySelectorAll('.slide');
   const pontos = document.querySelectorAll('.ponto');
   let atual = 0, timer;
@@ -443,12 +447,9 @@
     slides.forEach((s,n) => s.classList.toggle('ativo', n === atual));
     pontos.forEach((p,n) => p.classList.toggle('ativo', n === atual));
   }
-  function reiniciarTimer(){
-    clearInterval(timer);
-    timer = setInterval(() => mostrar(atual + 1), 8000);
-  }
-  pontos.forEach(p => p.addEventListener('click', () => { mostrar(Number(p.dataset.ir)); reiniciarTimer(); }));
-  reiniciarTimer();
+  function iniciar(){ clearInterval(timer); timer = setInterval(() => mostrar(atual + 1), 7000); }
+  pontos.forEach(p => p.addEventListener('click', () => { mostrar(Number(p.dataset.ir)); iniciar(); }));
+  iniciar();
 
   let tocando = false;
   const btnPlay = document.getElementById('btnPlay');

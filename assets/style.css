@@ -17,6 +17,8 @@
 
 *{ box-sizing:border-box; margin:0; padding:0; }
 html{ scroll-behavior:smooth; }
+html{ overflow-x:hidden; }
+html, body{ max-width:100%; }
 body{
   font-family:var(--font-body);
   color:var(--tinta);
@@ -86,13 +88,13 @@ footer{
   position:relative;
   background:var(--verde-escuro);
   color:#EFE8D8;
-  padding:12rem 12rem 2rem;
+  padding:12rem 0 2.5rem;
   margin-top:24rem;
 }
 /* recorte de papel verde texturizado, asset oficial */
 footer::before{
   content:"";
-  position:absolute; left:0; right:0; top:0; height:9rem;
+  position:absolute; left:0; right:0; top:0; height:11rem;
   background-image:url('partes/footer-fundo.png');
   background-size:100% 100%; background-repeat:no-repeat;
   transform:translateY(-72%);
@@ -103,33 +105,29 @@ footer::before{
   display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:3rem;
   align-items:start; padding-bottom:3rem;
 }
-.footer-logo{ height:2.9rem; width:auto; }
+.footer-logo{ height:3.4rem; width:auto; }
 .footer-col h4{
   font-family:var(--font-body);
-  font-size:1.25rem; font-weight:700; margin-bottom:1.5rem; color:#fff;
+  font-size:1.4rem; font-weight:700; margin-bottom:1.5rem; color:#fff;
 }
 .footer-col ul li{ margin-bottom:0.85rem; }
 .footer-col ul li a, .footer-col ul li{
-  font-size:1.3rem; font-weight:400; color:#D9D7C4; transition:color .2s ease;
+  font-size:1.45rem; font-weight:400; color:#D9D7C4; transition:color .2s ease;
 }
 .footer-col ul li a:hover{ color:var(--amarelo); }
-.footer-social{ display:flex; align-items:center; gap:1.1rem; margin-bottom:1.3rem; }
-.footer-social a{ display:flex; align-items:center; }
-/* tamanhos proporcionais por ícone, não a mesma largura para todos */
-.footer-social img{ width:auto; }
-.footer-social .ic-instagram{ height:1.55rem; }
-.footer-social .ic-youtube{ height:1.25rem; }
-.footer-social .ic-tiktok{ height:1.55rem; }
-.footer-social .ic-spotify{ height:1.55rem; }
-.footer-social .ic-soundcloud{ height:1.05rem; }
+/* ícones sociais: mesma caixa para todos */
+.footer-social{ display:flex; align-items:center; gap:1.15rem; margin-bottom:1.4rem; }
+.footer-social a{ width:2.1rem; height:2.1rem; display:flex; align-items:center; justify-content:center; }
+.footer-social a.ic-wide{ width:2.9rem; }
+.footer-social img{ max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; }
 .footer-pagamento{ display:flex; flex-direction:column; }
-.pagamento-linha{ display:flex; align-items:center; gap:1rem; margin-bottom:0.9rem; font-size:1.3rem; color:#D9D7C4; }
+.pagamento-linha{ display:flex; align-items:center; gap:1rem; margin-bottom:0.95rem; font-size:1.45rem; color:#D9D7C4; }
 .pagamento-linha img{ width:2.2rem; height:auto; flex-shrink:0; }
 .footer-bottom{
   max-width:none; margin:0 auto; position:relative; z-index:2;
   border-top:1px solid rgba(255,255,255,0.22); padding-top:1.5rem;
   display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.6rem;
-  font-size:1.15rem; color:#C6C4B0;
+  font-size:1.3rem; color:#C6C4B0;
 }
 .footer-bottom a:hover{ color:#fff; }
 .footer-bottom span a{ margin-left:1rem; }
@@ -140,15 +138,14 @@ footer::before{
   .logo{ height:26px; }
   .nav-links{ order:3; width:100%; justify-content:center; flex-wrap:wrap; gap:18px; }
   .nav-links li a{ font-size:14px; padding-bottom:14px; }
-  footer{ padding:70px 22px 26px; margin-top:50px; }
+  footer{ padding:70px 0 26px; margin-top:50px; }
   footer::before{ height:46px; transform:translateY(-90%); }
   .footer-grid{ grid-template-columns:1fr 1fr; gap:32px; padding-bottom:36px; }
   .footer-logo{ height:26px; }
   .footer-col h4{ font-size:13px; margin-bottom:14px; }
   .footer-col ul li a, .footer-col ul li{ font-size:14px; }
-  .footer-social .ic-instagram,.footer-social .ic-tiktok,.footer-social .ic-spotify{ height:18px; }
-  .footer-social .ic-youtube{ height:14px; }
-  .footer-social .ic-soundcloud{ height:12px; }
+  .footer-social a{ width:22px; height:22px; }
+  .footer-social a.ic-wide{ width:30px; }
   .pagamento-linha{ font-size:14px; }
   .pagamento-linha img{ width:24px; }
   .footer-bottom{ font-size:12px; flex-direction:column; }
