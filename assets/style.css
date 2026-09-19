@@ -19,7 +19,7 @@
 /* O design do Canva tem 1920 de largura; o site roda em 1440.
    1rem = 12px  ->  1920 x 0.75 = 1440. */
 html{ scroll-behavior:smooth; font-size:clamp(7px, 0.8333vw, 12px); overflow-x:hidden; }
-.container{ width:96rem; max-width:calc(100% - 4rem); margin:0 auto; }
+.container{ width:88rem; max-width:calc(100% - 4rem); margin:0 auto; }   /* 1056px a 1440 */
 html{ overflow-x:hidden; }
 html, body{ max-width:100%; }
 body{
