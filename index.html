@@ -38,17 +38,21 @@
 
   /* --- slide 1 --- */
   .podcast-foto{
-    position:absolute; left:0; top:9rem; width:44rem;
-    transform:rotate(-2deg); box-shadow:0.4rem 0.6rem 1rem rgba(0,0,0,0.18);
-    overflow:hidden;
+    position:absolute; left:0; top:6.5rem; width:47rem;
+    transform:rotate(-1.5deg);
+    /* moldura de papel em volta da foto */
+    padding:1.1rem;
+    background-color:#F4EEE6; background-image:url('assets/partes/fundo-pagina-creme.png');
+    background-size:31.25rem 31.25rem; background-repeat:repeat;
+    box-shadow:0.4rem 0.6rem 1.2rem rgba(0,0,0,0.20);
   }
   .podcast-foto-inner{
     aspect-ratio:774/355; position:relative; overflow:hidden; isolation:isolate;
     background:linear-gradient(#BEE2F4 0%, #DBEFF8 60%, #E9F5D7 60%, #E9F5D7 100%);
   }
   .podcast-foto-inner img{ width:100%; height:100%; object-fit:cover; display:block; }
-  .podcast-copy{ position:absolute; left:56rem; top:9.5rem; width:34rem; }
-  .podcast-seta{ position:absolute; top:-9.6rem; left:-3rem; width:19.9rem; }
+  .podcast-copy{ position:absolute; left:50rem; top:10rem; width:38rem; }
+  .podcast-seta{ position:absolute; top:-8.4rem; left:-4rem; width:18rem; }
   .podcast-titulo{
     font-family:var(--font-title); font-size:4.25rem; line-height:1.02;
     color:#fff; text-transform:uppercase;
@@ -71,7 +75,7 @@
   .btn-play{ font-size:1.5rem; padding:1.15rem 2.4rem; }
 
   /* --- slide 2 --- */
-  .diario-copy{ position:absolute; left:0; top:9rem; width:44rem; }
+  .diario-copy{ position:absolute; left:0; top:8rem; width:37rem; }
   .diario-eyebrow{
     font-family:var(--font-title); font-size:2.35rem; color:#fff;
     letter-spacing:0.03em; text-transform:uppercase;
@@ -92,7 +96,7 @@
   .diario-texto{ margin-top:1rem; font-size:1.5rem; line-height:1.55; color:#EDF2F6; max-width:27rem; }
   .diario-frase{ margin-top:1.4rem; font-size:1.5rem; font-style:italic; font-weight:700; color:#fff; }
   .diario-cta{ margin-top:1.9rem; font-size:1.4rem; padding:1.05rem 2.1rem; }
-  .colagem{ position:absolute; right:0; top:5rem; width:46rem; height:37rem; }
+  .colagem{ position:absolute; right:-2rem; top:1.5rem; width:53rem; height:46rem; }
   .colagem img{ position:absolute; }
   .colagem .papel-1{ width:26%; left:8%;  top:36%; }
   .colagem .papel-2{ width:22%; right:20%; top:52%; }
@@ -167,9 +171,9 @@
     font-family:var(--font-title); font-size:5.25rem; line-height:1.05;
     color:#fff; text-transform:uppercase;
   }
-  .verler-titulo .grifado{ position:relative; display:inline-block; padding:0 0.6rem; }
+  .verler-titulo .grifado{ position:relative; display:inline-block; padding:0 1.1rem; }
   .verler-titulo .grifado::before{
-    content:""; position:absolute; inset:0.4rem -0.3rem 0rem;
+    content:""; position:absolute; inset:-0.5rem -0.4rem -0.8rem;
     background-image:url('assets/partes/ver-ler-pensar-fundo-grifado.png');
     background-size:100% 100%; background-repeat:no-repeat; z-index:-1;
   }
@@ -178,9 +182,6 @@
     color:#FBF3EF; max-width:57rem; margin-inline:auto;
   }
   .verler-btn{ margin-top:3.6rem; font-size:1.5rem; padding:1.3rem 2.8rem; }
-  .verler-livro, .verler-camera{ position:absolute; z-index:2; }
-  .verler-livro{ left:3rem; top:44%; width:17rem; }
-  .verler-camera{ right:3rem; top:47%; width:15.5rem; }
 
   /* ---------------- MOBILE ---------------- */
   @media (max-width:900px){
@@ -227,8 +228,6 @@
     .verler-titulo{ font-size:clamp(28px,7.4vw,38px); }
     .verler-sub{ font-size:15px; margin-top:16px; }
     .verler-btn{ margin-top:30px; font-size:13px; padding:13px 24px; }
-    .verler-livro{ position:relative; left:auto; top:auto; width:130px; margin:28px auto 0; }
-    .verler-camera{ position:relative; right:auto; top:auto; width:120px; margin:16px auto 0; }
   }
 </style>
 </head>
@@ -356,8 +355,6 @@
 <!-- ============ PARA VER, LER E PENSAR ============ -->
 <section id="verler" class="verler">
   <div class="verler-recorte"></div>
-  <img src="assets/partes/ver-ler-pensar-livro.png" alt="" class="verler-livro">
-  <img src="assets/partes/ver-ler-pensar-camera.png" alt="" class="verler-camera">
   <div class="verler-conteudo">
     <h2 class="verler-titulo">Para ver, ler e <span class="grifado">pensar</span></h2>
     <p class="verler-sub">Livros, filmes e outras indicações que fazem parte das nossas conversas e também da nossa vida.</p>
