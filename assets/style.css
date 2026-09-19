@@ -44,9 +44,13 @@ section, footer, nav, main{ position:relative; }
 /* ============ HEADER ============ */
 .navbar{
   position:relative; z-index:60;
-  padding:5rem 0 0;
+  height:24rem;                 /* altura padrao do cabecalho em todas as paginas */
+  padding:6rem 0 0;
   background:transparent;
 }
+/* paginas internas nao tem o carrossel encaixado sob o cabecalho,
+   entao o bloco seguinte comeca logo abaixo do menu */
+.navbar.compacto{ height:auto; padding-bottom:1rem; }
 .navbar .container{
   display:flex; align-items:flex-start; justify-content:space-between; gap:2rem;
 }
@@ -97,8 +101,8 @@ footer{
   position:relative;
   background:var(--verde-escuro);
   color:#EFE8D8;
-  padding:10rem 0 2.5rem;
-  margin-top:14rem;
+  padding:8rem 0 2.2rem;
+  margin-top:8rem;
 }
 /* recorte de papel verde texturizado, asset oficial */
 footer::before{

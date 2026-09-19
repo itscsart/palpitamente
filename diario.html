@@ -9,12 +9,14 @@
 <link rel="stylesheet" href="assets/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  .app-nav{ background:var(--verde-escuro); color:#fff; }
-  .app-nav .logo-white{ height:26px; }
-  .app-nav .nav-links li a{ color:#e8e6d8; }
-  .app-nav .nav-links li a.active{ color:#fff; }
-  .app-nav .sair{ font-size:13px; font-weight:700; color:#e8e6d8; background:rgba(255,255,255,0.12); padding:9px 18px; border-radius:20px; border:none; cursor:pointer; }
-  .app-nav .sair:hover{ background:rgba(255,255,255,0.22); }
+  .sair{
+    font-family:var(--font-body); font-size:1.15rem; font-weight:700;
+    color:#fff; background:var(--verde-escuro);
+    padding:0.7rem 1.5rem; border-radius:2rem; border:none; cursor:pointer;
+    margin-left:0.8rem; white-space:nowrap;
+    transition:background .2s ease;
+  }
+  .sair:hover{ background:#4b4d2e; }
 
   main{ max-width:1100px; margin:0 auto; padding:44px 6vw 100px; }
 
@@ -94,15 +96,29 @@
 </head>
 <body>
 
-<nav class="navbar app-nav">
-  <a href="diario.html"><img src="assets/logo-branco.png" alt="Palpitamente" class="logo logo-white"></a>
-  <ul class="nav-links">
-    <li><a href="diario.html" class="active">Meu diário</a></li>
-    <li><a href="index.html">Site</a></li>
-  </ul>
-  <div class="nav-right">
-    <span class="nav-user" id="saudacao" style="color:#fff;"></span>
-    <button class="sair" onclick="logout()">Sair</button>
+<nav class="navbar compacto">
+  <div class="container">
+    <a href="index.html"><img src="assets/partes/header-logo-colorido.png" alt="Palpitamente" class="logo"></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Início
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+      <li><a href="sobre.html">Sobre nós
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+      <li><a href="produtos.html">Diário Digital
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+      <li><a href="index.html#contato">Contato
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+      <li><a href="diario.html" class="active">Meu diário
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+    </ul>
+    <div class="nav-social">
+      <a href="#" aria-label="Instagram"><img src="assets/partes/header-instagram-colorido.png" alt="Instagram"></a>
+      <a href="#" aria-label="YouTube"><img src="assets/partes/header-youtube-colorido.png" alt="YouTube"></a>
+      <a href="#" aria-label="TikTok"><img src="assets/partes/header-tiktok-colorido.png" alt="TikTok"></a>
+      <a href="#" aria-label="Spotify"><img src="assets/partes/header-spotify-colorido.png" alt="Spotify"></a>
+      <a href="#" class="ic-wide" aria-label="SoundCloud"><img src="assets/partes/header-soundcloud-colorido.png" alt="SoundCloud"></a>
+      <button class="sair" onclick="logout()">Sair</button>
+    </div>
   </div>
 </nav>
 
@@ -188,7 +204,6 @@
       return;
     }
 
-    document.getElementById('saudacao').textContent = perfil.nome ? `Olá, ${perfil.nome.split(' ')[0]}` : '';
     document.getElementById('fraseMotivacional').textContent = FRASES[Math.floor(Math.random()*FRASES.length)];
     atualizarProgresso();
     montarStickers();

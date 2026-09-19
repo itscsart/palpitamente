@@ -17,22 +17,11 @@
   /* O design do Canva tem 1920 de largura, mas o site roda em 1440.
      1rem = 12px  ->  1920 x 0.75 = 1440. Acima de 1440 o conteúdo
      para de crescer e fica centralizado; abaixo, reduz junto. */
-  /* ---------------- HEADER ---------------- */
-  .navbar{ height:24rem; padding:6rem 0 0; align-items:flex-start; }
-  .navbar .container{ display:flex; align-items:flex-start; justify-content:space-between; gap:2rem; }
-  .logo{ height:3.125rem; }
-  .nav-links{ gap:3.4rem; margin-top:0.35rem; }
-  .nav-links li a{ font-size:1.65rem; padding-bottom:1.4rem; }
-  .nav-links li a .marca-ativa{ bottom:0.35rem; width:110%; }
   /* ícones sociais: mesma caixa para todos */
-  .nav-social{ gap:1.15rem; margin-top:0.4rem; }
-  .nav-social a{ width:2.1rem; height:2.1rem; display:flex; align-items:center; justify-content:center; }
-  .nav-social a.ic-wide{ width:2.9rem; }
-  .nav-social img{ max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; }
 
   /* ---------------- CARROSSEL ---------------- */
   .carrossel{ position:relative; margin-top:-24rem; padding-top:24rem; overflow:hidden; }
-  .slides{ position:relative; height:54rem; }
+  .slides{ position:relative; height:50rem; }
   .slide{
     position:absolute; inset:0;
     opacity:0; visibility:hidden;
@@ -57,8 +46,7 @@
     aspect-ratio:774/355; position:relative; overflow:hidden; isolation:isolate;
     background:linear-gradient(#BEE2F4 0%, #DBEFF8 60%, #E9F5D7 60%, #E9F5D7 100%);
   }
-  .podcast-foto .nuvem{ position:absolute; background:#fff; border-radius:5rem; }
-  .podcast-foto .morro{ position:absolute; border-radius:50%; }
+  .podcast-foto-inner img{ width:100%; height:100%; object-fit:cover; display:block; }
   .podcast-copy{ position:absolute; left:56rem; top:9.5rem; width:34rem; }
   .podcast-seta{ position:absolute; top:-9.6rem; left:-3rem; width:19.9rem; }
   .podcast-titulo{
@@ -112,7 +100,7 @@
   .colagem .notebook{ width:54%; left:16%; top:30%; }
   .colagem .olho{ width:32%; right:12%; top:2%; }
 
-  .carrossel-pontos{ display:flex; justify-content:center; gap:1.1rem; padding:1.8rem 0 0; }
+  .carrossel-pontos{ display:flex; justify-content:center; gap:1.1rem; padding:1.5rem 0 0; }
   .ponto{
     width:2.4rem; height:2.4rem; border-radius:50%; cursor:pointer;
     background:transparent; border:0.18rem solid var(--verde-escuro);
@@ -121,8 +109,8 @@
   .ponto.ativo{ background:var(--verde-escuro); }
 
   /* ---------------- ÚLTIMOS PALPITES ---------------- */
-  .palpites{ padding:12rem 0 0; }
-  .palpites-topo{ display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:5rem; }
+  .palpites{ padding:7rem 0 0; }
+  .palpites-topo{ display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:4rem; }
   .palpites-titulo{
     font-family:var(--font-title); font-size:4.1rem;
     color:var(--tinta); text-transform:uppercase;
@@ -165,7 +153,7 @@
 
   /* ---------------- PARA VER, LER E PENSAR ---------------- */
   .verler{
-    position:relative; height:54rem; margin-top:14rem;
+    position:relative; height:48rem; margin-top:9rem;
     display:flex; align-items:center; justify-content:center;
   }
   .verler-recorte{
@@ -197,15 +185,6 @@
   @media (max-width:900px){
     html{ font-size:16px; }
     .container{ width:100%; max-width:none; padding:0 22px; }
-    .navbar{ height:auto; padding:26px 0 18px; }
-    .navbar .container{ flex-wrap:wrap; justify-content:center; gap:16px; }
-    .logo{ height:26px; }
-    .nav-links{ order:3; width:100%; justify-content:center; flex-wrap:wrap; gap:18px; margin-top:0; }
-    .nav-links li a{ font-size:14px; padding-bottom:14px; }
-    .nav-links li a .marca-ativa{ bottom:4px; }
-    .nav-social{ gap:14px; margin-top:0; }
-    .nav-social a{ width:24px; height:24px; }
-    .nav-social a.ic-wide{ width:32px; }
 
     .carrossel{ margin-top:0; padding-top:0; }
     .slides{ height:auto; overflow:hidden; }
@@ -290,12 +269,8 @@
       <div class="container">
         <div class="podcast-foto">
           <div class="podcast-foto-inner">
-            <div class="nuvem" style="width:12%; height:12%; top:24%; left:11%;"></div>
-            <div class="nuvem" style="width:17%; height:16%; top:16%; left:33%;"></div>
-            <div class="nuvem" style="width:8%;  height:9%;  top:25%; left:72%;"></div>
-            <div class="morro" style="width:50%; height:36%; bottom:-10%; left:0; transform:translateX(-16%); background:#8BB446;"></div>
-            <div class="morro" style="width:58%; height:26%; bottom:-11%; left:20%; background:#AFD26A;"></div>
-            <div class="morro" style="width:44%; height:34%; bottom:-9%; right:0; transform:translateX(14%); background:#7CA836;"></div>
+            <img src="assets/partes/podcast-foto.jpg" alt="As cinco integrantes do Palpitamente" onerror="this.style.display='none'">
+          </div>
           </div>
         </div>
         <div class="podcast-copy">
