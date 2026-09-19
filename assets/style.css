@@ -44,13 +44,19 @@ section, footer, nav, main{ position:relative; }
 /* ============ HEADER ============ */
 .navbar{
   position:relative; z-index:60;
-  height:24rem;                 /* altura padrao do cabecalho em todas as paginas */
-  padding:6rem 0 0;
+  padding:5rem 0 0;
   background:transparent;
 }
-/* paginas internas nao tem o carrossel encaixado sob o cabecalho,
-   entao o bloco seguinte comeca logo abaixo do menu */
-.navbar.compacto{ height:auto; padding-bottom:1rem; }
+/* faixas de cor: bordas retas, textura de papel dentro */
+.faixa{ position:relative; }
+.faixa::before{
+  content:""; position:absolute; inset:0; z-index:0;
+  background-repeat:repeat; background-size:31.25rem 31.25rem;
+}
+.faixa > *{ position:relative; z-index:1; }
+.faixa-verde::before{ background-color:#86964D; background-image:url('partes/faixa-verde-claro.png'); }
+.faixa-azul::before{  background-color:#5D85A6; background-image:url('partes/faixa-azul.png'); }
+.faixa-rosa::before{  background-color:#CA8F82; background-image:url('partes/faixa-rosa.png'); }
 .navbar .container{
   display:flex; align-items:flex-start; justify-content:space-between; gap:2rem;
 }
@@ -99,20 +105,14 @@ section, footer, nav, main{ position:relative; }
 /* ============ RODAPÉ ============ */
 footer{
   position:relative;
-  background:var(--verde-escuro);
+  background-color:#4C4F28;
+  background-image:url('partes/faixa-verde-escuro.png');
+  background-repeat:repeat; background-size:31.25rem 31.25rem;
   color:#EFE8D8;
-  padding:8rem 0 2.2rem;
-  margin-top:8rem;
+  padding:4.3rem 0 1.3rem;
+  margin-top:7.5rem;
 }
 /* recorte de papel verde texturizado, asset oficial */
-footer::before{
-  content:"";
-  position:absolute; left:0; right:0; top:0; height:11rem;
-  background-image:url('partes/footer-fundo.png');
-  background-size:100% 100%; background-repeat:no-repeat;
-  transform:translateY(-72%);
-  pointer-events:none; z-index:1;
-}
 .footer-grid{
   max-width:none; margin:0 auto; position:relative; z-index:2;
   display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:3rem;
@@ -157,19 +157,7 @@ footer::before{
   .nav-social a{ width:24px; height:24px; }
   .nav-social a.ic-wide{ width:32px; }
   footer{ padding:70px 0 26px; margin-top:50px; }
-  footer::before{ height:46px; transform:translateY(-90%); }
-  .footer-grid{ grid-template-columns:1fr 1fr; gap:32px; padding-bottom:36px; }
-  .footer-logo{ height:26px; }
-  .footer-col h4{ font-size:13px; margin-bottom:14px; }
-  .footer-col ul li a, .footer-col ul li{ font-size:14px; }
-  .footer-social a{ width:22px; height:22px; }
-  .footer-social a.ic-wide{ width:30px; }
-  .pagamento-linha{ font-size:14px; }
-  .pagamento-linha img{ width:24px; }
-  .footer-bottom{ font-size:12px; flex-direction:column; }
-  .footer-bottom span a{ margin-left:0; margin-right:16px; }
-}
-@media (max-width:560px){ .footer-grid{ grid-template-columns:1fr; } }
+  @media (max-width:560px){ .footer-grid{ grid-template-columns:1fr; } }
 
 /* ============ COMPATIBILIDADE (páginas internas) ============ */
 .grain{ display:none; }

@@ -20,8 +20,8 @@
   /* ícones sociais: mesma caixa para todos */
 
   /* ---------------- CARROSSEL ---------------- */
-  .carrossel{ position:relative; margin-top:-24rem; padding-top:24rem; overflow:hidden; }
-  .slides{ position:relative; height:50rem; }
+  .carrossel{ position:relative; margin-top:11.4rem; overflow:hidden; }
+  .slides{ position:relative; height:50.17rem; }   /* 602px no design */
   .slide{
     position:absolute; inset:0;
     opacity:0; visibility:hidden;
@@ -29,11 +29,11 @@
   }
   .slide.ativo{ opacity:1; visibility:visible; }
   .slide-recorte{
-    position:absolute; inset:0;
-    background-size:100% 100%; background-repeat:no-repeat; z-index:0;
+    position:absolute; inset:0; z-index:0;
+    background-repeat:repeat; background-size:31.25rem 31.25rem;
   }
-  .slide-podcast .slide-recorte{ background-image:url('assets/partes/podcast-fundo-verde.png'); }
-  .slide-diario  .slide-recorte{ background-image:url('assets/partes/diario-titulo-amarelo.png'); }
+  .slide-podcast .slide-recorte{ background-color:#86964D; background-image:url('assets/partes/faixa-verde-claro.png'); }
+  .slide-diario  .slide-recorte{ background-color:#5D85A6; background-image:url('assets/partes/faixa-azul.png'); }
   .slide .container{ position:relative; z-index:2; height:100%; }
 
   /* --- slide 1 --- */
@@ -100,7 +100,7 @@
   .colagem .notebook{ width:54%; left:16%; top:30%; }
   .colagem .olho{ width:32%; right:12%; top:2%; }
 
-  .carrossel-pontos{ display:flex; justify-content:center; gap:1.1rem; padding:1.5rem 0 0; }
+  .carrossel-pontos{ display:flex; justify-content:center; gap:1.1rem; padding:1.6rem 0 0; }
   .ponto{
     width:2.4rem; height:2.4rem; border-radius:50%; cursor:pointer;
     background:transparent; border:0.18rem solid var(--verde-escuro);
@@ -109,7 +109,7 @@
   .ponto.ativo{ background:var(--verde-escuro); }
 
   /* ---------------- ÚLTIMOS PALPITES ---------------- */
-  .palpites{ padding:7rem 0 0; }
+  .palpites{ padding:13rem 0 0; }
   .palpites-topo{ display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:4rem; }
   .palpites-titulo{
     font-family:var(--font-title); font-size:4.1rem;
@@ -153,13 +153,14 @@
 
   /* ---------------- PARA VER, LER E PENSAR ---------------- */
   .verler{
-    position:relative; height:48rem; margin-top:9rem;
+    position:relative; height:42.17rem; margin-top:18rem;  /* 506px no design */
+    overflow:hidden;
     display:flex; align-items:center; justify-content:center;
   }
   .verler-recorte{
-    position:absolute; inset:0;
-    background-image:url('assets/partes/ver-ler-pensar-fundo.png');
-    background-size:100% 100%; background-repeat:no-repeat; z-index:0;
+    position:absolute; inset:0; z-index:0;
+    background-color:#CA8F82; background-image:url('assets/partes/faixa-rosa.png');
+    background-repeat:repeat; background-size:31.25rem 31.25rem;
   }
   .verler-conteudo{ position:relative; z-index:2; text-align:center; width:100%; }
   .verler-titulo{
@@ -178,20 +179,18 @@
   }
   .verler-btn{ margin-top:3.6rem; font-size:1.5rem; padding:1.3rem 2.8rem; }
   .verler-livro, .verler-camera{ position:absolute; z-index:2; }
-  .verler-livro{ left:3rem; top:40%; width:19rem; }
-  .verler-camera{ right:3rem; top:43%; width:17.5rem; }
+  .verler-livro{ left:3rem; top:44%; width:17rem; }
+  .verler-camera{ right:3rem; top:47%; width:15.5rem; }
 
   /* ---------------- MOBILE ---------------- */
   @media (max-width:900px){
     html{ font-size:16px; }
     .container{ width:100%; max-width:none; padding:0 22px; }
 
-    .carrossel{ margin-top:0; padding-top:0; }
+    .carrossel{ margin-top:0; }
     .slides{ height:auto; overflow:hidden; }
     .slide{ position:relative; inset:auto; display:none; opacity:1; visibility:visible; }
     .slide.ativo{ display:block; }
-    .slide-podcast .slide-recorte{ background-size:250% 100%; background-position:center; }
-    .slide-diario  .slide-recorte{ background-size:280% 100%; background-position:center; }
     .slide .container{ padding:70px 22px 90px; height:auto; overflow:hidden; }
     .podcast-foto{ position:relative; left:auto; top:auto; width:95%; margin:0 auto 28px; overflow:hidden; transform:rotate(-1.5deg); }
     .podcast-copy{ position:relative; left:auto; top:auto; width:100%; }
@@ -224,7 +223,7 @@
     .palpite-play svg{ width:9px; height:9px; }
 
     .verler{ height:auto; padding:80px 22px 90px; margin-top:60px; }
-    .verler-recorte{ background-size:260% 100%; background-position:center; }
+
     .verler-titulo{ font-size:clamp(28px,7.4vw,38px); }
     .verler-sub{ font-size:15px; margin-top:16px; }
     .verler-btn{ margin-top:30px; font-size:13px; padding:13px 24px; }
@@ -270,7 +269,6 @@
         <div class="podcast-foto">
           <div class="podcast-foto-inner">
             <img src="assets/partes/podcast-foto.jpg" alt="As cinco integrantes do Palpitamente" onerror="this.style.display='none'">
-          </div>
           </div>
         </div>
         <div class="podcast-copy">

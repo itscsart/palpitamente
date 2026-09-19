@@ -12,14 +12,14 @@
 <style>
   /* ---------- FAIXA VERDE DE ABERTURA ---------- */
   .capa{
-    position:relative; height:35rem;
+    position:relative; height:42.67rem;   /* 512px no design */
     display:flex; align-items:center; justify-content:center;
-    margin-top:2rem;
+    margin-top:7.6rem;
   }
   .capa-recorte{
-    position:absolute; inset:0;
-    background-image:url('assets/partes/podcast-fundo-verde.png');
-    background-size:100% 100%; background-repeat:no-repeat; z-index:0;
+    position:absolute; inset:0; z-index:0;
+    background-color:#4C4F28; background-image:url('assets/partes/faixa-verde-escuro.png');
+    background-repeat:repeat; background-size:31.25rem 31.25rem;
   }
   .capa-conteudo{ position:relative; z-index:2; text-align:center; padding:0 6rem; }
   .capa h1{
@@ -32,7 +32,7 @@
   }
 
   /* ---------- SOBRE NÓS ---------- */
-  .sobre{ padding:8rem 0 6rem; }
+  .sobre{ padding:10.8rem 0 10.8rem; }
   .sobre-titulo-wrap{ position:relative; display:inline-block; margin-bottom:3.5rem; }
   .sobre-titulo{
     position:relative; display:flex; align-items:center; justify-content:center;
@@ -69,13 +69,13 @@
 
   /* ---------- QUEM FAZ PARTE (faixa rosa) ---------- */
   .equipe{
-    position:relative; height:47rem; margin-top:4rem;
+    position:relative; height:43.33rem; margin-top:0;   /* 520px no design */
     display:flex; align-items:center; justify-content:center;
   }
   .equipe-recorte{
-    position:absolute; inset:0;
-    background-image:url('assets/partes/ver-ler-pensar-fundo.png');
-    background-size:100% 100%; background-repeat:no-repeat; z-index:0;
+    position:absolute; inset:0; z-index:0;
+    background-color:#CA8F82; background-image:url('assets/partes/faixa-rosa.png');
+    background-repeat:repeat; background-size:31.25rem 31.25rem;
   }
   .equipe-conteudo{ position:relative; z-index:2; width:100%; text-align:center; }
   .equipe h2{
@@ -96,8 +96,8 @@
   }
 
   @media (max-width:900px){
-    .capa{ height:auto; padding:70px 22px 80px; margin-top:10px; }
-    .capa-recorte{ background-size:250% 100%; background-position:center; }
+    .capa{ height:auto; padding:70px 22px 80px; margin-top:0; }
+
     .capa h1{ font-size:clamp(22px,5.6vw,30px); }
     .capa p{ font-size:14.5px; margin-top:14px; }
     .sobre{ padding:50px 0 40px; }
@@ -109,8 +109,8 @@
     .guia{ padding:22px 22px 18px; margin-top:0; }
     .guia h3{ font-size:12.5px; margin-bottom:12px; }
     .guia li{ font-size:14px; padding:11px 0; }
-    .equipe{ height:auto; padding:70px 22px 80px; margin-top:30px; }
-    .equipe-recorte{ background-size:260% 100%; background-position:center; }
+    .equipe{ height:auto; padding:70px 22px 80px; margin-top:0; }
+
     .equipe h2{ font-size:clamp(20px,5.6vw,28px); margin-bottom:30px; }
     .equipe-lista{ gap:22px; }
     .integrante .foto{ width:82px; height:82px; margin-bottom:10px; }
