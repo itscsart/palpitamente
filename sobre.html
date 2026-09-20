@@ -107,16 +107,16 @@
     .sobre-titulo-wrap{ margin-bottom:28px; }
     .sobre-detalhe{ right:-34px; width:24px; }
     .sobre-grid{ grid-template-columns:1fr; gap:32px; }
-    .sobre-texto p{ font-size:14.5px; margin-bottom:14px; }
+    .sobre-texto p{ font-size:15px; line-height:1.8; margin-bottom:15px; }
     .guia{ padding:22px 22px 18px; margin-top:0; }
-    .guia h3{ font-size:12.5px; margin-bottom:12px; }
-    .guia li{ font-size:14px; padding:11px 0; }
+    .guia h3{ font-size:13px; margin-bottom:12px; }
+    .guia li{ font-size:14.5px; padding:13px 0; }
     .equipe{ height:auto; padding:70px 22px 80px; margin-top:0; }
 
     .equipe h2{ font-size:clamp(20px,5.6vw,28px); margin-bottom:30px; }
     .equipe-lista{ gap:22px; }
     .integrante .foto{ width:82px; height:82px; margin-bottom:10px; }
-    .integrante span{ font-size:14px; }
+    .integrante span{ font-size:14.5px; }
   }
 </style>
 </head>
@@ -153,8 +153,8 @@
 <section class="capa">
   <div class="capa-recorte"></div>
   <div class="capa-conteudo">
-    <h1>Cinco mulheres, uma conversa, vários pontos</h1>
-    <p>Conheça a história por trás do Palpitamente e o que nos move todos os dias.</p>
+    <h1 data-config="sobre_capa_titulo">Cinco mulheres, uma conversa, vários pontos</h1>
+    <p data-config="sobre_capa_sub">Conheça a história por trás do Palpitamente e o que nos move todos os dias.</p>
   </div>
 </section>
 
@@ -166,19 +166,19 @@
     </div>
     <div class="sobre-grid">
       <div class="sobre-texto">
-        <p>O Palpitamente nasceu da amizade entre cinco mulheres, de idades e vivências diferentes, com uma vontade em comum, criar um espaço onde mulheres possam conversar sobre tudo aquilo que faz parte da vida.</p>
-        <p>Por aqui, falamos sobre saúde mental no dia a dia, carreira, relacionamentos, família, amizades, cultura pop, músicas, filmes, séries e tantos outros assuntos que passam pela nossa cabeça.</p>
-        <p>A ideia é simples: falar sobre a vida como ela é. Dos assuntos mais leves aos mais sérios, sempre com bom humor, troca, acolhimento e espaço para diferentes opiniões.</p>
-        <p>Mais do que um podcast, queremos construir uma comunidade onde toda mulher possa se identificar, participar e também dar o seu palpite.</p>
+        <p data-config="sobre_p1">O Palpitamente nasceu da amizade entre cinco mulheres, de idades e vivências diferentes, com uma vontade em comum, criar um espaço onde mulheres possam conversar sobre tudo aquilo que faz parte da vida.</p>
+        <p data-config="sobre_p2">Por aqui, falamos sobre saúde mental no dia a dia, carreira, relacionamentos, família, amizades, cultura pop, músicas, filmes, séries e tantos outros assuntos que passam pela nossa cabeça.</p>
+        <p data-config="sobre_p3">A ideia é simples: falar sobre a vida como ela é. Dos assuntos mais leves aos mais sérios, sempre com bom humor, troca, acolhimento e espaço para diferentes opiniões.</p>
+        <p data-config="sobre_p4">Mais do que um podcast, queremos construir uma comunidade onde toda mulher possa se identificar, participar e também dar o seu palpite.</p>
       </div>
       <div class="guia">
-        <h3>O que nos guia</h3>
+        <h3 data-config="guia_titulo">O que nos guia</h3>
         <ul>
-          <li>Conversas reais, sem filtro</li>
-          <li>Acolhimento acima de julgamento</li>
-          <li>Espaço para todas as opiniões</li>
-          <li>Comunidade antes de audiência</li>
-          <li>Saúde mental feminina no centro</li>
+          <li data-config="guia_1">Conversas reais, sem filtro</li>
+          <li data-config="guia_2">Acolhimento acima de julgamento</li>
+          <li data-config="guia_3">Espaço para todas as opiniões</li>
+          <li data-config="guia_4">Comunidade antes de audiência</li>
+          <li data-config="guia_5">Saúde mental feminina no centro</li>
         </ul>
       </div>
     </div>
@@ -188,27 +188,27 @@
 <section class="equipe">
   <div class="equipe-recorte"></div>
   <div class="equipe-conteudo">
-    <h2>Que faz parte do Palpitamente?</h2>
+    <h2 data-config="equipe_titulo">Que faz parte do Palpitamente?</h2>
     <div class="equipe-lista">
       <div class="integrante">
         <div class="foto"><img src="assets/partes/integrante-camila.jpg" alt="Camila" onerror="this.style.display='none'"></div>
-        <span>Camila</span>
+        <span data-config="nome_1">Camila</span>
       </div>
       <div class="integrante">
         <div class="foto"><img src="assets/partes/integrante-laura.jpg" alt="Laura" onerror="this.style.display='none'"></div>
-        <span>Laura</span>
+        <span data-config="nome_2">Laura</span>
       </div>
       <div class="integrante">
         <div class="foto"><img src="assets/partes/integrante-livia.jpg" alt="Livia" onerror="this.style.display='none'"></div>
-        <span>Livia</span>
+        <span data-config="nome_3">Livia</span>
       </div>
       <div class="integrante">
         <div class="foto"><img src="assets/partes/integrante-mara.jpg" alt="Mara" onerror="this.style.display='none'"></div>
-        <span>Mara</span>
+        <span data-config="nome_4">Mara</span>
       </div>
       <div class="integrante">
         <div class="foto"><img src="assets/partes/integrante-vitoria.jpg" alt="Vitória" onerror="this.style.display='none'"></div>
-        <span>Vitória</span>
+        <span data-config="nome_5">Vitória</span>
       </div>
     </div>
   </div>

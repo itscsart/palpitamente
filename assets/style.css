@@ -162,11 +162,24 @@ footer{
   .navbar .container{ flex-wrap:wrap; gap:16px; justify-content:center; align-items:center; }
   .logo{ height:26px; }
   .nav-links{ order:3; width:100%; justify-content:center; flex-wrap:wrap; gap:18px; margin-top:0; }
-  .nav-links li a{ font-size:14px; padding-bottom:14px; }
+  .nav-links li a{ font-size:15px; padding:9px 4px 14px; display:inline-block; }
   .nav-social{ gap:14px; margin-top:0; }
-  .nav-social a{ width:24px; height:24px; }
-  .nav-social a.ic-wide{ width:32px; }
+  /* o ícone continua do mesmo tamanho, mas a área clicável cresce:
+     abaixo de 36px o dedo erra o alvo */
+  .nav-social{ gap:6px; }
+  .nav-social a{ width:38px; height:38px; }
+  .nav-social a.ic-wide{ width:46px; }
+  .nav-social img{ max-width:24px; max-height:24px; }
+  .nav-social a.ic-wide img{ max-width:32px; }
   footer{ padding:70px 0 26px; margin-top:50px; }
+  .footer-col ul li{ margin-bottom:4px; }
+  .footer-col ul li a{ display:inline-block; padding:11px 0; }
+  .footer-social{ gap:8px; }
+  .footer-social a{ width:38px; height:38px; }
+  .footer-social a.ic-wide{ width:46px; }
+  .footer-social img{ max-width:22px; max-height:22px; }
+  .footer-bottom{ flex-direction:column; align-items:flex-start; gap:8px; }
+  .footer-bottom a{ display:inline-block; padding:5px 0; }
   @media (max-width:560px){ .footer-grid{ grid-template-columns:1fr; } }
 }
 
@@ -200,6 +213,29 @@ footer{
 .bt-painel:hover{ background:#B5766A; }
 @media (max-width:900px){ .bt-painel{ font-size:11px; padding:7px 12px; } }
 
+
+/* ============ TOQUE NO CELULAR ============ */
+@media (max-width:900px){
+  /* No celular a base rem cai para 7px, porque a escala acompanha a
+     largura da tela. Tudo que ficou em rem virava texto ilegível.
+     Abaixo, os casos que não tinham valor em px. */
+  .footer-col h4{ font-size:13px; letter-spacing:0.06em; }
+  .footer-col ul li a, .footer-col ul li{ font-size:14px; }
+  .footer-bottom, .footer-bottom span, .footer-bottom a{ font-size:12.5px; }
+  .pagamento-linha{ font-size:14px; gap:10px; }
+  .pagamento-linha img{ width:20px; }
+  .footer-logo{ height:30px; }
+  .footer-col{ margin-bottom:6px; }
+
+  /* nenhum botão ou campo abaixo de 44px de altura */
+  .btn-primary, .btn-secondary, button, select,
+  input[type="text"], input[type="email"], input[type="password"],
+  input[type="date"], input[type="file"]{
+    min-height:44px;
+  }
+  /* o iOS dá zoom sozinho em campo com fonte abaixo de 16px */
+  input, select, textarea{ font-size:16px !important; }
+}
 
 /* ============ VOLTAR AO TOPO ============ */
 .ao-topo{

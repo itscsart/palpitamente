@@ -114,7 +114,20 @@
     .form{ padding:16px 14px 18px; }
     .grade-campos{ grid-template-columns:1fr; gap:12px; }
     .campo input, .campo select, .campo textarea{ font-size:14px; padding:11px 12px; }
-    .bt{ font-size:12.5px; padding:9px 14px; }
+    .bt{ font-size:13.5px; padding:12px 16px; min-height:44px; }
+    .linha .resumo b{ font-size:14px; }
+    .linha .resumo small{ font-size:12.5px; }
+    .linha .ident{ font-size:12.5px; }
+    .campo label{ font-size:12px; }
+    .campo small{ font-size:12px; }
+    .contagem{ font-size:13px; }
+    .recado{ font-size:13px; }
+    .adm-sub{ font-size:13px; }
+    .form h3{ font-size:16px; }
+    .barreira p{ font-size:14px; }
+    .grupo-config > h3{ font-size:14px; }
+    .tag{ font-size:11.5px; padding:4px 9px; }
+    .vazio{ font-size:14px; }
   }
 </style>
 </head>
@@ -621,7 +634,25 @@ const DICAS = {
   rede_youtube:     'Endereço completo do canal.',
   rede_tiktok:      'Endereço completo do perfil.',
   rede_spotify:     'Endereço completo do programa no Spotify.',
-  rede_soundcloud:  'Endereço completo do perfil no SoundCloud.'
+  rede_soundcloud:  'Endereço completo do perfil no SoundCloud.',
+  sobre_capa_titulo:'Título grande na faixa verde da página Sobre nós.',
+  sobre_capa_sub:   'Frase logo abaixo do título, na faixa verde.',
+  sobre_p1:         'Primeiro parágrafo da história do Palpitamente.',
+  sobre_p2:         'Segundo parágrafo.',
+  sobre_p3:         'Terceiro parágrafo.',
+  sobre_p4:         'Quarto parágrafo.',
+  guia_titulo:      'Título do cartão claro ao lado do texto.',
+  guia_1:           'Item do cartão "O que nos guia".',
+  guia_2:           'Item do cartão "O que nos guia".',
+  guia_3:           'Item do cartão "O que nos guia".',
+  guia_4:           'Item do cartão "O que nos guia".',
+  guia_5:           'Item do cartão "O que nos guia".',
+  equipe_titulo:    'Título da faixa rosa com as fotos das integrantes.',
+  nome_1:           'Nome abaixo da primeira foto. A foto troca pelo arquivo assets/partes/integrante-camila.jpg',
+  nome_2:           'Nome abaixo da segunda foto.',
+  nome_3:           'Nome abaixo da terceira foto.',
+  nome_4:           'Nome abaixo da quarta foto.',
+  nome_5:           'Nome abaixo da quinta foto.'
 };
 
 async function carregarConfig(){
