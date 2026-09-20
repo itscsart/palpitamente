@@ -51,54 +51,110 @@
     background-image:url('assets/partes/ultimos-palpites-grifado.png');
     background-size:100% 100%; background-repeat:no-repeat; z-index:-1;
   }
-  /* filtro de genero */
-  .filtros{ display:flex; flex-wrap:wrap; gap:0.9rem; margin-bottom:3rem; }
+  /* ---------- filtro de genero ---------- */
+  .filtros{ display:flex; flex-wrap:wrap; gap:0.7rem; margin-bottom:2.8rem; }
   .filtro{
-    font-family:var(--font-body); font-size:1.2rem; font-weight:600;
+    font-family:var(--font-body); font-size:1.1rem; font-weight:600;
     color:var(--verde-escuro); background:transparent;
-    border:0.15rem solid var(--verde-escuro); border-radius:2rem;
-    padding:0.7rem 1.6rem; cursor:pointer;
+    border:0.13rem solid var(--verde-escuro); border-radius:2rem;
+    padding:0.55rem 1.3rem; cursor:pointer;
     transition:background .18s ease, color .18s ease;
   }
   .filtro:hover{ background:rgba(94,96,58,0.1); }
   .filtro.ativo{ background:var(--verde-escuro); color:#fff; }
-  .filtro .conta{ opacity:0.65; margin-left:0.45rem; font-weight:500; }
+  .filtro .conta{ opacity:0.6; margin-left:0.4rem; font-weight:500; }
 
-  .grupo-lista{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:2.2rem; }
+  /* ---------- cards ---------- */
+  .grupo-lista{ display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:1.6rem; }
   .indicacao{
-    background:#FBF7F1; border-radius:1rem; overflow:hidden;
-    box-shadow:0 0.4rem 1.6rem rgba(0,0,0,0.06);
+    background:#FBF7F1; border-radius:0.7rem; overflow:hidden;
+    box-shadow:0 0.3rem 1.1rem rgba(0,0,0,0.07);
     display:flex; flex-direction:column;
+    border:none; padding:0; text-align:left; font:inherit; cursor:pointer;
+    transition:transform .16s ease, box-shadow .16s ease;
   }
-  /* capa */
-  .ind-capa{
-    width:100%; aspect-ratio:2/3; position:relative; overflow:hidden;
-    background:var(--rosa);
-  }
+  .indicacao:hover{ transform:translateY(-0.4rem); box-shadow:0 0.7rem 1.8rem rgba(0,0,0,0.13); }
+  /* precisa vencer o display:flex acima, senao o filtro nao esconde nada */
+  .indicacao[hidden]{ display:none !important; }
+
+  .ind-capa{ width:100%; aspect-ratio:2/3; position:relative; overflow:hidden; background:var(--rosa); }
   .ind-capa img{ width:100%; height:100%; object-fit:cover; display:block; }
   .ind-capa.sem-imagem{
-    display:flex; align-items:center; justify-content:center; text-align:center;
-    padding:2rem 1.6rem;
+    display:flex; align-items:center; justify-content:center;
     background:linear-gradient(160deg, #CA8F82 0%, #B57F73 100%);
   }
-  .ind-capa.sem-imagem svg{ width:38%; height:auto; opacity:0.35; fill:none; stroke:#fff; stroke-width:1.4; }
-  .ind-texto{ padding:1.6rem 1.5rem 1.8rem; display:flex; flex-direction:column; flex:1; }
+  .ind-capa.sem-imagem svg{ width:40%; height:auto; opacity:0.35; fill:none; stroke:#fff; stroke-width:1.4; }
+
+  .ind-texto{ padding:0.95rem 0.9rem 1.1rem; display:flex; flex-direction:column; flex:1; }
   .indicacao h3{
-    font-family:var(--font-title); font-size:1.5rem; line-height:1.22;
-    color:var(--tinta); text-transform:uppercase; margin-bottom:0.55rem;
+    font-family:var(--font-title); font-size:1.12rem; line-height:1.22;
+    color:var(--tinta); text-transform:uppercase; margin-bottom:0.35rem;
   }
-  .indicacao .autor{ font-size:1.2rem; font-weight:600; color:var(--rosa); letter-spacing:0.02em; }
+  .indicacao .autor{ font-size:0.95rem; font-weight:600; color:var(--rosa); line-height:1.3; }
   .indicacao .genero{
-    display:inline-block; align-self:flex-start; margin-top:1rem;
-    font-size:1.05rem; font-weight:600; color:#6A6A52;
-    background:#EFE6DA; border-radius:1.4rem; padding:0.4rem 0.9rem;
+    display:inline-block; align-self:flex-start; margin-top:0.7rem;
+    font-size:0.85rem; font-weight:600; color:#6A6A52;
+    background:#EFE6DA; border-radius:1.2rem; padding:0.3rem 0.65rem;
   }
-  .indicacao .nota{ margin-top:1rem; font-size:1.2rem; line-height:1.65; color:#4A4A38; }
   .sem-resultado{ font-size:1.4rem; color:#7A7A62; font-style:italic; padding:1.5rem 0; }
-  .grupo-vazio{
-    font-size:1.4rem; color:#7A7A62; font-style:italic;
-    padding:2.2rem 0 0;
+
+  /* ---------- janela de detalhe ---------- */
+  .modal{
+    position:fixed; inset:0; z-index:200;
+    background:rgba(40,38,28,0.62);
+    display:flex; align-items:center; justify-content:center;
+    padding:3rem 2rem; opacity:0; visibility:hidden;
+    transition:opacity .2s ease, visibility .2s ease;
   }
+  .modal.aberto{ opacity:1; visibility:visible; }
+  .modal-caixa{
+    background:#FBF7F1; border-radius:1.2rem; overflow:hidden;
+    width:min(64rem, 100%); max-height:86vh; overflow-y:auto;
+    display:grid; grid-template-columns:20rem 1fr;
+    box-shadow:0 1.6rem 4rem rgba(0,0,0,0.3);
+    transform:translateY(1.4rem); transition:transform .22s ease;
+  }
+  .modal.aberto .modal-caixa{ transform:translateY(0); }
+  .modal-capa{ aspect-ratio:2/3; background:var(--rosa); }
+  .modal-capa img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .modal-capa.sem-imagem{
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(160deg, #CA8F82 0%, #B57F73 100%);
+  }
+  .modal-capa.sem-imagem svg{ width:38%; height:auto; opacity:0.35; fill:none; stroke:#fff; stroke-width:1.4; }
+  .modal-info{ padding:3rem 3rem 3.2rem; position:relative; }
+  .modal-fechar{
+    position:absolute; top:1.4rem; right:1.6rem;
+    width:2.8rem; height:2.8rem; border-radius:50%; border:none; cursor:pointer;
+    background:#EFE6DA; color:var(--verde-escuro);
+    font-size:1.6rem; line-height:1; display:flex; align-items:center; justify-content:center;
+    transition:background .18s ease;
+  }
+  .modal-fechar:hover{ background:#E2D5C4; }
+  .modal-tipo{
+    font-size:1.05rem; font-weight:700; letter-spacing:0.1em;
+    color:var(--rosa); text-transform:uppercase;
+  }
+  .modal-info h2{
+    font-family:var(--font-title); font-size:2.4rem; line-height:1.14;
+    color:var(--tinta); text-transform:uppercase; margin:0.7rem 0 0.9rem;
+    padding-right:3rem;
+  }
+  .modal-autor{ font-size:1.35rem; color:#5A5A48; }
+  .modal-autor strong{ color:var(--tinta); }
+  .modal-genero{
+    display:inline-block; margin-top:1.4rem;
+    font-size:1.1rem; font-weight:600; color:#6A6A52;
+    background:#EFE6DA; border-radius:1.4rem; padding:0.45rem 1rem;
+  }
+  .modal-sinopse{ margin-top:1.8rem; font-size:1.35rem; line-height:1.8; color:#3A3A2C; }
+  .modal-sinopse p + p{ margin-top:1rem; }
+  .modal-nota{
+    margin-top:1.8rem; padding:1.4rem 1.6rem;
+    background:#F1E7DC; border-left:0.35rem solid var(--rosa); border-radius:0.5rem;
+    font-size:1.25rem; line-height:1.7; color:#4A4A38; font-style:italic;
+  }
+  .modal-vazio{ margin-top:1.8rem; font-size:1.3rem; color:#8A8A72; font-style:italic; }
 
   @media (max-width:900px){
     .capa{ height:auto; padding:70px 22px 80px; margin-top:0; }
@@ -107,15 +163,23 @@
     .indicacoes{ padding:50px 0 60px; }
     .grupo{ margin-bottom:44px; }
     .grupo-titulo{ font-size:19px; padding:11px 24px 14px; margin-bottom:22px; }
-    .filtros{ gap:7px; margin-bottom:20px; }
-    .filtro{ font-size:12px; padding:8px 13px; border-width:2px; }
-    .grupo-lista{ grid-template-columns:repeat(2, minmax(0,1fr)); gap:14px; }
-    .ind-texto{ padding:12px 12px 14px; }
+    .filtros{ gap:6px; margin-bottom:18px; }
+    .filtro{ font-size:11.5px; padding:7px 12px; border-width:2px; }
+    .grupo-lista{ grid-template-columns:repeat(3, minmax(0,1fr)); gap:10px; }
+    .ind-texto{ padding:9px 8px 11px; }
     .ind-capa.sem-imagem svg{ width:42%; }
-    .indicacao h3{ font-size:14px; }
-    .indicacao .autor{ font-size:12px; }
-    .indicacao .genero{ font-size:10.5px; padding:4px 8px; margin-top:8px; }
-    .indicacao .nota{ font-size:12px; }
+    .modal{ padding:0; }
+    .modal-caixa{ grid-template-columns:1fr; border-radius:0; max-height:100vh; width:100%; }
+    .modal-capa{ aspect-ratio:3/2; }
+    .modal-info{ padding:22px 20px 30px; }
+    .modal-info h2{ font-size:21px; }
+    .modal-autor{ font-size:14px; }
+    .modal-sinopse{ font-size:14px; margin-top:16px; }
+    .modal-nota{ font-size:13px; }
+    .indicacao h3{ font-size:11.5px; }
+    .indicacao .autor{ font-size:10px; }
+    .indicacao .genero{ font-size:9px; padding:3px 6px; margin-top:6px; }
+
     .grupo-vazio{ font-size:14px; }
   }
 </style>
@@ -131,6 +195,8 @@
       <li><a href="sobre.html">Sobre nós
         <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
       <li><a href="produtos.html">Diário Digital
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+      <li><a href="indicacoes.html" class="active">Indicações
         <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
       <li><a href="index.html#contato">Contato
         <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
@@ -158,6 +224,22 @@
 <section class="indicacoes">
   <div class="container" id="listaIndicacoes"></div>
 </section>
+
+<!-- janela de detalhe da indicação -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitulo" hidden>
+  <div class="modal-caixa">
+    <div class="modal-capa" id="modalCapa"></div>
+    <div class="modal-info">
+      <button class="modal-fechar" id="modalFechar" aria-label="Fechar">&times;</button>
+      <span class="modal-tipo" id="modalTipo"></span>
+      <h2 id="modalTitulo"></h2>
+      <p class="modal-autor" id="modalAutor"></p>
+      <span class="modal-genero" id="modalGenero"></span>
+      <div class="modal-sinopse" id="modalSinopse"></div>
+      <div id="modalNota"></div>
+    </div>
+  </div>
+</div>
 
 <footer id="contato">
   <div class="container">
@@ -215,21 +297,23 @@
     const alvo = document.getElementById('listaIndicacoes');
     if (!alvo || typeof INDICACOES === 'undefined') return;
 
-    function cartao(i){
+    const rotuloTipo = { livro:'Livro', filme:'Filme', serie:'Série' };
+    INDICACOES.forEach((it, n) => it._id = n);
+
+    function cartao(i, rotulo){
       const capa = capaDaIndicacao(i);
       const imagem = capa
         ? `<div class="ind-capa"><img src="${capa}" alt="Capa de ${i.titulo}" loading="lazy"
              onerror="this.parentElement.classList.add('sem-imagem'); this.outerHTML=SEM_CAPA"></div>`
         : `<div class="ind-capa sem-imagem">${SEM_CAPA}</div>`;
-      return `<article class="indicacao" data-genero="${i.genero || ''}">
+      return `<button type="button" class="indicacao" data-id="${i._id}" data-genero="${i.genero || ''}">
                 ${imagem}
                 <div class="ind-texto">
                   <h3>${i.titulo}</h3>
                   <span class="autor">${i.autor}</span>
                   ${i.genero ? `<span class="genero">${i.genero}</span>` : ''}
-                  ${i.nota ? `<p class="nota">${i.nota}</p>` : ''}
                 </div>
-              </article>`;
+              </button>`;
     }
 
     alvo.innerHTML = GRUPOS.map(g => {
@@ -239,33 +323,30 @@
                   <p class="grupo-vazio">${g.vazio}</p></div>`;
       }
       const generos = generosDoTipo(g.tipo);
-      // so mostra o filtro se houver mais de um genero
       const filtros = generos.length > 1
-        ? `<div class="filtros" data-tipo="${g.tipo}">
-             <button class="filtro ativo" data-genero="todos">Todos<span class="conta">${itens.length}</span></button>
+        ? `<div class="filtros">
+             <button type="button" class="filtro ativo" data-genero="todos">Todos<span class="conta">${itens.length}</span></button>
              ${generos.map(ge => {
                 const n = itens.filter(i => i.genero === ge).length;
-                return `<button class="filtro" data-genero="${ge}">${ge}<span class="conta">${n}</span></button>`;
+                return `<button type="button" class="filtro" data-genero="${ge}">${ge}<span class="conta">${n}</span></button>`;
              }).join('')}
            </div>`
         : '';
       return `<div class="grupo" data-tipo="${g.tipo}">
                 <span class="grupo-titulo">${g.titulo}</span>
                 ${filtros}
-                <div class="grupo-lista">${itens.map(cartao).join('')}</div>
+                <div class="grupo-lista">${itens.map(i => cartao(i, g.rotulo)).join('')}</div>
                 <p class="sem-resultado" hidden>Nenhuma indicação nesse gênero ainda.</p>
               </div>`;
     }).join('');
 
-    // ----- filtragem -----
+    // ---------- filtro ----------
     alvo.addEventListener('click', e => {
       const btn = e.target.closest('.filtro');
       if (!btn) return;
       const grupo = btn.closest('.grupo');
       const escolhido = btn.dataset.genero;
-
       grupo.querySelectorAll('.filtro').forEach(b => b.classList.toggle('ativo', b === btn));
-
       let visiveis = 0;
       grupo.querySelectorAll('.indicacao').forEach(card => {
         const mostra = (escolhido === 'todos') || (card.dataset.genero === escolhido);
@@ -274,6 +355,56 @@
       });
       grupo.querySelector('.sem-resultado').hidden = visiveis > 0;
     });
+
+    // ---------- janela de detalhe ----------
+    const modal = document.getElementById('modal');
+    const elCapa = document.getElementById('modalCapa');
+
+    function abrir(item, rotulo){
+      document.getElementById('modalTipo').textContent = rotuloTipo[item.tipo] || '';
+      document.getElementById('modalTitulo').textContent = item.titulo;
+      document.getElementById('modalAutor').innerHTML = `${rotulo}: <strong>${item.autor}</strong>`;
+      const ge = document.getElementById('modalGenero');
+      ge.textContent = item.genero || '';
+      ge.style.display = item.genero ? 'inline-block' : 'none';
+
+      const capa = capaDaIndicacao(item);
+      elCapa.className = capa ? 'modal-capa' : 'modal-capa sem-imagem';
+      elCapa.innerHTML = capa
+        ? `<img src="${capa}" alt="Capa de ${item.titulo}"
+             onerror="this.parentElement.className='modal-capa sem-imagem'; this.outerHTML=SEM_CAPA">`
+        : SEM_CAPA;
+
+      document.getElementById('modalSinopse').innerHTML = item.sinopse
+        ? item.sinopse.split('\n').filter(Boolean).map(t => `<p>${t}</p>`).join('')
+        : `<p class="modal-vazio">A descrição dessa indicação ainda não foi escrita.</p>`;
+
+      document.getElementById('modalNota').innerHTML = item.nota
+        ? `<div class="modal-nota">${item.nota}</div>` : '';
+
+      modal.hidden = false;
+      requestAnimationFrame(() => modal.classList.add('aberto'));
+      document.body.style.overflow = 'hidden';
+      document.getElementById('modalFechar').focus();
+    }
+
+    function fechar(){
+      modal.classList.remove('aberto');
+      document.body.style.overflow = '';
+      setTimeout(() => { modal.hidden = true; }, 220);
+    }
+
+    alvo.addEventListener('click', e => {
+      const card = e.target.closest('.indicacao');
+      if (!card) return;
+      const item = INDICACOES.find(i => String(i._id) === card.dataset.id);
+      const grupo = GRUPOS.find(g => g.tipo === item.tipo);
+      abrir(item, grupo ? grupo.rotulo : 'Autoria');
+    });
+
+    document.getElementById('modalFechar').addEventListener('click', fechar);
+    modal.addEventListener('click', e => { if (e.target === modal) fechar(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) fechar(); });
   })();
 
   (async () => {
