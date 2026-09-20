@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palpitamente — Indicações</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  /* ---------- FAIXA ROSA DE ABERTURA ---------- */
+  .capa{
+    position:relative; height:35rem; margin-top:7.6rem;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .capa-recorte{
+    position:absolute; inset:0; z-index:0;
+    background-color:#CA8F82; background-image:url('assets/partes/faixa-rosa.png');
+    background-repeat:repeat; background-size:31.25rem 31.25rem;
+  }
+  .capa-conteudo{ position:relative; z-index:2; text-align:center; padding:0 6rem; }
+  .capa h1{
+    font-family:var(--font-title); font-size:3.4rem; line-height:1.12;
+    color:#fff; text-transform:uppercase;
+  }
+  .capa h1 .grifado{ position:relative; display:inline-block; padding:0 1.1rem; }
+  .capa h1 .grifado::before{
+    content:""; position:absolute; inset:-0.5rem -0.4rem -0.8rem;
+    background-image:url('assets/partes/ver-ler-pensar-fundo-grifado.png');
+    background-size:100% 100%; background-repeat:no-repeat; z-index:-1;
+  }
+  .capa p{
+    margin-top:1.8rem; font-size:1.45rem; line-height:1.55;
+    color:#FBF3EF; max-width:48rem; margin-inline:auto;
+  }
+  .capa-livro, .capa-camera{ position:absolute; z-index:2; max-height:56%; width:auto; }
+  .capa-livro{ left:5%; top:40%; }
+  .capa-camera{ right:5%; top:44%; }
+
+  /* ---------- GRUPOS ---------- */
+  .indicacoes{ padding:8rem 0 9rem; }
+  .grupo{ margin-bottom:7rem; }
+  .grupo:last-child{ margin-bottom:0; }
+  .grupo-titulo{
+    position:relative; display:inline-block; margin-bottom:3.4rem;
+    padding:1.2rem 3rem 1.5rem;
+    font-family:var(--font-title); font-size:2.3rem;
+    color:var(--verde-escuro); text-transform:uppercase; letter-spacing:0.03em;
+  }
+  .grupo-titulo::before{
+    content:""; position:absolute; inset:0;
+    background-image:url('assets/partes/ultimos-palpites-grifado.png');
+    background-size:100% 100%; background-repeat:no-repeat; z-index:-1;
+  }
+  .grupo-lista{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:2.4rem; }
+  .indicacao{
+    background:#FBF7F1; border-radius:1rem;
+    padding:2.4rem 2.2rem;
+    border-left:0.5rem solid var(--rosa);
+    box-shadow:0 0.4rem 1.6rem rgba(0,0,0,0.05);
+  }
+  .indicacao h3{
+    font-family:var(--font-title); font-size:1.85rem; line-height:1.2;
+    color:var(--tinta); text-transform:uppercase; margin-bottom:0.7rem;
+  }
+  .indicacao .autor{
+    font-size:1.3rem; font-weight:600; color:var(--rosa);
+    letter-spacing:0.02em;
+  }
+  .indicacao .nota{ margin-top:1.1rem; font-size:1.3rem; line-height:1.7; color:#4A4A38; }
+  .grupo-vazio{
+    font-size:1.4rem; color:#7A7A62; font-style:italic;
+    padding:2.2rem 0 0;
+  }
+
+  @media (max-width:900px){
+    .capa{ height:auto; padding:70px 22px 80px; margin-top:0; }
+    .capa h1{ font-size:clamp(24px,6.2vw,32px); }
+    .capa p{ font-size:14.5px; margin-top:14px; }
+    .capa-livro, .capa-camera{ position:relative; left:auto; right:auto; top:auto;
+                               max-height:none; width:96px; margin:22px auto 0; display:block; }
+    .indicacoes{ padding:50px 0 60px; }
+    .grupo{ margin-bottom:44px; }
+    .grupo-titulo{ font-size:19px; padding:11px 24px 14px; margin-bottom:22px; }
+    .grupo-lista{ grid-template-columns:1fr; gap:16px; }
+    .indicacao{ padding:18px 16px; border-left-width:5px; }
+    .indicacao h3{ font-size:17px; }
+    .indicacao .autor{ font-size:13.5px; }
+    .indicacao .nota{ font-size:13.5px; }
+    .grupo-vazio{ font-size:14px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="navbar compacto">
+  <div class="container">
+    <a href="index.html"><img src="assets/partes/header-logo-colorido.png" alt="Palpitamente" class="logo"></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Início
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+      <li><a href="sobre.html">Sobre nós
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+      <li><a href="produtos.html">Diário Digital
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+      <li><a href="index.html#contato">Contato
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+      <li><a href="login.html" id="navEntrar">Entrar
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+    </ul>
+    <div class="nav-social">
+      <a href="#" aria-label="Instagram"><img src="assets/partes/header-instagram-colorido.png" alt="Instagram"></a>
+      <a href="#" aria-label="YouTube"><img src="assets/partes/header-youtube-colorido.png" alt="YouTube"></a>
+      <a href="#" aria-label="TikTok"><img src="assets/partes/header-tiktok-colorido.png" alt="TikTok"></a>
+      <a href="#" aria-label="Spotify"><img src="assets/partes/header-spotify-colorido.png" alt="Spotify"></a>
+      <a href="#" class="ic-wide" aria-label="SoundCloud"><img src="assets/partes/header-soundcloud-colorido.png" alt="SoundCloud"></a>
+    </div>
+  </div>
+</nav>
+
+<section class="capa">
+  <div class="capa-recorte"></div>
+  <img src="assets/partes/ver-ler-pensar-livro.png" alt="" class="capa-livro">
+  <img src="assets/partes/ver-ler-pensar-camera.png" alt="" class="capa-camera">
+  <div class="capa-conteudo">
+    <h1>Para ver, ler e <span class="grifado">pensar</span></h1>
+    <p>Livros, filmes e outras indicações que fazem parte das nossas conversas e também da nossa vida.</p>
+  </div>
+</section>
+
+<section class="indicacoes">
+  <div class="container" id="listaIndicacoes"></div>
+</section>
+
+<footer id="contato">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <img src="assets/partes/footer-logo-branco.png" alt="Palpitamente" class="footer-logo">
+      </div>
+      <div class="footer-col">
+        <h4>Navegação</h4>
+        <ul>
+          <li><a href="index.html">Início</a></li>
+          <li><a href="sobre.html">Sobre nós</a></li>
+          <li><a href="produtos.html">Diário digital</a></li>
+          <li><a href="tel:+5511957895463">(11) 95789-5463</a></li>
+          <li><a href="mailto:contato@palpitamente.com">contato@palpitamente.com</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Siga-Nos</h4>
+        <div class="footer-social">
+          <a href="#" aria-label="Instagram"><img src="assets/partes/footer-instagram-branco.png" alt="Instagram"></a>
+          <a href="#" aria-label="YouTube"><img src="assets/partes/footer-youtube-branco.png" alt="YouTube"></a>
+          <a href="#" aria-label="TikTok"><img src="assets/partes/footer-tiktok-branco.png" alt="TikTok"></a>
+          <a href="#" aria-label="Spotify"><img src="assets/partes/footer-spotify-branco.png" alt="Spotify"></a>
+          <a href="#" class="ic-wide" aria-label="SoundCloud"><img src="assets/partes/footer-soundcloud-branco.png" alt="SoundCloud"></a>
+        </div>
+        <ul><li><a href="#">@palpitamente</a></li></ul>
+      </div>
+      <div class="footer-col">
+        <h4>Formas de Pagamento</h4>
+        <div class="footer-pagamento">
+          <div class="pagamento-linha"><img src="assets/partes/pag-boleto.png" alt=""> Boleto</div>
+          <div class="pagamento-linha"><img src="assets/partes/pag-pix.png" alt=""> PIX</div>
+          <div class="pagamento-linha"><img src="assets/partes/pag-cartao.png" alt=""> Cartão</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024 Palpitamente. Todos os direitos reservados.</span>
+      <span><a href="#">Política de Privacidade</a><a href="#">Termos de Uso</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/indicacoes.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+  (function montarIndicacoes(){
+    const alvo = document.getElementById('listaIndicacoes');
+    if (!alvo || typeof INDICACOES === 'undefined') return;
+
+    alvo.innerHTML = GRUPOS.map(g => {
+      const itens = INDICACOES.filter(i => i.tipo === g.tipo);
+      const conteudo = itens.length
+        ? `<div class="grupo-lista">` + itens.map(i => `
+             <article class="indicacao">
+               <h3>${i.titulo}</h3>
+               <span class="autor">${i.autor}</span>
+               ${i.nota ? `<p class="nota">${i.nota}</p>` : ''}
+             </article>`).join('') + `</div>`
+        : `<p class="grupo-vazio">${g.vazio}</p>`;
+      return `<div class="grupo">
+                <span class="grupo-titulo">${g.titulo}</span>
+                ${conteudo}
+              </div>`;
+    }).join('');
+  })();
+
+  (async () => {
+    const user = await getUsuarioLogado();
+    if (user) {
+      const link = document.getElementById('navEntrar');
+      link.childNodes[0].nodeValue = 'Minha conta';
+      link.href = 'diario.html';
+    }
+  })();
+</script>
+</body>
+</html>
