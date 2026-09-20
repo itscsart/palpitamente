@@ -326,6 +326,56 @@
   .comentario.oculto{ opacity:0.5; }
   .novo-comentario{ display:flex; gap:0.8rem; margin-top:1.2rem; }
   .novo-comentario input{ flex:1; }
+  /* respostas encaixadas sob o comentário */
+  .respostas{ margin-left:3.5rem; border-left:0.15rem solid #E7DDD2; padding-left:1.2rem; }
+  .respostas .comentario{ border-top:none; padding:0.7rem 0; }
+  .responder-caixa{ display:flex; gap:0.7rem; margin:0.6rem 0 0.2rem 3.5rem; }
+  .responder-caixa input{ flex:1; font-size:1.15rem; padding:0.7rem 0.9rem; }
+  .responder-caixa button{ padding:0.6rem 1.2rem; font-size:1.1rem; }
+  .resp-a{ font-size:1.05rem; color:var(--rosa); font-weight:700; }
+
+  /* sino de notificações */
+  .sino{ position:relative; }
+  .bt-sino{
+    position:relative; background:#EFE6DA; border:none; border-radius:50%;
+    width:4rem; height:4rem; cursor:pointer; color:var(--verde-escuro);
+    display:flex; align-items:center; justify-content:center;
+    transition:background .18s ease;
+  }
+  .bt-sino:hover{ background:#E2D5C4; }
+  .bt-sino svg{ width:2rem; height:2rem; }
+  .contador-sino{
+    position:absolute; top:-0.3rem; right:-0.3rem; min-width:1.9rem; height:1.9rem;
+    padding:0 0.4rem; border-radius:1rem; background:var(--rosa); color:#fff;
+    font-size:1.05rem; font-weight:700; display:flex; align-items:center; justify-content:center;
+  }
+  .lista-notif{
+    position:absolute; right:0; top:4.8rem; width:34rem; max-height:40rem; overflow-y:auto;
+    background:#FBF7F1; border-radius:1rem; box-shadow:0 1rem 3rem rgba(0,0,0,0.22);
+    z-index:120; padding:0.6rem;
+  }
+  .notif-topo{
+    display:flex; align-items:center; justify-content:space-between; gap:1rem;
+    padding:0.9rem 1rem; border-bottom:0.1rem solid #E7DDD2; margin-bottom:0.4rem;
+  }
+  .notif-topo h4{ font-family:var(--font-title); font-size:1.4rem; color:var(--tinta); text-transform:uppercase; }
+  .notif-topo button{
+    background:none; border:none; cursor:pointer; padding:0;
+    font-family:inherit; font-size:1.05rem; font-weight:600; color:var(--rosa);
+  }
+  .notif{
+    display:flex; gap:0.9rem; align-items:flex-start; width:100%; text-align:left;
+    background:none; border:none; cursor:pointer; border-radius:0.6rem;
+    padding:0.9rem 1rem; font-family:inherit;
+  }
+  .notif:hover{ background:#EFE6DA; }
+  .notif.nova{ background:#F5EBE2; }
+  .notif .avatar{ width:2.8rem; height:2.8rem; font-size:1.2rem; }
+  .notif-texto{ font-size:1.15rem; line-height:1.5; color:#3A3A2C; }
+  .notif-texto strong{ color:var(--tinta); }
+  .notif-quando{ font-size:0.95rem; color:#9A917F; margin-top:0.2rem; }
+  .notif-vazio{ padding:2.4rem 1rem; text-align:center; font-size:1.2rem; color:#9A917F; font-style:italic; }
+
   .comentarios-off{ font-size:1.15rem; color:#9A917F; font-style:italic; padding:1rem 0 0; }
 
   /* ============ RECOMPENSAS ============ */
@@ -372,6 +422,12 @@
     .compor-foto svg{ width:20px; height:20px; }
     #btPostar{ padding:9px 18px; font-size:13px; }
     .compor-previa img{ max-width:180px; max-height:130px; }
+    .lista-notif{ width:min(92vw, 340px); right:-10px; top:52px; }
+    .bt-sino{ width:38px; height:38px; }
+    .bt-sino svg{ width:18px; height:18px; }
+    .contador-sino{ min-width:17px; height:17px; font-size:10px; }
+    .respostas{ margin-left:20px; padding-left:10px; }
+    .responder-caixa{ margin-left:20px; }
     .feed{ gap:14px; }
     .post{ padding:16px 16px 12px; }
     .post-titulo{ font-size:16px; }
@@ -431,9 +487,19 @@
   <div class="container">
 
     <div class="app-topo">
-      <div>
+      <div style="flex:1; min-width:22rem;">
         <h1 class="app-titulo">Pausa para Mim</h1>
         <p class="app-sub" id="saudacao"></p>
+      </div>
+      <div class="sino">
+        <button class="bt-sino" id="btSino" aria-label="Notificações">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M18 8a6 6 0 10-12 0c0 7-3 8-3 8h18s-3-1-3-8"/>
+            <path d="M13.7 21a2 2 0 01-3.4 0"/>
+          </svg>
+          <span class="contador-sino" id="contadorSino" hidden>0</span>
+        </button>
+        <div class="lista-notif" id="listaNotif" hidden></div>
       </div>
       <div class="progresso">
         <div class="progresso-topo">
@@ -753,13 +819,16 @@ const $$ = s => [...document.querySelectorAll(s)];
   montarPaletas();
   prepararCanvas();
   ligarFerramentas();
-  ligarAbas();
   ligarEditor();
   ligarFiltros();
   ligarCompor();
   ligarAtualizarFeed();
+  ligarSino();
 
   await carregarPaginas();
+  ligarAbas();          // só agora, para a aba salva abrir já com dados
+  await carregarNotificacoes();
+  setInterval(carregarNotificacoes, 60000);   // confere a cada minuto
   montarStickers();
   montarPremios();
 })();
@@ -780,11 +849,24 @@ function escapar(t){
 // ABAS
 // ============================================================
 function ligarAbas(){
-  $$('.aba').forEach(b => b.addEventListener('click', () => {
-    $$('.aba').forEach(x => x.classList.toggle('ativa', x === b));
-    $$('.painel').forEach(p => p.classList.toggle('ativo', p.id === 'painel-' + b.dataset.painel));
-    if (b.dataset.painel === 'comunidade') carregarFeed();
-  }));
+  $$('.aba').forEach(b => b.addEventListener('click', () => irPara(b.dataset.painel)));
+
+  // recarregar a página não pode jogar a usuária de volta para "Escrever".
+  // O endereço guarda a aba, então F5 e o botão voltar do navegador funcionam.
+  window.addEventListener('hashchange', () => irPara(abaDoEndereco(), false));
+  irPara(abaDoEndereco(), false);
+}
+
+function abaDoEndereco(){
+  const nome = (location.hash || '').replace('#','');
+  return ['escrever','paginas','comunidade','recompensas'].includes(nome) ? nome : 'escrever';
+}
+
+function irPara(painel, mudarEndereco = true){
+  $$('.aba').forEach(x => x.classList.toggle('ativa', x.dataset.painel === painel));
+  $$('.painel').forEach(p => p.classList.toggle('ativo', p.id === 'painel-' + painel));
+  if (mudarEndereco && location.hash !== '#' + painel) location.hash = painel;
+  if (painel === 'comunidade') carregarFeed();
 }
 
 // ============================================================
@@ -1407,6 +1489,109 @@ async function carregarFeed(){
   feedCarregado = true;
 }
 
+// ============================================================
+// NOTIFICAÇÕES
+// ============================================================
+let notificacoes = [];
+
+function quandoFoi(iso){
+  const seg = Math.floor((Date.now() - new Date(iso)) / 1000);
+  if (seg < 60)    return 'agora';
+  if (seg < 3600)  return `há ${Math.floor(seg/60)} min`;
+  if (seg < 86400) return `há ${Math.floor(seg/3600)} h`;
+  const d = Math.floor(seg/86400);
+  return d === 1 ? 'ontem' : `há ${d} dias`;
+}
+
+const TEXTO_NOTIF = {
+  comentario: a => `<strong>${a}</strong> comentou na sua publicação`,
+  resposta:   a => `<strong>${a}</strong> respondeu seu comentário`,
+  curtida:    a => `<strong>${a}</strong> curtiu sua publicação`
+};
+
+async function carregarNotificacoes(){
+  const { data, error } = await supabaseClient
+    .from('notificacoes').select('*')
+    .eq('user_id', usuaria.id)
+    .order('created_at', { ascending:false }).limit(30);
+  if (error) { console.warn('notificações:', error.message); return; }
+
+  notificacoes = data || [];
+
+  // nomes de quem causou a notificação
+  const ids = [...new Set(notificacoes.map(n => n.autor_id))];
+  let nomes = {};
+  if (ids.length) {
+    const { data: perfis } = await supabaseClient.from('profiles').select('id, nome').in('id', ids);
+    (perfis||[]).forEach(p => { nomes[p.id] = p.nome; });
+  }
+  notificacoes.forEach(n => { n._autor = nomes[n.autor_id] || 'Alguém'; });
+
+  const novas = notificacoes.filter(n => !n.lida).length;
+  const cont = $('#contadorSino');
+  cont.textContent = novas > 9 ? '9+' : novas;
+  cont.hidden = novas === 0;
+
+  desenharNotificacoes();
+}
+
+function desenharNotificacoes(){
+  const cx = $('#listaNotif');
+  const temNaoLida = notificacoes.some(n => !n.lida);
+  const itens = notificacoes.length
+    ? notificacoes.map(n => `
+        <button class="notif${n.lida?'':' nova'}" data-id="${n.id}" data-entrada="${n.entry_id||''}">
+          <div class="avatar">${iniciais(n._autor)}</div>
+          <div>
+            <div class="notif-texto">${(TEXTO_NOTIF[n.tipo]||(a=>a))(escapar(n._autor))}</div>
+            <div class="notif-quando">${quandoFoi(n.created_at)}</div>
+          </div>
+        </button>`).join('')
+    : '<p class="notif-vazio">Nenhuma notificação por enquanto.</p>';
+
+  cx.innerHTML = `
+    <div class="notif-topo">
+      <h4>Notificações</h4>
+      ${temNaoLida ? '<button id="lerTodas">Marcar todas como lidas</button>' : ''}
+    </div>${itens}`;
+}
+
+function ligarSino(){
+  $('#btSino').addEventListener('click', e => {
+    e.stopPropagation();
+    const cx = $('#listaNotif');
+    cx.hidden = !cx.hidden;
+    if (!cx.hidden) carregarNotificacoes();
+  });
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.sino')) $('#listaNotif').hidden = true;
+  });
+
+  $('#listaNotif').addEventListener('click', async e => {
+    if (e.target.closest('#lerTodas')) {
+      await supabaseClient.from('notificacoes').update({ lida:true })
+        .eq('user_id', usuaria.id).eq('lida', false);
+      await carregarNotificacoes();
+      return;
+    }
+    const bt = e.target.closest('.notif');
+    if (!bt) return;
+    await supabaseClient.from('notificacoes').update({ lida:true }).eq('id', bt.dataset.id);
+    $('#listaNotif').hidden = true;
+    irPara('comunidade');
+    await carregarNotificacoes();
+    // abre os comentários da publicação avisada
+    setTimeout(() => {
+      const post = document.querySelector(`.post[data-id="${bt.dataset.entrada}"]`);
+      if (!post) return;
+      post.scrollIntoView({ behavior:'smooth', block:'center' });
+      if (!post.querySelector('.comentarios').classList.contains('aberto'))
+        post.querySelector('.ver-comentarios').click();
+    }, 700);
+  });
+}
+
 // ---------- caixa de escrever na comunidade ----------
 let fotoDoPost = null;
 
@@ -1534,6 +1719,21 @@ document.addEventListener('click', async e => {
     return;
   }
 
+  // enviar resposta
+  const btResp = e.target.closest('.enviar-resposta');
+  if (btResp) {
+    const cx = btResp.closest('.responder-caixa');
+    const txt = cx.querySelector('.campo-resposta').value.trim();
+    if (!txt) return;
+    const { error } = await supabaseClient.from('entry_comments')
+      .insert({ entry_id:id, user_id:usuaria.id, texto:txt, parent_id:btResp.dataset.pai });
+    if (error) { alert('Não deu para responder: ' + error.message); return; }
+    await desenharComentarios(post, id, meu);
+    const n = post.querySelector('.n-comentarios');
+    n.textContent = +n.textContent + 1;
+    return;
+  }
+
   // enviar comentário
   if (e.target.closest('.enviar-comentario')) {
     const campo = post.querySelector('.campo-comentario');
@@ -1561,6 +1761,21 @@ document.addEventListener('click', async e => {
       const oculto = btCom.dataset.oculto === 'true';
       await supabaseClient.from('entry_comments').update({ oculto: !oculto }).eq('id', cid);
     }
+    if (btCom.dataset.acao === 'responder') {
+      const alvo = btCom.closest('.comentario');
+      if (alvo.nextElementSibling?.classList.contains('responder-caixa')) {
+        alvo.nextElementSibling.remove(); return;
+      }
+      const autor = alvo.querySelector('.com-autora').textContent.trim();
+      const cx = document.createElement('div');
+      cx.className = 'responder-caixa';
+      cx.innerHTML = `<input type="text" class="campo-fer campo-resposta" maxlength="1000"
+                        placeholder="Respondendo ${escapar(autor)}...">
+                      <button class="btn-primary enviar-resposta" data-pai="${cid}">Responder</button>`;
+      alvo.after(cx);
+      cx.querySelector('input').focus();
+      return;
+    }
     if (btCom.dataset.acao === 'denunciar') {
       const motivo = prompt('O que há de errado com este comentário?');
       if (!motivo) return;
@@ -1581,7 +1796,7 @@ async function desenharComentarios(post, id, meu){
   // auth.users, entao o Supabase nao resolve a juncao. Buscamos os nomes a parte.
   const { data, error } = await supabaseClient
     .from('entry_comments')
-    .select('id, texto, oculto, user_id, created_at')
+    .select('id, texto, oculto, user_id, parent_id, created_at')
     .eq('entry_id', id).order('created_at', { ascending:true });
 
   let nomes = {};
@@ -1592,13 +1807,14 @@ async function desenharComentarios(post, id, meu){
     (perfis || []).forEach(p => { nomes[p.id] = p.nome; });
   }
 
-  const lista = error ? '' : (data||[]).map(c => {
+  function bloco(c, ehResposta){
     const autor = nomes[c.user_id] || 'Anônima';
     const meuComentario = c.user_id === usuaria.id;
     const acoes = [];
-    if (meu)            acoes.push(`<button data-acao="ocultar" data-oculto="${c.oculto}">${c.oculto?'Mostrar':'Ocultar'}</button>`);
-    if (meu || meuComentario) acoes.push(`<button data-acao="apagar">Apagar</button>`);
-    if (!meuComentario) acoes.push(`<button data-acao="denunciar">Denunciar</button>`);
+    if (ligado && !ehResposta) acoes.push(`<button data-acao="responder">Responder</button>`);
+    if (meu)                   acoes.push(`<button data-acao="ocultar" data-oculto="${c.oculto}">${c.oculto?'Mostrar':'Ocultar'}</button>`);
+    if (meu || meuComentario)  acoes.push(`<button data-acao="apagar">Apagar</button>`);
+    if (!meuComentario)        acoes.push(`<button data-acao="denunciar">Denunciar</button>`);
     return `<div class="comentario${c.oculto?' oculto':''}" data-id="${c.id}">
               <div class="avatar">${iniciais(autor)}</div>
               <div class="com-corpo">
@@ -1607,7 +1823,18 @@ async function desenharComentarios(post, id, meu){
                 <div class="com-acoes">${acoes.join('')}</div>
               </div>
             </div>`;
-  }).join('');
+  }
+
+  let lista = '';
+  if (!error) {
+    const raizes    = (data||[]).filter(c => !c.parent_id);
+    const respostas = (data||[]).filter(c =>  c.parent_id);
+    lista = raizes.map(c => {
+      const filhas = respostas.filter(r => r.parent_id === c.id);
+      return bloco(c, false)
+        + (filhas.length ? `<div class="respostas">${filhas.map(r => bloco(r, true)).join('')}</div>` : '');
+    }).join('');
+  }
 
   const formulario = ligado
     ? `<div class="novo-comentario">
