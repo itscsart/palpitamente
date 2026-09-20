@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Palpitamente — Episódios</title>
+<link rel="preconnect" href="https://nziohpkjubndecqoeofw.supabase.co" crossorigin>
+<link rel="dns-prefetch" href="https://nziohpkjubndecqoeofw.supabase.co">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -198,6 +200,18 @@
   (async function montarLista(){
     const alvo = document.getElementById('listaEpisodios');
     if (!alvo) return;
+
+    alvo.innerHTML = Array.from({length:2}, () =>
+      `<article class="episodio">
+         <div class="ep-media esqueleto"></div>
+         <div class="ep-info">
+           <div class="esqueleto" style="height:1.6rem; width:5rem; margin-bottom:1.4rem"></div>
+           <div class="esqueleto" style="height:2.2rem; margin-bottom:1rem"></div>
+           <div class="esqueleto" style="height:1rem; margin-bottom:0.5rem"></div>
+           <div class="esqueleto" style="height:1rem; width:70%"></div>
+         </div>
+       </article>`).join('');
+
     const lista = await buscarEpisodios();
 
     alvo.innerHTML = lista.map(ep => {
@@ -251,5 +265,11 @@
     }
   })();
 </script>
+
+<button class="ao-topo" id="aoTopo" aria-label="Voltar ao topo">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 19V5"/><path d="M5 12l7-7 7 7"/>
+  </svg>
+</button>
 </body>
 </html>

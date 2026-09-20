@@ -93,3 +93,22 @@ if (document.readyState !== 'loading') aplicarConfig();
     if (!error && data && data.is_admin === true) link.hidden = false;
   } catch(_) { /* na dúvida, continua escondido */ }
 })();
+
+/* ---------- voltar ao topo ----------
+   Espera o DOM ficar pronto: o botão fica no fim do corpo, depois
+   das tags de script, então na hora que este arquivo roda ele ainda
+   não existe. */
+function ligarAoTopo(){
+  const bt = document.getElementById('aoTopo');
+  if (!bt) return;
+  const conferir = () => bt.classList.toggle('visivel', window.scrollY > 400);
+  window.addEventListener('scroll', conferir, { passive:true });
+  conferir();
+  bt.addEventListener('click', () => {
+    const suave = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top:0, behavior: suave ? 'smooth' : 'auto' });
+  });
+}
+if (document.readyState === 'loading')
+  document.addEventListener('DOMContentLoaded', ligarAoTopo);
+else ligarAoTopo();
