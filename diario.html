@@ -1577,15 +1577,23 @@ async function desenharComentarios(post, id, meu){
   const caixa = post.querySelector('.comentarios');
   const ligado = post.querySelector('.alternar-comentarios')?.dataset.on !== 'false';
 
+  // Nao da para pedir profiles(nome) direto: entry_comments aponta para
+  // auth.users, entao o Supabase nao resolve a juncao. Buscamos os nomes a parte.
   const { data, error } = await supabaseClient
     .from('entry_comments')
-    .select('id, texto, oculto, user_id, created_at, profiles(nome)')
+    .select('id, texto, oculto, user_id, created_at')
     .eq('entry_id', id).order('created_at', { ascending:true });
 
-  if (error) { caixa.innerHTML = `<p class="comentarios-off">Não deu para carregar os comentários.</p>`; return; }
+  let nomes = {};
+  if (!error && data && data.length) {
+    const ids = [...new Set(data.map(c => c.user_id))];
+    const { data: perfis } = await supabaseClient
+      .from('profiles').select('id, nome').in('id', ids);
+    (perfis || []).forEach(p => { nomes[p.id] = p.nome; });
+  }
 
-  const lista = (data||[]).map(c => {
-    const autor = c.profiles?.nome || 'Anônima';
+  const lista = error ? '' : (data||[]).map(c => {
+    const autor = nomes[c.user_id] || 'Anônima';
     const meuComentario = c.user_id === usuaria.id;
     const acoes = [];
     if (meu)            acoes.push(`<button data-acao="ocultar" data-oculto="${c.oculto}">${c.oculto?'Mostrar':'Ocultar'}</button>`);
@@ -1608,7 +1616,10 @@ async function desenharComentarios(post, id, meu){
        </div>`
     : `<p class="comentarios-off">Os comentários desta página estão desativados.</p>`;
 
-  caixa.innerHTML = (lista || '<p class="comentarios-off">Nenhum comentário ainda.</p>') + formulario;
+  const vazio = error
+    ? '<p class="comentarios-off">Não deu para carregar os comentários, mas você ainda pode escrever.</p>'
+    : '<p class="comentarios-off">Nenhum comentário ainda. Seja a primeira.</p>';
+  caixa.innerHTML = (lista || vazio) + formulario;
 }
 </script>
 </body>

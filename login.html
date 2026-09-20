@@ -267,9 +267,12 @@
       return;
     }
     // Se a confirmação de e-mail estiver desativada no Supabase, já loga direto.
-    // Conta nova ainda não tem o diário liberado, então volta para a página de compra.
+    // O diário é gratuito, então a conta nova já entra com ele liberado.
     if (data.session) {
-      window.location.href = 'produtos.html';
+      await supabaseClient.from('profiles')
+        .update({ has_diary: true })
+        .eq('id', data.session.user.id);
+      window.location.href = 'diario.html';
     } else {
       msg.textContent = 'Conta criada! Verifique seu e-mail para confirmar.';
       msg.className = 'auth-msg ok';
