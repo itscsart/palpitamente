@@ -3,95 +3,310 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Palpitamente — Meu Diário</title>
+<title>Pausa para Mim — Palpitamente</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700&family=Caveat:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Patrick+Hand&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  .sair{
-    font-family:var(--font-body); font-size:1.15rem; font-weight:700;
-    color:#fff; background:var(--verde-escuro);
-    padding:0.7rem 1.5rem; border-radius:2rem; border:none; cursor:pointer;
-    margin-left:0.8rem; white-space:nowrap;
-    transition:background .2s ease;
+  /* ============ ESTRUTURA ============ */
+  .app{ padding:3rem 0 6rem; }
+  .app-topo{
+    display:flex; align-items:flex-end; justify-content:space-between;
+    gap:2rem; flex-wrap:wrap; margin-bottom:2.4rem;
   }
-  .sair:hover{ background:#4b4d2e; }
+  .app-titulo{ font-family:var(--font-title); font-size:3rem; color:var(--tinta); text-transform:uppercase; }
+  .app-sub{ font-size:1.3rem; color:#6A6A52; margin-top:0.4rem; }
 
-  main{ max-width:1100px; margin:0 auto; padding:44px 6vw 100px; }
+  /* progresso das 365 páginas */
+  .progresso{ min-width:26rem; }
+  .progresso-topo{ display:flex; justify-content:space-between; font-size:1.15rem; color:#5A5A48; margin-bottom:0.6rem; }
+  .progresso-topo strong{ color:var(--tinta); }
+  .barra{ height:0.9rem; background:#E7DDD2; border-radius:1rem; overflow:hidden; }
+  .barra span{ display:block; height:100%; background:var(--verde-claro); border-radius:1rem; transition:width .4s ease; }
+  .proxima-recompensa{ font-size:1.1rem; color:var(--rosa); margin-top:0.6rem; font-weight:600; }
 
-  .progresso{
-    background:#fff; border-radius:10px; padding:24px 28px; margin-bottom:34px;
-    box-shadow:0 6px 18px rgba(0,0,0,0.06); display:flex; align-items:center; gap:26px; flex-wrap:wrap;
+  /* abas */
+  .abas{ display:flex; gap:0.6rem; flex-wrap:wrap; border-bottom:0.13rem solid #DCD0C2; margin-bottom:2.6rem; }
+  .aba{
+    font-family:var(--font-body); font-size:1.3rem; font-weight:700;
+    color:#7A7A62; background:none; border:none; cursor:pointer;
+    padding:1rem 1.6rem; border-bottom:0.25rem solid transparent; margin-bottom:-0.13rem;
+    transition:color .18s ease, border-color .18s ease;
   }
-  .progresso-texto{ flex:1; min-width:220px; }
-  .progresso-texto h2{ font-size:19px; text-transform:uppercase; color:var(--verde-escuro); }
-  .progresso-texto p{ font-size:13.5px; color:#66664f; margin-top:4px; }
-  .barra{ flex:2; min-width:220px; height:14px; background:#eee7d8; border-radius:10px; overflow:hidden; }
-  .barra-fill{ height:100%; background:linear-gradient(90deg, var(--amarelo), var(--rosa)); transition:width .5s ease; }
-  .reward-banner{
-    display:none; margin-top:16px; background:var(--amarelo); color:var(--tinta);
-    padding:14px 18px; border-radius:8px; font-weight:700; font-size:14px;
-  }
-
-  .tabs{ display:flex; gap:10px; margin-bottom:24px; }
-  .tab-btn{
-    padding:10px 22px; border-radius:30px; border:1.5px solid #ddd4c2; background:#fff;
-    font-weight:700; font-size:13.5px; cursor:pointer; color:var(--tinta);
-  }
-  .tab-btn.active{ background:var(--verde-escuro); color:#fff; border-color:var(--verde-escuro); }
-
+  .aba:hover{ color:var(--verde-escuro); }
+  .aba.ativa{ color:var(--verde-escuro); border-bottom-color:var(--verde-escuro); }
   .painel{ display:none; }
-  .painel.active{ display:block; }
+  .painel.ativo{ display:block; }
 
-  /* --- ESCREVER --- */
-  .pagina{
-    position:relative; background:#fffdf8; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.08);
-    min-height:420px; padding:34px; overflow:hidden;
-  }
-  .frase-motivacional{
-    font-family:'Anton',sans-serif; font-size:15px; color:var(--rosa); margin-bottom:16px; letter-spacing:0.3px;
-  }
-  .pagina textarea{
-    width:100%; min-height:280px; border:none; resize:vertical; font-family:'Montserrat',sans-serif;
-    font-size:15.5px; line-height:1.8; color:var(--tinta); background:transparent;
-  }
-  .pagina textarea:focus{ outline:none; }
-  .sticker-on-page{ position:absolute; font-size:34px; cursor:grab; user-select:none; }
+  /* ============ EDITOR ============ */
+  .editor{ display:grid; grid-template-columns:20rem minmax(0,1fr); gap:2.4rem; align-items:start; }
 
-  .escrever-rodape{ display:flex; align-items:center; justify-content:space-between; margin-top:16px; flex-wrap:wrap; gap:14px; }
-  .privacidade{ display:flex; align-items:center; gap:10px; font-size:13.5px; font-weight:600; }
-  .switch{ position:relative; width:44px; height:24px; background:#ddd4c2; border-radius:20px; cursor:pointer; }
-  .switch.on{ background:var(--verde-escuro); }
-  .switch::after{ content:""; position:absolute; top:3px; left:3px; width:18px; height:18px; background:#fff; border-radius:50%; transition:transform .2s ease; }
-  .switch.on::after{ transform:translateX(20px); }
-  .contador-palavras{ font-size:12.5px; color:#8a8a72; }
-
-  .stickers-tray{ display:flex; gap:12px; margin-top:18px; flex-wrap:wrap; }
-  .sticker-item{
-    font-size:28px; background:#fff; border-radius:10px; padding:8px 12px; cursor:grab;
-    box-shadow:0 3px 8px rgba(0,0,0,0.08); border:1.5px dashed #ddd4c2;
+  /* painel lateral estilo Canva */
+  .ferramentas{
+    background:#FBF7F1; border-radius:1rem; padding:1.6rem 1.4rem;
+    box-shadow:0 0.3rem 1.2rem rgba(0,0,0,0.06); position:sticky; top:2rem;
   }
-
-  /* --- RABISCO --- */
-  .rabisco-toolbar{ display:flex; align-items:center; gap:16px; margin-bottom:14px; flex-wrap:wrap; }
-  .cor-swatch{ width:26px; height:26px; border-radius:50%; cursor:pointer; border:2px solid transparent; }
-  .cor-swatch.selected{ border-color:var(--tinta); }
-  .espessura-btn{ width:30px; height:30px; border-radius:50%; background:#fff; border:1.5px solid #ddd4c2; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-  .espessura-btn span{ background:var(--tinta); border-radius:50%; display:block; }
-  #canvasRabisco{ width:100%; height:420px; background:#fffdf8; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.08); cursor:crosshair; touch-action:none; }
-
-  /* --- ENTRADAS --- */
-  .entrada{
-    background:#fff; border-radius:10px; padding:20px 24px; margin-bottom:14px; box-shadow:0 4px 12px rgba(0,0,0,0.05);
+  .fer-abas{ display:flex; gap:0.4rem; margin-bottom:1.6rem; }
+  .fer-aba{
+    flex:1; font-size:1rem; font-weight:700; color:#7A7A62;
+    background:#EFE6DA; border:none; border-radius:0.6rem; padding:0.7rem 0.3rem;
+    cursor:pointer; transition:background .16s ease, color .16s ease;
   }
-  .entrada-topo{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
-  .entrada-data{ font-size:12.5px; color:#8a8a72; }
-  .entrada-tag{ font-size:11px; font-weight:800; padding:3px 10px; border-radius:20px; text-transform:uppercase; }
-  .entrada-tag.privado{ background:#eee7d8; color:#8a8a72; }
-  .entrada-tag.publico{ background:var(--verde-claro); color:#fff; }
-  .entrada-texto{ font-size:14.5px; line-height:1.7; color:#3a3a2c; white-space:pre-wrap; }
-  .vazio{ text-align:center; color:#9a9a80; padding:40px 0; font-size:14px; }
+  .fer-aba.ativa{ background:var(--verde-escuro); color:#fff; }
+  .fer-bloco{ display:none; }
+  .fer-bloco.ativo{ display:block; }
+  .fer-bloco h4{
+    font-size:0.95rem; font-weight:700; color:#9A917F;
+    text-transform:uppercase; letter-spacing:0.08em; margin:1.4rem 0 0.7rem;
+  }
+  .fer-bloco h4:first-child{ margin-top:0; }
+
+  .campo-fer{ width:100%; padding:0.7rem 0.8rem; border:0.12rem solid #DDD4C2;
+              border-radius:0.6rem; font-family:inherit; font-size:1.1rem;
+              background:#fff; color:var(--tinta); }
+  .campo-fer:focus{ outline:none; border-color:var(--verde-escuro); }
+
+  .linha-botoes{ display:flex; gap:0.4rem; flex-wrap:wrap; }
+  .bt-fer{
+    flex:1; min-width:2.8rem; padding:0.65rem 0.4rem;
+    background:#fff; border:0.12rem solid #DDD4C2; border-radius:0.6rem;
+    font-size:1.1rem; color:var(--tinta); cursor:pointer;
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .bt-fer:hover{ background:#EFE6DA; }
+  .bt-fer.ativo{ background:var(--verde-escuro); border-color:var(--verde-escuro); color:#fff; }
+
+  .paleta{ display:grid; grid-template-columns:repeat(8,1fr); gap:0.4rem; }
+  .cor{
+    aspect-ratio:1; border-radius:50%; border:0.15rem solid rgba(0,0,0,0.1);
+    cursor:pointer; padding:0; transition:transform .12s ease;
+  }
+  .cor:hover{ transform:scale(1.15); }
+  .cor.ativa{ box-shadow:0 0 0 0.22rem var(--verde-escuro); }
+
+  .faixa-range{ width:100%; accent-color:var(--verde-escuro); }
+  .valor-range{ font-size:1rem; color:#7A7A62; text-align:right; }
+
+  .subir{
+    display:block; width:100%; text-align:center; cursor:pointer;
+    border:0.13rem dashed #C8BCAE; border-radius:0.8rem;
+    padding:1.6rem 1rem; color:#7A7A62; font-size:1.1rem; line-height:1.5;
+    transition:border-color .16s ease, color .16s ease;
+  }
+  .subir:hover{ border-color:var(--verde-escuro); color:var(--verde-escuro); }
+  .subir input{ display:none; }
+
+  .grade-stickers{ display:grid; grid-template-columns:repeat(4,1fr); gap:0.5rem; }
+  .sticker-bt{
+    aspect-ratio:1; background:#fff; border:0.12rem solid #EFE6DA; border-radius:0.6rem;
+    font-size:1.8rem; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:transform .12s ease, border-color .15s ease;
+  }
+  .sticker-bt:hover{ transform:scale(1.08); border-color:var(--verde-claro); }
+  .sticker-bt.bloqueado{ opacity:0.3; cursor:not-allowed; filter:grayscale(1); }
+  .sticker-bt.bloqueado:hover{ transform:none; }
+  .aviso-fer{ font-size:1rem; color:#9A917F; line-height:1.5; margin-top:0.8rem; }
+
+  /* ---------- a página em si ---------- */
+  .folha-area{ background:#FBF7F1; border-radius:1rem; padding:1.6rem; box-shadow:0 0.3rem 1.2rem rgba(0,0,0,0.06); }
+  .folha-cabeca{ display:flex; gap:1rem; align-items:center; flex-wrap:wrap; margin-bottom:1.2rem; }
+  .folha-cabeca input[type="text"]{ flex:1; min-width:16rem; }
+  .folha-cabeca input[type="date"]{ width:15rem; }
+
+  .folha-palco{ position:relative; }
+  .folha{
+    position:relative; width:100%; aspect-ratio:1/1.32;
+    container-type:size;          /* faz o cqw dos stickers medir a folha */
+    background:#fff; border-radius:0.6rem; overflow:hidden;
+    box-shadow:inset 0 0 0 0.1rem #EFE6DA;
+    background-image:repeating-linear-gradient(#fff 0 2.55rem, #F0EBE2 2.55rem 2.6rem);
+  }
+  .camada{ position:absolute; inset:0; }
+  .camada-texto{
+    padding:2.2rem 2.4rem; overflow-y:auto; z-index:2;
+    font-family:'Caveat', cursive; font-size:1.9rem; line-height:2.6rem; color:#2E2E22;
+    outline:none;
+  }
+  .camada-texto:empty::before{ content:attr(data-vazio); color:#B8B0A4; }
+  .camada-desenho{ z-index:3; pointer-events:none; }
+  .camada-itens{ z-index:4; pointer-events:none; }
+  .folha.modo-desenho .camada-desenho{ pointer-events:auto; cursor:crosshair; }
+  .folha.modo-desenho .camada-texto{ pointer-events:none; }
+
+  .item{
+    position:absolute; pointer-events:auto; cursor:grab;
+    user-select:none; touch-action:none;
+  }
+  .item.arrastando{ cursor:grabbing; }
+  .item img{ display:block; width:100%; height:100%; border-radius:0.4rem; pointer-events:none; }
+  .item.emoji{ display:flex; align-items:center; justify-content:center; line-height:1; }
+  .item.selecionado{ outline:0.16rem dashed var(--verde-escuro); outline-offset:0.3rem; }
+  .item-acoes{
+    position:absolute; top:-2.4rem; right:0; display:none; gap:0.3rem;
+    background:#fff; border-radius:0.5rem; padding:0.25rem; box-shadow:0 0.2rem 0.8rem rgba(0,0,0,0.18);
+  }
+  .item.selecionado .item-acoes{ display:flex; }
+  .item-acoes button{
+    border:none; background:#EFE6DA; border-radius:0.35rem; cursor:pointer;
+    width:2rem; height:2rem; font-size:1rem; color:var(--tinta);
+  }
+  .item-acoes button:hover{ background:#E2D5C4; }
+
+  .folha-rodape{ display:flex; align-items:center; justify-content:space-between; gap:1.4rem; flex-wrap:wrap; margin-top:1.4rem; }
+  .privacidade{ display:flex; align-items:center; gap:1.2rem; flex-wrap:wrap; }
+  .chave{ display:flex; align-items:center; gap:0.6rem; font-size:1.2rem; color:#4A4A38; cursor:pointer; }
+  .chave input{
+    appearance:none; width:3.4rem; height:1.9rem; border-radius:1rem; background:#D6CABB;
+    position:relative; cursor:pointer; transition:background .2s ease; margin:0; flex-shrink:0;
+  }
+  .chave input::after{
+    content:""; position:absolute; top:0.22rem; left:0.22rem; width:1.46rem; height:1.46rem;
+    background:#fff; border-radius:50%; transition:transform .2s ease;
+  }
+  .chave input:checked{ background:var(--verde-claro); }
+  .chave input:checked::after{ transform:translateX(1.5rem); }
+  .msg-salvar{ font-size:1.15rem; min-height:1.6rem; }
+  .msg-salvar.ok{ color:var(--verde-escuro); }
+  .msg-salvar.erro{ color:#B5473C; }
+
+  /* ============ MINHAS PÁGINAS ============ */
+  .filtros-paginas{
+    display:grid; grid-template-columns:minmax(0,2fr) repeat(2, minmax(0,1fr)) auto;
+    gap:1rem; align-items:end; margin-bottom:2.2rem;
+    background:#FBF7F1; border-radius:1rem; padding:1.4rem 1.6rem;
+  }
+  .filtros-paginas label{ display:block; font-size:1rem; font-weight:700; color:#7A7A62;
+                          text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.5rem; }
+  .grade-paginas{ display:grid; grid-template-columns:repeat(auto-fill, minmax(17rem,1fr)); gap:1.4rem; }
+  .cartao-pagina{
+    background:#FBF7F1; border-radius:0.9rem; padding:1.4rem 1.5rem 1.2rem;
+    box-shadow:0 0.3rem 1rem rgba(0,0,0,0.06); cursor:pointer;
+    border-left:0.4rem solid var(--verde-claro);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .cartao-pagina:hover{ transform:translateY(-0.3rem); box-shadow:0 0.7rem 1.6rem rgba(0,0,0,0.12); }
+  .cartao-pagina.publica{ border-left-color:var(--rosa); }
+  .cp-topo{ display:flex; justify-content:space-between; align-items:baseline; gap:1rem; margin-bottom:0.6rem; }
+  .cp-num{ font-family:var(--font-title); font-size:1.25rem; color:var(--rosa); }
+  .cp-data{ font-size:1rem; color:#9A917F; }
+  .cp-titulo{ font-family:var(--font-title); font-size:1.5rem; color:var(--tinta);
+              text-transform:uppercase; line-height:1.2; margin-bottom:0.5rem; }
+  .cp-previa{ font-size:1.15rem; line-height:1.6; color:#5A5A48;
+              display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+  .cp-rodape{ display:flex; align-items:center; justify-content:space-between; margin-top:1.1rem; gap:0.8rem; }
+  .selo{ font-size:0.95rem; font-weight:700; padding:0.3rem 0.7rem; border-radius:1rem; }
+  .selo.priv{ background:#E7DDD2; color:#6A6A52; }
+  .selo.pub{ background:#F3DFD9; color:#A9685C; }
+  .cp-acoes{ display:flex; gap:0.4rem; }
+  .cp-acoes button{
+    border:none; background:#EFE6DA; border-radius:0.5rem; cursor:pointer;
+    padding:0.45rem 0.8rem; font-size:1rem; font-weight:600; color:var(--tinta);
+  }
+  .cp-acoes button:hover{ background:#E2D5C4; }
+  .cp-acoes button.perigo:hover{ background:#F0CFC9; color:#A0463A; }
+
+  /* ============ COMUNIDADE ============ */
+  .diretrizes{
+    background:#F1E7DC; border-left:0.4rem solid var(--rosa); border-radius:0.6rem;
+    padding:1.5rem 1.8rem; margin-bottom:2.4rem;
+  }
+  .diretrizes h4{ font-family:var(--font-title); font-size:1.4rem; color:var(--tinta);
+                  text-transform:uppercase; margin-bottom:0.7rem; }
+  .diretrizes p{ font-size:1.2rem; line-height:1.7; color:#4A4A38; }
+
+  .feed{ display:flex; flex-direction:column; gap:2rem; max-width:62rem; }
+  .post{ background:#FBF7F1; border-radius:1rem; padding:2rem 2.2rem 1.6rem; box-shadow:0 0.3rem 1.2rem rgba(0,0,0,0.06); }
+  .post-topo{ display:flex; align-items:center; gap:1rem; margin-bottom:1.2rem; }
+  .avatar{
+    width:3.4rem; height:3.4rem; border-radius:50%; flex-shrink:0;
+    background:var(--verde-claro); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-title); font-size:1.4rem;
+  }
+  .post-autora{ font-size:1.3rem; font-weight:700; color:var(--tinta); }
+  .post-data{ font-size:1.05rem; color:#9A917F; }
+  .post-titulo{ font-family:var(--font-title); font-size:1.8rem; color:var(--tinta);
+                text-transform:uppercase; margin-bottom:0.8rem; }
+  .post-texto{ font-size:1.3rem; line-height:1.8; color:#3A3A2C; white-space:pre-wrap; }
+  .post-imagens{ display:flex; gap:0.8rem; flex-wrap:wrap; margin-top:1.2rem; }
+  .post-imagens img{ max-width:14rem; border-radius:0.6rem; }
+
+  .post-acoes{ display:flex; align-items:center; gap:1.6rem; margin-top:1.4rem;
+               padding-top:1.2rem; border-top:0.1rem solid #E7DDD2; }
+  .acao{ display:flex; align-items:center; gap:0.5rem; background:none; border:none; cursor:pointer;
+         font-family:inherit; font-size:1.2rem; font-weight:600; color:#6A6A52; padding:0; }
+  .acao:hover{ color:var(--verde-escuro); }
+  .acao.curtido{ color:var(--rosa); }
+  .acao svg{ width:1.6rem; height:1.6rem; }
+  .acao .dono{ margin-left:auto; }
+
+  .comentarios{ margin-top:1.4rem; display:none; }
+  .comentarios.aberto{ display:block; }
+  .comentario{ display:flex; gap:0.9rem; padding:0.9rem 0; border-top:0.1rem dashed #E7DDD2; }
+  .comentario .avatar{ width:2.6rem; height:2.6rem; font-size:1.1rem; }
+  .com-corpo{ flex:1; }
+  .com-autora{ font-size:1.15rem; font-weight:700; color:var(--tinta); }
+  .com-texto{ font-size:1.2rem; line-height:1.6; color:#4A4A38; margin-top:0.2rem; }
+  .com-acoes{ display:flex; gap:0.8rem; margin-top:0.4rem; }
+  .com-acoes button{ background:none; border:none; cursor:pointer; padding:0;
+                     font-family:inherit; font-size:1rem; font-weight:600; color:#9A917F; }
+  .com-acoes button:hover{ color:var(--rosa); }
+  .comentario.oculto{ opacity:0.5; }
+  .novo-comentario{ display:flex; gap:0.8rem; margin-top:1.2rem; }
+  .novo-comentario input{ flex:1; }
+  .comentarios-off{ font-size:1.15rem; color:#9A917F; font-style:italic; padding:1rem 0 0; }
+
+  /* ============ RECOMPENSAS ============ */
+  .grade-premios{ display:grid; grid-template-columns:repeat(auto-fill, minmax(15rem,1fr)); gap:1.4rem; }
+  .premio{
+    background:#FBF7F1; border-radius:0.9rem; padding:1.6rem 1.4rem; text-align:center;
+    box-shadow:0 0.3rem 1rem rgba(0,0,0,0.06); position:relative;
+  }
+  .premio.bloqueado{ opacity:0.55; }
+  .premio-icone{ font-size:2.8rem; line-height:1; margin-bottom:0.8rem; }
+  .premio h4{ font-family:var(--font-title); font-size:1.3rem; color:var(--tinta);
+              text-transform:uppercase; margin-bottom:0.4rem; }
+  .premio p{ font-size:1.05rem; line-height:1.55; color:#6A6A52; }
+  .premio-meta{ font-size:1rem; font-weight:700; color:var(--rosa); margin-top:0.8rem; }
+  .premio .cadeado{ position:absolute; top:1rem; right:1.1rem; font-size:1.2rem; opacity:0.5; }
+
+  .vazio{ padding:4rem 0; text-align:center; font-size:1.4rem; color:#7A7A62; font-style:italic; }
+  .sem-diario{ max-width:46rem; margin:6rem auto; text-align:center; }
+  .sem-diario h2{ font-family:var(--font-title); font-size:2.6rem; color:var(--tinta);
+                  text-transform:uppercase; margin-bottom:1rem; }
+  .sem-diario p{ font-size:1.4rem; line-height:1.7; color:#5A5A48; margin-bottom:2rem; }
+
+  /* ============ MOBILE ============ */
+  @media (max-width:900px){
+    .app{ padding:24px 0 50px; }
+    .app-topo{ gap:18px; margin-bottom:18px; }
+    .app-titulo{ font-size:24px; }
+    .app-sub{ font-size:13px; }
+    .progresso{ min-width:0; width:100%; }
+    .abas{ gap:2px; margin-bottom:20px; overflow-x:auto; }
+    .aba{ font-size:13px; padding:10px 12px; white-space:nowrap; }
+    .editor{ grid-template-columns:1fr; gap:16px; }
+    .ferramentas{ position:static; padding:14px 12px; }
+    .fer-aba{ font-size:11px; padding:9px 2px; }
+    .folha-area{ padding:12px; }
+    .camada-texto{ padding:16px 18px; font-size:17px; line-height:26px; }
+    .folha{ background-image:repeating-linear-gradient(#fff 0 25px, #F0EBE2 25px 26px); }
+    .filtros-paginas{ grid-template-columns:1fr; gap:12px; padding:14px; }
+    .grade-paginas{ grid-template-columns:1fr; gap:12px; }
+    .feed{ gap:14px; }
+    .post{ padding:16px 16px 12px; }
+    .post-titulo{ font-size:16px; }
+    .post-texto{ font-size:14px; }
+    .post-acoes{ gap:14px; font-size:13px; }
+    .acao{ font-size:13px; }
+    .grade-premios{ grid-template-columns:repeat(2,1fr); gap:10px; }
+    .premio{ padding:14px 10px; }
+    .premio-icone{ font-size:24px; }
+    .premio h4{ font-size:12px; }
+    .premio p{ font-size:10.5px; }
+  }
 </style>
 </head>
 <body>
@@ -110,7 +325,7 @@
         <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
       <li><a href="index.html#contato">Contato
         <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
-      <li><a href="diario.html" class="active">Meu diário
+      <li><a href="diario.html" class="active">Pausa para Mim
         <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
     </ul>
     <div class="nav-social">
@@ -124,276 +339,1018 @@
   </div>
 </nav>
 
-<main>
-  <div class="progresso">
-    <div class="progresso-texto">
-      <h2 id="progressoTitulo">Sua jornada de escrita</h2>
-      <p id="progressoTexto">Carregando seu progresso...</p>
+<!-- quem não comprou ainda -->
+<section class="app" id="semDiario" hidden>
+  <div class="container">
+    <div class="sem-diario">
+      <h2>Seu diário ainda não está liberado</h2>
+      <p>O Pausa para Mim é um espaço só seu, com 365 páginas para escrever, desenhar e guardar o que passa pela sua cabeça.</p>
+      <a href="produtos.html" class="btn-primary">Quero meu diário</a>
     </div>
-    <div class="barra"><div class="barra-fill" id="barraFill" style="width:0%"></div></div>
   </div>
-  <div class="reward-banner" id="rewardBanner"></div>
+</section>
 
-  <div class="tabs">
-    <button class="tab-btn active" data-tab="escrever">Escrever</button>
-    <button class="tab-btn" data-tab="rabisco">Rabiscar</button>
-    <button class="tab-btn" data-tab="entradas">Minhas páginas</button>
-  </div>
+<section class="app" id="app" hidden>
+  <div class="container">
 
-  <!-- ESCREVER -->
-  <div class="painel active" id="painel-escrever">
-    <div class="pagina" id="paginaEscrita">
-      <div class="frase-motivacional" id="fraseMotivacional">"Cada palavra escrita é um passo em direção a você mesma."</div>
-      <textarea id="textoEntrada" placeholder="Comece a escrever sobre o seu dia..."></textarea>
-    </div>
-    <div class="stickers-tray" id="stickerTray"></div>
-    <div class="escrever-rodape">
-      <div class="privacidade">
-        <span>Tornar pública</span>
-        <div class="switch" id="switchPrivacidade"></div>
+    <div class="app-topo">
+      <div>
+        <h1 class="app-titulo">Pausa para Mim</h1>
+        <p class="app-sub" id="saudacao"></p>
       </div>
-      <span class="contador-palavras" id="contadorPalavras">0 palavras</span>
-      <button class="btn-primary" id="btnSalvarEntrada">Salvar página</button>
+      <div class="progresso">
+        <div class="progresso-topo">
+          <span>Seu ano</span>
+          <span><strong id="qtdPaginas">0</strong> de 365 páginas</span>
+        </div>
+        <div class="barra"><span id="barraPreenche" style="width:0%"></span></div>
+        <p class="proxima-recompensa" id="proximaRecompensa"></p>
+      </div>
     </div>
-  </div>
 
-  <!-- RABISCO -->
-  <div class="painel" id="painel-rabisco">
-    <div class="rabisco-toolbar">
-      <div class="cor-swatch selected" style="background:#2E2E1E" data-cor="#2E2E1E"></div>
-      <div class="cor-swatch" style="background:#D4A397" data-cor="#D4A397"></div>
-      <div class="cor-swatch" style="background:#DABC38" data-cor="#DABC38"></div>
-      <div class="cor-swatch" style="background:#688AA6" data-cor="#688AA6"></div>
-      <div class="cor-swatch" style="background:#99B268" data-cor="#99B268"></div>
-      <span style="width:1px;height:22px;background:#ddd4c2;"></span>
-      <div class="espessura-btn" data-esp="2"><span style="width:5px;height:5px;"></span></div>
-      <div class="espessura-btn" data-esp="5"><span style="width:9px;height:9px;"></span></div>
-      <div class="espessura-btn" data-esp="10"><span style="width:14px;height:14px;"></span></div>
-      <span style="width:1px;height:22px;background:#ddd4c2;"></span>
-      <button class="btn-secondary" id="btnLimparCanvas">Limpar</button>
+    <div class="abas">
+      <button class="aba ativa" data-painel="escrever">Escrever</button>
+      <button class="aba" data-painel="paginas">Minhas páginas</button>
+      <button class="aba" data-painel="comunidade">Comunidade</button>
+      <button class="aba" data-painel="recompensas">Recompensas</button>
     </div>
-    <canvas id="canvasRabisco"></canvas>
-  </div>
 
-  <!-- ENTRADAS -->
-  <div class="painel" id="painel-entradas">
-    <div id="listaEntradas"></div>
+    <!-- ============ ESCREVER ============ -->
+    <div class="painel ativo" id="painel-escrever">
+      <div class="editor">
+
+        <aside class="ferramentas">
+          <div class="fer-abas">
+            <button class="fer-aba ativa" data-fer="texto">Texto</button>
+            <button class="fer-aba" data-fer="desenho">Desenho</button>
+            <button class="fer-aba" data-fer="midia">Mídia</button>
+            <button class="fer-aba" data-fer="stickers">Stickers</button>
+          </div>
+
+          <!-- texto -->
+          <div class="fer-bloco ativo" data-bloco="texto">
+            <h4>Fonte</h4>
+            <select class="campo-fer" id="selFonte">
+              <option value="'Caveat', cursive">Caveat (manuscrita)</option>
+              <option value="'Patrick Hand', cursive">Patrick Hand</option>
+              <option value="'Montserrat', sans-serif">Montserrat</option>
+              <option value="'Playfair Display', serif">Playfair Display</option>
+              <option value="'Courier Prime', monospace">Courier Prime</option>
+              <option value="'Anton', sans-serif">Anton</option>
+            </select>
+
+            <h4>Tamanho</h4>
+            <input type="range" class="faixa-range" id="rangeTamanho" min="12" max="48" value="26">
+            <div class="valor-range"><span id="valTamanho">26</span> px</div>
+
+            <h4>Estilo</h4>
+            <div class="linha-botoes">
+              <button class="bt-fer" data-cmd="bold" title="Negrito"><b>B</b></button>
+              <button class="bt-fer" data-cmd="italic" title="Itálico"><i>I</i></button>
+              <button class="bt-fer" data-cmd="underline" title="Sublinhado"><u>U</u></button>
+              <button class="bt-fer" data-cmd="strikeThrough" title="Riscado"><s>S</s></button>
+            </div>
+
+            <h4>Alinhamento</h4>
+            <div class="linha-botoes">
+              <button class="bt-fer" data-cmd="justifyLeft">◧</button>
+              <button class="bt-fer" data-cmd="justifyCenter">◍</button>
+              <button class="bt-fer" data-cmd="justifyRight">◨</button>
+            </div>
+
+            <h4>Listas</h4>
+            <div class="linha-botoes">
+              <button class="bt-fer" data-cmd="insertUnorderedList">• Lista</button>
+              <button class="bt-fer" data-cmd="insertOrderedList">1. Lista</button>
+            </div>
+
+            <h4>Cor do texto</h4>
+            <div class="paleta" id="paletaTexto"></div>
+          </div>
+
+          <!-- desenho -->
+          <div class="fer-bloco" data-bloco="desenho">
+            <h4>Modo</h4>
+            <div class="linha-botoes">
+              <button class="bt-fer" id="btDesenhar">Desenhar</button>
+              <button class="bt-fer" id="btBorracha">Borracha</button>
+            </div>
+            <p class="aviso-fer" id="avisoDesenho">Com o modo ligado, a escrita fica travada até você desligar.</p>
+
+            <h4>Espessura</h4>
+            <input type="range" class="faixa-range" id="rangePincel" min="1" max="30" value="4">
+            <div class="valor-range"><span id="valPincel">4</span> px</div>
+
+            <h4>Cor do traço</h4>
+            <div class="paleta" id="paletaPincel"></div>
+
+            <h4>&nbsp;</h4>
+            <button class="bt-fer" id="btLimparDesenho" style="width:100%">Apagar todo o desenho</button>
+          </div>
+
+          <!-- mídia -->
+          <div class="fer-bloco" data-bloco="midia">
+            <h4>Suas fotos</h4>
+            <label class="subir">
+              <input type="file" id="subirFoto" accept="image/*">
+              Clique para escolher uma foto<br>
+              <small>JPG ou PNG, até 2 MB</small>
+            </label>
+            <p class="aviso-fer">Depois de inserir, arraste a foto pela página. Clique nela para redimensionar, girar ou remover.</p>
+          </div>
+
+          <!-- stickers -->
+          <div class="fer-bloco" data-bloco="stickers">
+            <h4>Desbloqueados</h4>
+            <div class="grade-stickers" id="gradeStickers"></div>
+            <p class="aviso-fer" id="avisoStickers"></p>
+          </div>
+        </aside>
+
+        <div class="folha-area">
+          <div class="folha-cabeca">
+            <input type="text" class="campo-fer" id="tituloPagina" placeholder="Título da página (opcional)">
+            <input type="date" class="campo-fer" id="dataPagina">
+          </div>
+
+          <div class="folha-palco">
+            <div class="folha" id="folha">
+              <div class="camada camada-texto" id="areaTexto" contenteditable="true"
+                   data-vazio="Escreva aqui o que passou pela sua cabeça hoje..."></div>
+              <canvas class="camada camada-desenho" id="canvasDesenho"></canvas>
+              <div class="camada camada-itens" id="camadaItens"></div>
+            </div>
+          </div>
+
+          <div class="folha-rodape">
+            <div class="privacidade">
+              <label class="chave">
+                <input type="checkbox" id="chavePublica">
+                <span>Publicar na comunidade</span>
+              </label>
+              <label class="chave" id="rotuloComentarios" hidden>
+                <input type="checkbox" id="chaveComentarios" checked>
+                <span>Permitir comentários</span>
+              </label>
+            </div>
+            <div style="display:flex; align-items:center; gap:1.2rem; flex-wrap:wrap;">
+              <span class="msg-salvar" id="msgSalvar"></span>
+              <button class="btn-secondary" id="btNovaPagina">Nova página</button>
+              <button class="btn-primary" id="btSalvar">Salvar página</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ MINHAS PÁGINAS ============ -->
+    <div class="painel" id="painel-paginas">
+      <div class="filtros-paginas">
+        <div>
+          <label for="buscaTexto">Buscar por título ou conteúdo</label>
+          <input type="text" class="campo-fer" id="buscaTexto" placeholder="ex.: viagem, terapia, domingo">
+        </div>
+        <div>
+          <label for="dataDe">De</label>
+          <input type="date" class="campo-fer" id="dataDe">
+        </div>
+        <div>
+          <label for="dataAte">Até</label>
+          <input type="date" class="campo-fer" id="dataAte">
+        </div>
+        <div>
+          <label for="filtroPriv">Visibilidade</label>
+          <select class="campo-fer" id="filtroPriv">
+            <option value="">Todas</option>
+            <option value="pub">Públicas</option>
+            <option value="priv">Privadas</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:1.4rem; flex-wrap:wrap; margin-bottom:1.6rem;">
+        <span style="font-size:1.25rem; color:#6A6A52;" id="contagemPaginas"></span>
+        <button class="btn-secondary" id="btLimparFiltros">Limpar filtros</button>
+      </div>
+      <div class="grade-paginas" id="gradePaginas"></div>
+      <p class="vazio" id="vazioPaginas" hidden>Nenhuma página encontrada com esses filtros.</p>
+    </div>
+
+    <!-- ============ COMUNIDADE ============ -->
+    <div class="painel" id="painel-comunidade">
+      <div class="diretrizes">
+        <h4>Como a gente conversa por aqui</h4>
+        <p>Este é um espaço de acolhimento. Comentários com ofensa, ameaça, discurso de ódio ou qualquer coisa contra a lei
+           serão removidos. Você pode desativar ou apagar comentários nas suas próprias páginas quando quiser.</p>
+      </div>
+      <div class="feed" id="feed"></div>
+      <p class="vazio" id="vazioFeed" hidden>Ainda não há nada publicado na comunidade. Que tal ser a primeira?</p>
+    </div>
+
+    <!-- ============ RECOMPENSAS ============ -->
+    <div class="painel" id="painel-recompensas">
+      <p style="font-size:1.3rem; color:#5A5A48; margin-bottom:2rem; max-width:52rem; line-height:1.7;">
+        A cada <strong>5 páginas escritas</strong> você desbloqueia algo novo. Não tem pressa nem prazo:
+        o diário tem 365 páginas e é seu para o ano inteiro.
+      </p>
+      <div class="grade-premios" id="gradePremios"></div>
+    </div>
+
   </div>
-</main>
+</section>
 
 <script src="assets/supabase-client.js"></script>
 <script>
-  const FRASES = [
-    '"Cada palavra escrita é um passo em direção a você mesma."',
-    '"Você não precisa ter todas as respostas hoje. Só precisa começar."',
-    '"Escrever é uma forma de se escutar."',
-    '"Sua história importa, do jeito que ela for."',
-    '"Um dia de cada vez, uma página de cada vez."'
-  ];
-  const STICKERS = ['🌿','💛','✨','🌸','☁️','💌','🩷','🌙'];
+// ============================================================
+// PAUSA PARA MIM
+// ============================================================
+const TOTAL_PAGINAS = 365;
+const A_CADA        = 5;      // páginas por recompensa
 
-  let usuario = null;
-  let perfil = null;
-  const LINHAS_POR_PAGINA = 40; // ~ quantas "linhas" de texto contam como 1 página
+const CORES = ['#2E2E22','#5E603A','#99B268','#D4A397','#DABC38','#688AA6','#1F527A','#B5473C',
+               '#FFFFFF','#8A8A72','#E8A0B4','#7B5EA7','#3E8E7E','#C96A2B','#4A4A38','#F2D7B6'];
 
-  async function iniciar() {
-    usuario = await exigirLogin();
-    if (!usuario) return;
+// catálogo de recompensas: a cada 5 páginas
+const PREMIOS = [
+  { em:5,   icone:'🌱', nome:'Primeiros passos',   desc:'Pacote de stickers de plantinhas.',            stickers:['🌱','🌿','🍀','🌻'] },
+  { em:10,  icone:'☕', nome:'Ritual da manhã',    desc:'Stickers de café, chá e aconchego.',           stickers:['☕','🍵','🥐','🕯️'] },
+  { em:15,  icone:'🌙', nome:'Noites de pensar',   desc:'Stickers de lua, estrelas e sono.',            stickers:['🌙','⭐','✨','💤'] },
+  { em:20,  icone:'🎧', nome:'Trilha sonora',      desc:'Stickers de música e podcast.',                stickers:['🎧','🎵','🎙️','💿'] },
+  { em:25,  icone:'💌', nome:'Cartas para mim',    desc:'Stickers de afeto e carinho.',                 stickers:['💌','💖','🤍','🫶'] },
+  { em:30,  icone:'📚', nome:'Leitora assídua',    desc:'Stickers de livros e leitura.',                stickers:['📚','📖','🔖','✒️'] },
+  { em:40,  icone:'🌊', nome:'Maré de emoções',    desc:'Stickers de água, mar e calma.',               stickers:['🌊','🐚','☁️','🫧'] },
+  { em:50,  icone:'🔥', nome:'Cinquenta páginas',  desc:'Stickers de energia e conquista.',             stickers:['🔥','⚡','🏆','🎉'] },
+  { em:75,  icone:'🦋', nome:'Transformação',      desc:'Stickers de mudança e recomeço.',              stickers:['🦋','🐛','🌈','🪞'] },
+  { em:100, icone:'💎', nome:'Cem páginas',        desc:'Stickers raros, só para quem chegou aqui.',    stickers:['💎','👑','🪄','🗝️'] },
+  { em:150, icone:'🌺', nome:'Meio caminho',       desc:'Stickers florais de meio de jornada.',         stickers:['🌺','🌸','🪷','🍃'] },
+  { em:200, icone:'🧭', nome:'Sua própria bússola',desc:'Stickers de caminho e direção.',               stickers:['🧭','🗺️','🚪','🪜'] },
+  { em:250, icone:'🎬', nome:'Sua história',       desc:'Stickers de cinema e memória.',                stickers:['🎬','📷','🎞️','📼'] },
+  { em:300, icone:'🌟', nome:'Reta final',         desc:'Stickers brilhantes de reta final.',           stickers:['🌟','💫','🪐','☄️'] },
+  { em:365, icone:'🏅', nome:'Um ano inteiro',     desc:'Você escreveu o ano todo. Medalha sua.',       stickers:['🏅','🎖️','🥇','🫀'] }
+];
+const STICKERS_BASE = ['❤️','⭐','☀️','🌷'];   // vêm com o diário
 
-    perfil = await getPerfil(usuario.id);
-    if (!perfil || !perfil.has_diary) {
-      window.location.href = 'produtos.html';
-      return;
-    }
+// ---------- estado ----------
+let usuaria  = null;
+let perfil   = null;
+let paginas  = [];
+let editando = null;          // id da página em edição, ou null
+let itemSel  = null;
 
-    document.getElementById('fraseMotivacional').textContent = FRASES[Math.floor(Math.random()*FRASES.length)];
-    atualizarProgresso();
-    montarStickers();
-    carregarEntradas();
-    prepararCanvas();
-  }
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
 
-  function atualizarProgresso() {
-    const paginas = perfil.pages_written || 0;
-    const proximaMeta = (Math.floor(paginas / 5) + 1) * 5;
-    const faltam = proximaMeta - paginas;
-    const pct = ((paginas % 5) / 5) * 100;
+// ============================================================
+// ARRANQUE
+// ============================================================
+(async function iniciar(){
+  usuaria = await getUsuarioLogado();
+  if (!usuaria) { window.location.href = 'login.html'; return; }
 
-    document.getElementById('progressoTexto').textContent =
-      `${paginas} página(s) escrita(s) — faltam ${faltam} para a próxima recompensa`;
-    document.getElementById('barraFill').style.width = pct + '%';
-  }
+  const { data } = await supabaseClient.from('profiles').select('*').eq('id', usuaria.id).single();
+  perfil = data || {};
 
-  function montarStickers() {
-    const tray = document.getElementById('stickerTray');
-    STICKERS.forEach(s => {
-      const el = document.createElement('div');
-      el.className = 'sticker-item';
-      el.textContent = s;
-      el.draggable = true;
-      el.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', s));
-      tray.appendChild(el);
-    });
-    const pagina = document.getElementById('paginaEscrita');
-    pagina.addEventListener('dragover', e => e.preventDefault());
-    pagina.addEventListener('drop', e => {
-      e.preventDefault();
-      const emoji = e.dataTransfer.getData('text/plain');
-      if (!emoji) return;
-      const rect = pagina.getBoundingClientRect();
-      const el = document.createElement('span');
-      el.className = 'sticker-on-page';
-      el.textContent = emoji;
-      el.style.left = (e.clientX - rect.left - 17) + 'px';
-      el.style.top = (e.clientY - rect.top - 17) + 'px';
-      el.draggable = true;
-      el.addEventListener('dragstart', ev => {
-        ev.dataTransfer.setData('text/plain-move', JSON.stringify({ id: el.dataset.id }));
-      });
-      el.dataset.id = Date.now();
-      el.ondblclick = () => el.remove();
-      pagina.appendChild(el);
-    });
-  }
+  if (!perfil.has_diary) { $('#semDiario').hidden = false; return; }
+  $('#app').hidden = false;
 
-  document.getElementById('switchPrivacidade').addEventListener('click', function(){
-    this.classList.toggle('on');
+  const nome = (perfil.nome || '').split(' ')[0];
+  $('#saudacao').textContent = nome ? `Oi, ${nome}. Esta página é sua.` : 'Esta página é sua.';
+  $('#dataPagina').value = hoje();
+
+  montarPaletas();
+  prepararCanvas();
+  ligarFerramentas();
+  ligarAbas();
+  ligarEditor();
+  ligarFiltros();
+
+  await carregarPaginas();
+  montarStickers();
+  montarPremios();
+})();
+
+function hoje(){ return new Date().toISOString().slice(0,10); }
+function iniciais(nome){ return (nome||'A').trim().charAt(0).toUpperCase(); }
+function dataBonita(d){
+  if (!d) return '';
+  const [a,m,dia] = d.split('-');
+  return `${dia}/${m}/${a}`;
+}
+function escapar(t){
+  return String(t||'').replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ============================================================
+// ABAS
+// ============================================================
+function ligarAbas(){
+  $$('.aba').forEach(b => b.addEventListener('click', () => {
+    $$('.aba').forEach(x => x.classList.toggle('ativa', x === b));
+    $$('.painel').forEach(p => p.classList.toggle('ativo', p.id === 'painel-' + b.dataset.painel));
+    if (b.dataset.painel === 'comunidade') carregarFeed();
+  }));
+}
+
+// ============================================================
+// PAINEL DE FERRAMENTAS
+// ============================================================
+function montarPaletas(){
+  ['#paletaTexto','#paletaPincel'].forEach((sel, idx) => {
+    $(sel).innerHTML = CORES.map((c,i) =>
+      `<button class="cor${(idx===0? i===0 : i===0)?' ativa':''}" style="background:${c}" data-cor="${c}"></button>`
+    ).join('');
+  });
+  $('#paletaTexto').addEventListener('click', e => {
+    const b = e.target.closest('.cor'); if (!b) return;
+    $$('#paletaTexto .cor').forEach(x => x.classList.toggle('ativa', x === b));
+    aplicarNoTexto(() => document.execCommand('foreColor', false, b.dataset.cor));
+  });
+  $('#paletaPincel').addEventListener('click', e => {
+    const b = e.target.closest('.cor'); if (!b) return;
+    $$('#paletaPincel .cor').forEach(x => x.classList.toggle('ativa', x === b));
+    pincel.cor = b.dataset.cor;
+  });
+}
+
+function aplicarNoTexto(fn){
+  const area = $('#areaTexto');
+  area.focus();
+  fn();
+}
+
+function ligarFerramentas(){
+  // troca de bloco
+  $$('.fer-aba').forEach(b => b.addEventListener('click', () => {
+    $$('.fer-aba').forEach(x => x.classList.toggle('ativa', x === b));
+    $$('.fer-bloco').forEach(x => x.classList.toggle('ativo', x.dataset.bloco === b.dataset.fer));
+  }));
+
+  // comandos de formatação
+  $$('.bt-fer[data-cmd]').forEach(b => b.addEventListener('click', () => {
+    aplicarNoTexto(() => document.execCommand(b.dataset.cmd, false, null));
+    b.classList.toggle('ativo', document.queryCommandState(b.dataset.cmd));
+  }));
+
+  // fonte e tamanho aplicam na seleção, ou na área toda se nada estiver selecionado
+  $('#selFonte').addEventListener('change', e => aplicarEstilo('fontFamily', e.target.value));
+  $('#rangeTamanho').addEventListener('input', e => {
+    $('#valTamanho').textContent = e.target.value;
+    aplicarEstilo('fontSize', e.target.value + 'px');
+    aplicarEstilo('lineHeight', Math.round(e.target.value * 1.45) + 'px');
   });
 
-  document.getElementById('textoEntrada').addEventListener('input', function(){
-    const palavras = this.value.trim().split(/\s+/).filter(Boolean).length;
-    document.getElementById('contadorPalavras').textContent = palavras + ' palavras';
+  // desenho
+  $('#btDesenhar').addEventListener('click', () => alternarDesenho('pincel'));
+  $('#btBorracha').addEventListener('click', () => alternarDesenho('borracha'));
+  $('#rangePincel').addEventListener('input', e => {
+    $('#valPincel').textContent = e.target.value;
+    pincel.grossura = +e.target.value;
+  });
+  $('#btLimparDesenho').addEventListener('click', () => {
+    if (!confirm('Apagar todo o desenho desta página?')) return;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
   });
 
-  document.getElementById('btnSalvarEntrada').addEventListener('click', async () => {
-    const texto = document.getElementById('textoEntrada').value.trim();
-    if (!texto) return;
-    const publico = document.getElementById('switchPrivacidade').classList.contains('on');
-
-    const { error } = await supabaseClient.from('diary_entries').insert({
-      user_id: usuario.id, content: texto, is_public: publico
-    });
-    if (error) { alert('Não foi possível salvar: ' + error.message); return; }
-
-    const novasPaginas = (perfil.pages_written || 0) + 1;
-    const desbloqueouRecompensa = novasPaginas % 5 === 0;
-    const novasRecompensas = (perfil.rewards_unlocked || 0) + (desbloqueouRecompensa ? 1 : 0);
-
-    await supabaseClient.from('profiles').update({
-      pages_written: novasPaginas, rewards_unlocked: novasRecompensas
-    }).eq('id', usuario.id);
-
-    perfil.pages_written = novasPaginas;
-    perfil.rewards_unlocked = novasRecompensas;
-    atualizarProgresso();
-
-    if (desbloqueouRecompensa) {
-      const banner = document.getElementById('rewardBanner');
-      banner.style.display = 'block';
-      banner.textContent = `🎉 Você desbloqueou uma nova recompensa por escrever ${novasPaginas} páginas!`;
-    }
-
-    document.getElementById('textoEntrada').value = '';
-    document.getElementById('contadorPalavras').textContent = '0 palavras';
-    document.querySelectorAll('.sticker-on-page').forEach(el => el.remove());
-    carregarEntradas();
+  // upload de foto
+  $('#subirFoto').addEventListener('change', e => {
+    const arq = e.target.files[0];
+    if (!arq) return;
+    if (arq.size > 2*1024*1024) { alert('A foto precisa ter no máximo 2 MB.'); e.target.value=''; return; }
+    const leitor = new FileReader();
+    leitor.onload = () => { inserirItem({ tipo:'foto', src:leitor.result }); e.target.value=''; };
+    leitor.readAsDataURL(arq);
   });
+}
 
-  async function carregarEntradas() {
-    const { data, error } = await supabaseClient
-      .from('diary_entries')
-      .select('*')
-      .eq('user_id', usuario.id)
-      .order('created_at', { ascending: false });
+function aplicarEstilo(prop, valor){
+  const sel = window.getSelection();
+  const area = $('#areaTexto');
+  if (sel && !sel.isCollapsed && area.contains(sel.anchorNode)) {
+    const span = document.createElement('span');
+    span.style[prop] = valor;
+    try { sel.getRangeAt(0).surroundContents(span); return; } catch(_) {}
+  }
+  area.style[prop] = valor;
+}
 
-    const lista = document.getElementById('listaEntradas');
-    lista.innerHTML = '';
-    if (error || !data || data.length === 0) {
-      lista.innerHTML = '<div class="vazio">Você ainda não escreveu nenhuma página. Vá para a aba "Escrever" e comece.</div>';
-      return;
+// ============================================================
+// DESENHO
+// ============================================================
+let canvas, ctx, desenhando = false, modoDesenho = null;
+const pincel = { cor:'#2E2E22', grossura:4 };
+
+function prepararCanvas(){
+  canvas = $('#canvasDesenho');
+  ctx = canvas.getContext('2d');
+  redimensionarCanvas();
+  window.addEventListener('resize', redimensionarCanvas);
+
+  const pos = e => {
+    const r = canvas.getBoundingClientRect();
+    const p = e.touches ? e.touches[0] : e;
+    return { x:(p.clientX - r.left) * (canvas.width / r.width),
+             y:(p.clientY - r.top)  * (canvas.height / r.height) };
+  };
+  const inicio = e => {
+    if (!modoDesenho) return;
+    e.preventDefault(); desenhando = true;
+    const {x,y} = pos(e);
+    ctx.beginPath(); ctx.moveTo(x,y);
+  };
+  const mover = e => {
+    if (!desenhando) return;
+    e.preventDefault();
+    const {x,y} = pos(e);
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.lineWidth = pincel.grossura * (canvas.width / canvas.getBoundingClientRect().width);
+    if (modoDesenho === 'borracha') {
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.lineWidth *= 3;
+    } else {
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = pincel.cor;
     }
-    data.forEach(entrada => {
-      const div = document.createElement('div');
-      div.className = 'entrada';
-      const data_fmt = new Date(entrada.created_at).toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
-      div.innerHTML = `
-        <div class="entrada-topo">
-          <span class="entrada-data">${data_fmt}</span>
-          <span class="entrada-tag ${entrada.is_public ? 'publico' : 'privado'}">${entrada.is_public ? 'Pública' : 'Privada'}</span>
+    ctx.lineTo(x,y); ctx.stroke();
+  };
+  const fim = () => { desenhando = false; };
+
+  ['mousedown','touchstart'].forEach(ev => canvas.addEventListener(ev, inicio, {passive:false}));
+  ['mousemove','touchmove'].forEach(ev => canvas.addEventListener(ev, mover, {passive:false}));
+  ['mouseup','mouseleave','touchend'].forEach(ev => canvas.addEventListener(ev, fim));
+}
+
+function redimensionarCanvas(){
+  const anterior = canvas.width ? canvas.toDataURL() : null;
+  const r = $('#folha').getBoundingClientRect();
+  canvas.width = Math.round(r.width * 2);      // 2x para não ficar serrilhado
+  canvas.height = Math.round(r.height * 2);
+  if (anterior) {
+    const img = new Image();
+    img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    img.src = anterior;
+  }
+}
+
+function alternarDesenho(modo){
+  modoDesenho = (modoDesenho === modo) ? null : modo;
+  $('#folha').classList.toggle('modo-desenho', !!modoDesenho);
+  $('#btDesenhar').classList.toggle('ativo', modoDesenho === 'pincel');
+  $('#btBorracha').classList.toggle('ativo', modoDesenho === 'borracha');
+  $('#avisoDesenho').textContent = modoDesenho
+    ? 'Modo ligado: a escrita está travada. Clique de novo para voltar a escrever.'
+    : 'Com o modo ligado, a escrita fica travada até você desligar.';
+}
+
+// ============================================================
+// FOTOS E STICKERS NA PÁGINA
+// ============================================================
+function inserirItem(dados){
+  const camada = $('#camadaItens');
+  const el = document.createElement('div');
+  el.className = 'item' + (dados.tipo === 'sticker' ? ' emoji' : '');
+  el.dataset.tipo = dados.tipo;
+
+  const larg = dados.w ?? (dados.tipo === 'sticker' ? 12 : 38);   // % da folha
+  el.style.left   = (dados.x ?? 30) + '%';
+  el.style.top    = (dados.y ?? 30) + '%';
+  el.style.width  = larg + '%';
+  el.style.transform = `rotate(${dados.rot ?? 0}deg)`;
+
+  if (dados.tipo === 'sticker') {
+    el.style.aspectRatio = '1';
+    el.style.fontSize = (larg * 0.78) + 'cqw';
+    el.textContent = dados.src;
+    el.dataset.src = dados.src;
+  } else {
+    el.innerHTML = `<img src="${dados.src}" alt="">`;
+    el.dataset.src = dados.src;
+  }
+
+  el.insertAdjacentHTML('beforeend', `
+    <div class="item-acoes">
+      <button data-acao="menor" title="Diminuir">−</button>
+      <button data-acao="maior" title="Aumentar">+</button>
+      <button data-acao="girar" title="Girar">↻</button>
+      <button data-acao="remover" title="Remover">×</button>
+    </div>`);
+
+  camada.appendChild(el);
+  arrastavel(el);
+  selecionar(el);
+  return el;
+}
+
+function selecionar(el){
+  $$('.item').forEach(i => i.classList.toggle('selecionado', i === el));
+  itemSel = el;
+}
+
+function arrastavel(el){
+  let ox=0, oy=0, ini=null;
+  const palco = () => $('#folha').getBoundingClientRect();
+
+  const comecar = e => {
+    if (e.target.closest('.item-acoes')) return;
+    e.preventDefault(); e.stopPropagation();
+    selecionar(el);
+    const p = e.touches ? e.touches[0] : e;
+    const r = el.getBoundingClientRect();
+    ox = p.clientX - r.left; oy = p.clientY - r.top;
+    ini = true;
+    el.classList.add('arrastando');
+  };
+  const mover = e => {
+    if (!ini) return;
+    e.preventDefault();
+    const p = e.touches ? e.touches[0] : e;
+    const f = palco();
+    let x = ((p.clientX - ox - f.left) / f.width) * 100;
+    let y = ((p.clientY - oy - f.top) / f.height) * 100;
+    x = Math.max(-5, Math.min(95, x));
+    y = Math.max(-5, Math.min(95, y));
+    el.style.left = x + '%'; el.style.top = y + '%';
+  };
+  const parar = () => { ini = false; el.classList.remove('arrastando'); };
+
+  ['mousedown','touchstart'].forEach(ev => el.addEventListener(ev, comecar, {passive:false}));
+  ['mousemove','touchmove'].forEach(ev => document.addEventListener(ev, mover, {passive:false}));
+  ['mouseup','touchend'].forEach(ev => document.addEventListener(ev, parar));
+
+  el.querySelector('.item-acoes').addEventListener('click', e => {
+    const bt = e.target.closest('button'); if (!bt) return;
+    e.stopPropagation();
+    const larg = parseFloat(el.style.width);
+    const rot  = parseFloat((el.style.transform.match(/-?\d+(\.\d+)?/) || [0])[0]);
+    if (bt.dataset.acao === 'menor')  el.style.width = Math.max(4, larg - 5) + '%';
+    if (bt.dataset.acao === 'maior')  el.style.width = Math.min(100, larg + 5) + '%';
+    if (bt.dataset.acao === 'girar')  el.style.transform = `rotate(${(rot + 15) % 360}deg)`;
+    if (bt.dataset.acao === 'remover'){ el.remove(); itemSel = null; }
+    if (el.dataset.tipo === 'sticker' && bt.dataset.acao !== 'remover') {
+      el.style.fontSize = (parseFloat(el.style.width) * 0.78) + 'cqw';
+    }
+  });
+}
+
+document.addEventListener('click', e => {
+  // o clique que insere um item vem do painel de ferramentas:
+  // sem essa checagem, o item nasce e se desseleciona no mesmo clique
+  if (e.target.closest('.item') || e.target.closest('.ferramentas')) return;
+  $$('.item').forEach(i => i.classList.remove('selecionado'));
+  itemSel = null;
+});
+
+// ---------- stickers desbloqueados ----------
+function stickersLiberados(){
+  const feitas = perfil.pages_written || 0;
+  const extras = PREMIOS.filter(p => feitas >= p.em).flatMap(p => p.stickers);
+  return [...STICKERS_BASE, ...extras];
+}
+
+function montarStickers(){
+  const liberados = stickersLiberados();
+  const todos = [...STICKERS_BASE, ...PREMIOS.flatMap(p => p.stickers)];
+  $('#gradeStickers').innerHTML = todos.map(s => {
+    const ok = liberados.includes(s);
+    return `<button class="sticker-bt${ok?'':' bloqueado'}" data-sticker="${s}"${ok?'':' disabled'}>${s}</button>`;
+  }).join('');
+
+  const faltam = PREMIOS.find(p => (perfil.pages_written||0) < p.em);
+  $('#avisoStickers').textContent = faltam
+    ? `Faltam ${faltam.em - (perfil.pages_written||0)} páginas para o pacote "${faltam.nome}".`
+    : 'Você desbloqueou todos os pacotes. Parabéns.';
+
+  $('#gradeStickers').onclick = e => {
+    const b = e.target.closest('.sticker-bt:not(.bloqueado)');
+    if (b) inserirItem({ tipo:'sticker', src:b.dataset.sticker });
+  };
+}
+
+function montarPremios(){
+  const feitas = perfil.pages_written || 0;
+  $('#gradePremios').innerHTML = PREMIOS.map(p => {
+    const ok = feitas >= p.em;
+    return `<div class="premio${ok?'':' bloqueado'}">
+              ${ok?'':'<span class="cadeado">🔒</span>'}
+              <div class="premio-icone">${p.icone}</div>
+              <h4>${p.nome}</h4>
+              <p>${p.desc}</p>
+              <div class="premio-meta">${ok ? 'Desbloqueado' : `${p.em} páginas`}</div>
+            </div>`;
+  }).join('');
+}
+
+function atualizarProgresso(){
+  const feitas = perfil.pages_written || 0;
+  $('#qtdPaginas').textContent = feitas;
+  $('#barraPreenche').style.width = Math.min(100, (feitas / TOTAL_PAGINAS) * 100) + '%';
+  const prox = PREMIOS.find(p => feitas < p.em);
+  $('#proximaRecompensa').textContent = prox
+    ? `Faltam ${prox.em - feitas} páginas para "${prox.nome}" ${prox.icone}`
+    : 'Você desbloqueou tudo. Que ano.';
+}
+
+// ============================================================
+// SALVAR E CARREGAR PÁGINAS
+// ============================================================
+function ligarEditor(){
+  $('#chavePublica').addEventListener('change', e => {
+    $('#rotuloComentarios').hidden = !e.target.checked;
+  });
+  $('#btSalvar').addEventListener('click', salvarPagina);
+  $('#btNovaPagina').addEventListener('click', () => { limparEditor(); aviso('Página em branco pronta.', 'ok'); });
+}
+
+function aviso(txt, tipo){
+  const el = $('#msgSalvar');
+  el.textContent = txt; el.className = 'msg-salvar ' + (tipo||'');
+  if (txt) setTimeout(() => { if (el.textContent === txt) el.textContent = ''; }, 4000);
+}
+
+function coletarConteudo(){
+  const itens = $$('.item').map(el => ({
+    tipo: el.dataset.tipo,
+    src:  el.dataset.src,
+    x:    parseFloat(el.style.left),
+    y:    parseFloat(el.style.top),
+    w:    parseFloat(el.style.width),
+    rot:  parseFloat((el.style.transform.match(/-?\d+(\.\d+)?/) || [0])[0])
+  }));
+  const temDesenho = ctx.getImageData(0,0,canvas.width,canvas.height)
+                        .data.some((v,i) => i % 4 === 3 && v !== 0);
+  return {
+    html:    $('#areaTexto').innerHTML,
+    texto:   $('#areaTexto').innerText.trim(),
+    estilo:  { fontFamily:$('#areaTexto').style.fontFamily, fontSize:$('#areaTexto').style.fontSize,
+               lineHeight:$('#areaTexto').style.lineHeight },
+    desenho: temDesenho ? canvas.toDataURL('image/png') : null,
+    itens
+  };
+}
+
+async function salvarPagina(){
+  const conteudo = coletarConteudo();
+  if (!conteudo.texto && !conteudo.desenho && !conteudo.itens.length) {
+    aviso('Escreva, desenhe ou coloque algo antes de salvar.', 'erro'); return;
+  }
+
+  const registro = {
+    user_id:        usuaria.id,
+    titulo:         $('#tituloPagina').value.trim() || null,
+    data_pagina:    $('#dataPagina').value || hoje(),
+    conteudo_rico:  conteudo,
+    content:        conteudo.texto.slice(0, 5000),
+    is_public:      $('#chavePublica').checked,
+    comentarios_on: $('#chaveComentarios').checked,
+    atualizado_em:  new Date().toISOString()
+  };
+
+  aviso('Salvando...');
+  let erro;
+  if (editando) {
+    ({ error: erro } = await supabaseClient.from('diary_entries').update(registro).eq('id', editando));
+  } else {
+    registro.numero_pagina = (perfil.pages_written || 0) + 1;
+    ({ error: erro } = await supabaseClient.from('diary_entries').insert(registro));
+  }
+  if (erro) { aviso('Não deu para salvar: ' + erro.message, 'erro'); return; }
+
+  const antes = perfil.pages_written || 0;
+  await carregarPaginas();
+  const agora = perfil.pages_written || 0;
+
+  if (!editando && Math.floor(agora / A_CADA) > Math.floor(antes / A_CADA)) {
+    const premio = PREMIOS.find(p => p.em === agora) || null;
+    aviso(premio ? `Página salva! Você desbloqueou "${premio.nome}" ${premio.icone}` : 'Página salva! Recompensa liberada.', 'ok');
+  } else {
+    aviso(editando ? 'Página atualizada.' : 'Página salva.', 'ok');
+  }
+  limparEditor();
+}
+
+function limparEditor(){
+  editando = null;
+  $('#areaTexto').innerHTML = '';
+  $('#areaTexto').removeAttribute('style');
+  $('#tituloPagina').value = '';
+  $('#dataPagina').value = hoje();
+  $('#chavePublica').checked = false;
+  $('#chaveComentarios').checked = true;
+  $('#rotuloComentarios').hidden = true;
+  $('#camadaItens').innerHTML = '';
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  $('#btSalvar').textContent = 'Salvar página';
+}
+
+function abrirNoEditor(p){
+  editando = p.id;
+  const c = p.conteudo_rico || {};
+  $('#areaTexto').innerHTML = c.html || escapar(p.content || '');
+  if (c.estilo) Object.assign($('#areaTexto').style, c.estilo);
+  $('#tituloPagina').value = p.titulo || '';
+  $('#dataPagina').value = p.data_pagina || hoje();
+  $('#chavePublica').checked = !!p.is_public;
+  $('#chaveComentarios').checked = p.comentarios_on !== false;
+  $('#rotuloComentarios').hidden = !p.is_public;
+
+  $('#camadaItens').innerHTML = '';
+  (c.itens || []).forEach(inserirItem);
+  $$('.item').forEach(i => i.classList.remove('selecionado'));
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if (c.desenho) {
+    const img = new Image();
+    img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    img.src = c.desenho;
+  }
+
+  $('#btSalvar').textContent = 'Salvar alterações';
+  $$('.aba').forEach(x => x.classList.toggle('ativa', x.dataset.painel === 'escrever'));
+  $$('.painel').forEach(x => x.classList.toggle('ativo', x.id === 'painel-escrever'));
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+async function carregarPaginas(){
+  const { data, error } = await supabaseClient
+    .from('diary_entries').select('*')
+    .eq('user_id', usuaria.id)
+    .order('data_pagina', { ascending:false })
+    .order('created_at',  { ascending:false });
+  if (error) { console.error(error); return; }
+  paginas = data || [];
+
+  const { data: pf } = await supabaseClient.from('profiles').select('*').eq('id', usuaria.id).single();
+  if (pf) perfil = pf;
+
+  atualizarProgresso();
+  montarStickers();
+  montarPremios();
+  desenharPaginas();
+}
+
+// ============================================================
+// MINHAS PÁGINAS: filtro, abrir, excluir
+// ============================================================
+function ligarFiltros(){
+  ['#buscaTexto','#dataDe','#dataAte','#filtroPriv'].forEach(s =>
+    $(s).addEventListener('input', desenharPaginas));
+  $('#btLimparFiltros').addEventListener('click', () => {
+    $('#buscaTexto').value=''; $('#dataDe').value=''; $('#dataAte').value=''; $('#filtroPriv').value='';
+    desenharPaginas();
+  });
+}
+
+function filtrar(){
+  const q  = $('#buscaTexto').value.trim().toLowerCase();
+  const de = $('#dataDe').value, ate = $('#dataAte').value, pv = $('#filtroPriv').value;
+  return paginas.filter(p => {
+    const texto = ((p.titulo||'') + ' ' + (p.conteudo_rico?.texto || p.content || '')).toLowerCase();
+    if (q  && !texto.includes(q)) return false;
+    if (de && (p.data_pagina||'') < de) return false;
+    if (ate&& (p.data_pagina||'') > ate) return false;
+    if (pv === 'pub'  && !p.is_public) return false;
+    if (pv === 'priv' &&  p.is_public) return false;
+    return true;
+  });
+}
+
+function desenharPaginas(){
+  const lista = filtrar();
+  $('#contagemPaginas').innerHTML = lista.length === paginas.length
+    ? `<strong>${paginas.length}</strong> ${paginas.length===1?'página escrita':'páginas escritas'}`
+    : `<strong>${lista.length}</strong> de ${paginas.length} páginas`;
+  $('#vazioPaginas').hidden = lista.length > 0;
+
+  $('#gradePaginas').innerHTML = lista.map(p => {
+    const previa = (p.conteudo_rico?.texto || p.content || '').slice(0,240);
+    return `<article class="cartao-pagina${p.is_public?' publica':''}" data-id="${p.id}">
+      <div class="cp-topo">
+        <span class="cp-num">#${String(p.numero_pagina||'?').padStart(3,'0')}</span>
+        <span class="cp-data">${dataBonita(p.data_pagina)}</span>
+      </div>
+      <h3 class="cp-titulo">${escapar(p.titulo) || 'Sem título'}</h3>
+      <p class="cp-previa">${escapar(previa) || '<em>Página só com desenho ou imagens</em>'}</p>
+      <div class="cp-rodape">
+        <span class="selo ${p.is_public?'pub':'priv'}">${p.is_public?'Pública':'Privada'}</span>
+        <div class="cp-acoes">
+          <button data-acao="abrir">Abrir</button>
+          <button data-acao="excluir" class="perigo">Excluir</button>
         </div>
-        <div class="entrada-texto">${entrada.content.replace(/</g,'&lt;')}</div>
-      `;
-      lista.appendChild(div);
-    });
+      </div>
+    </article>`;
+  }).join('');
+}
+
+document.addEventListener('click', async e => {
+  const cartao = e.target.closest('.cartao-pagina');
+  if (!cartao) return;
+  const p = paginas.find(x => x.id === cartao.dataset.id);
+  if (!p) return;
+  const bt = e.target.closest('button');
+
+  if (bt && bt.dataset.acao === 'excluir') {
+    if (!confirm(`Excluir a página "${p.titulo || 'sem título'}"? Isso não tem volta.`)) return;
+    const { error } = await supabaseClient.from('diary_entries').delete().eq('id', p.id);
+    if (error) { alert('Não deu para excluir: ' + error.message); return; }
+    if (editando === p.id) limparEditor();
+    await carregarPaginas();
+    return;
+  }
+  abrirNoEditor(p);
+});
+
+// ============================================================
+// COMUNIDADE
+// ============================================================
+let feedCarregado = false;
+
+async function carregarFeed(){
+  const { data, error } = await supabaseClient
+    .from('feed_publico').select('*').order('created_at', { ascending:false }).limit(50);
+
+  if (error) {
+    $('#feed').innerHTML = `<p class="vazio">Não deu para carregar a comunidade.<br>
+      <small>${escapar(error.message)}</small></p>`;
+    return;
   }
 
-  // ---- abas ----
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.painel').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('painel-' + btn.dataset.tab).classList.add('active');
-    });
-  });
+  const posts = data || [];
+  $('#vazioFeed').hidden = posts.length > 0;
 
-  // ---- canvas de rabisco ----
-  function prepararCanvas() {
-    const canvas = document.getElementById('canvasRabisco');
-    const ctx = canvas.getContext('2d');
-    function resize() {
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width;
-      canvas.height = rect.height;
-    }
-    resize();
-    window.addEventListener('resize', resize);
-
-    let desenhando = false;
-    let cor = '#2E2E1E';
-    let espessura = 5;
-
-    document.querySelectorAll('.cor-swatch').forEach(sw => {
-      sw.addEventListener('click', () => {
-        document.querySelectorAll('.cor-swatch').forEach(s => s.classList.remove('selected'));
-        sw.classList.add('selected');
-        cor = sw.dataset.cor;
-      });
-    });
-    document.querySelectorAll('.espessura-btn').forEach(btn => {
-      btn.addEventListener('click', () => { espessura = parseInt(btn.dataset.esp); });
-    });
-    document.getElementById('btnLimparCanvas').addEventListener('click', () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    });
-
-    function pos(e) {
-      const rect = canvas.getBoundingClientRect();
-      const cx = e.touches ? e.touches[0].clientX : e.clientX;
-      const cy = e.touches ? e.touches[0].clientY : e.clientY;
-      return { x: cx - rect.left, y: cy - rect.top };
-    }
-    function start(e) { desenhando = true; const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }
-    function move(e) {
-      if (!desenhando) return;
-      const p = pos(e);
-      ctx.lineTo(p.x, p.y);
-      ctx.strokeStyle = cor; ctx.lineWidth = espessura; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-      ctx.stroke();
-      e.preventDefault();
-    }
-    function end() { desenhando = false; }
-
-    canvas.addEventListener('mousedown', start);
-    canvas.addEventListener('mousemove', move);
-    window.addEventListener('mouseup', end);
-    canvas.addEventListener('touchstart', start);
-    canvas.addEventListener('touchmove', move, { passive:false });
-    canvas.addEventListener('touchend', end);
+  // quais eu já curti
+  const ids = posts.map(p => p.id);
+  let minhasCurtidas = [];
+  if (ids.length) {
+    const { data: c } = await supabaseClient.from('entry_likes')
+      .select('entry_id').eq('user_id', usuaria.id).in('entry_id', ids);
+    minhasCurtidas = (c||[]).map(x => x.entry_id);
   }
 
-  iniciar();
+  $('#feed').innerHTML = posts.map(p => {
+    const c = p.conteudo_rico || {};
+    const meu = p.user_id === usuaria.id;
+    const curti = minhasCurtidas.includes(p.id);
+    const fotos = (c.itens||[]).filter(i => i.tipo==='foto')
+                    .map(i => `<img src="${i.src}" alt="">`).join('');
+    return `<article class="post" data-id="${p.id}" data-dono="${meu}">
+      <div class="post-topo">
+        <div class="avatar">${iniciais(p.autora)}</div>
+        <div>
+          <div class="post-autora">${escapar(p.autora)}${meu?' <small style="color:#9A917F">(você)</small>':''}</div>
+          <div class="post-data">${dataBonita(p.data_pagina)}</div>
+        </div>
+      </div>
+      ${p.titulo ? `<h3 class="post-titulo">${escapar(p.titulo)}</h3>` : ''}
+      <p class="post-texto">${escapar(c.texto || '')}</p>
+      ${fotos ? `<div class="post-imagens">${fotos}</div>` : ''}
+      <div class="post-acoes">
+        <button class="acao curtir${curti?' curtido':''}" data-curti="${curti}">
+          <svg viewBox="0 0 24 24" fill="${curti?'currentColor':'none'}" stroke="currentColor" stroke-width="1.8">
+            <path d="M12 20.3l-1.4-1.3C5.4 14.3 2 11.3 2 7.6 2 4.9 4.1 3 6.6 3c1.5 0 3 .7 3.9 1.9l1.5 1.8 1.5-1.8C14.4 3.7 15.9 3 17.4 3 19.9 3 22 4.9 22 7.6c0 3.7-3.4 6.7-8.6 11.4L12 20.3z"/>
+          </svg>
+          <span class="n-curtidas">${p.curtidas}</span>
+        </button>
+        <button class="acao ver-comentarios">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M21 11.5a8.4 8.4 0 01-9 8.4 9 9 0 01-3.9-.9L3 21l1.9-4.6A8.4 8.4 0 013 11.5a8.4 8.4 0 019-8.4 8.4 8.4 0 019 8.4z"/>
+          </svg>
+          <span class="n-comentarios">${p.comentarios}</span>
+        </button>
+        ${meu ? `<button class="acao dono alternar-comentarios" data-on="${p.comentarios_on}">
+                   ${p.comentarios_on ? 'Desativar comentários' : 'Reativar comentários'}</button>` : ''}
+      </div>
+      <div class="comentarios"></div>
+    </article>`;
+  }).join('');
+
+  feedCarregado = true;
+}
+
+// ---------- interações do feed ----------
+document.addEventListener('click', async e => {
+  const post = e.target.closest('.post');
+  if (!post) return;
+  const id  = post.dataset.id;
+  const meu = post.dataset.dono === 'true';
+
+  // curtir
+  const btCurtir = e.target.closest('.curtir');
+  if (btCurtir) {
+    const curti = btCurtir.dataset.curti === 'true';
+    const n = btCurtir.querySelector('.n-curtidas');
+    if (curti) {
+      await supabaseClient.from('entry_likes').delete().eq('entry_id', id).eq('user_id', usuaria.id);
+      btCurtir.dataset.curti = 'false'; btCurtir.classList.remove('curtido');
+      btCurtir.querySelector('svg').setAttribute('fill','none');
+      n.textContent = Math.max(0, +n.textContent - 1);
+    } else {
+      const { error } = await supabaseClient.from('entry_likes').insert({ entry_id:id, user_id:usuaria.id });
+      if (error) return;
+      btCurtir.dataset.curti = 'true'; btCurtir.classList.add('curtido');
+      btCurtir.querySelector('svg').setAttribute('fill','currentColor');
+      n.textContent = +n.textContent + 1;
+    }
+    return;
+  }
+
+  // abrir e fechar comentários
+  if (e.target.closest('.ver-comentarios')) {
+    const caixa = post.querySelector('.comentarios');
+    if (caixa.classList.contains('aberto')) { caixa.classList.remove('aberto'); return; }
+    caixa.classList.add('aberto');
+    await desenharComentarios(post, id, meu);
+    return;
+  }
+
+  // dona do post liga e desliga comentários
+  const btAlt = e.target.closest('.alternar-comentarios');
+  if (btAlt) {
+    const ligado = btAlt.dataset.on === 'true';
+    const { error } = await supabaseClient.from('diary_entries')
+      .update({ comentarios_on: !ligado }).eq('id', id);
+    if (error) { alert('Não deu para mudar: ' + error.message); return; }
+    btAlt.dataset.on = String(!ligado);
+    btAlt.textContent = !ligado ? 'Desativar comentários' : 'Reativar comentários';
+    const caixa = post.querySelector('.comentarios');
+    if (caixa.classList.contains('aberto')) await desenharComentarios(post, id, meu);
+    return;
+  }
+
+  // enviar comentário
+  if (e.target.closest('.enviar-comentario')) {
+    const campo = post.querySelector('.campo-comentario');
+    const txt = campo.value.trim();
+    if (!txt) return;
+    const { error } = await supabaseClient.from('entry_comments')
+      .insert({ entry_id:id, user_id:usuaria.id, texto:txt });
+    if (error) { alert('Não deu para comentar: ' + error.message); return; }
+    campo.value = '';
+    await desenharComentarios(post, id, meu);
+    const n = post.querySelector('.n-comentarios');
+    n.textContent = +n.textContent + 1;
+    return;
+  }
+
+  // apagar ou ocultar comentário
+  const btCom = e.target.closest('.com-acoes button');
+  if (btCom) {
+    const cid = btCom.closest('.comentario').dataset.id;
+    if (btCom.dataset.acao === 'apagar') {
+      if (!confirm('Apagar este comentário?')) return;
+      await supabaseClient.from('entry_comments').delete().eq('id', cid);
+    }
+    if (btCom.dataset.acao === 'ocultar') {
+      const oculto = btCom.dataset.oculto === 'true';
+      await supabaseClient.from('entry_comments').update({ oculto: !oculto }).eq('id', cid);
+    }
+    if (btCom.dataset.acao === 'denunciar') {
+      const motivo = prompt('O que há de errado com este comentário?');
+      if (!motivo) return;
+      const { error } = await supabaseClient.from('comment_reports')
+        .insert({ comment_id:cid, user_id:usuaria.id, motivo });
+      alert(error ? 'Você já denunciou este comentário.' : 'Denúncia registrada. Obrigada por avisar.');
+      return;
+    }
+    await desenharComentarios(post, id, meu);
+  }
+});
+
+async function desenharComentarios(post, id, meu){
+  const caixa = post.querySelector('.comentarios');
+  const ligado = post.querySelector('.alternar-comentarios')?.dataset.on !== 'false';
+
+  const { data, error } = await supabaseClient
+    .from('entry_comments')
+    .select('id, texto, oculto, user_id, created_at, profiles(nome)')
+    .eq('entry_id', id).order('created_at', { ascending:true });
+
+  if (error) { caixa.innerHTML = `<p class="comentarios-off">Não deu para carregar os comentários.</p>`; return; }
+
+  const lista = (data||[]).map(c => {
+    const autor = c.profiles?.nome || 'Anônima';
+    const meuComentario = c.user_id === usuaria.id;
+    const acoes = [];
+    if (meu)            acoes.push(`<button data-acao="ocultar" data-oculto="${c.oculto}">${c.oculto?'Mostrar':'Ocultar'}</button>`);
+    if (meu || meuComentario) acoes.push(`<button data-acao="apagar">Apagar</button>`);
+    if (!meuComentario) acoes.push(`<button data-acao="denunciar">Denunciar</button>`);
+    return `<div class="comentario${c.oculto?' oculto':''}" data-id="${c.id}">
+              <div class="avatar">${iniciais(autor)}</div>
+              <div class="com-corpo">
+                <div class="com-autora">${escapar(autor)}${c.oculto?' <small>(oculto)</small>':''}</div>
+                <div class="com-texto">${escapar(c.texto)}</div>
+                <div class="com-acoes">${acoes.join('')}</div>
+              </div>
+            </div>`;
+  }).join('');
+
+  const formulario = ligado
+    ? `<div class="novo-comentario">
+         <input type="text" class="campo-fer campo-comentario" placeholder="Escreva um comentário gentil..." maxlength="1000">
+         <button class="btn-primary enviar-comentario" style="padding:0.8rem 1.6rem; font-size:1.15rem;">Enviar</button>
+       </div>`
+    : `<p class="comentarios-off">Os comentários desta página estão desativados.</p>`;
+
+  caixa.innerHTML = (lista || '<p class="comentarios-off">Nenhum comentário ainda.</p>') + formulario;
+}
 </script>
-
 </body>
 </html>
