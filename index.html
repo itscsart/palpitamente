@@ -21,13 +21,14 @@
 
   /* ---------------- CARROSSEL ---------------- */
   .carrossel{ position:relative; margin-top:11.4rem; overflow:hidden; }
-  .slides{ position:relative; height:50.17rem; }   /* 602px no design */
-  .slide{
-    position:absolute; inset:0;
-    opacity:0; visibility:hidden;
-    transition:opacity .9s ease;
+  .slides{ position:relative; height:50.17rem; overflow:hidden; }   /* 602px no design */
+  /* trilho que desliza na horizontal */
+  .trilha{
+    display:flex; width:200%; height:100%;
+    transition:transform .65s cubic-bezier(.45,.05,.25,1);
+    will-change:transform;
   }
-  .slide.ativo{ opacity:1; visibility:visible; }
+  .slide{ position:relative; width:50%; height:100%; flex:0 0 50%; }
   .slide-recorte{
     position:absolute; inset:0; z-index:0;
     background-repeat:repeat; background-size:31.25rem 31.25rem;
@@ -118,6 +119,17 @@
   .colagem .notebook{ width:54%; left:16%; top:30%; }
   .colagem .olho{ width:32%; right:12%; top:2%; }
 
+  .carrossel-seta{
+    position:absolute; top:50%; transform:translateY(-50%); z-index:6;
+    width:4rem; height:4rem; border-radius:50%;
+    background:rgba(255,255,255,0.85); border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:background .2s ease, transform .15s ease;
+  }
+  .carrossel-seta:hover{ background:#fff; transform:translateY(-50%) scale(1.06); }
+  .carrossel-seta svg{ width:1.4rem; height:1.4rem; fill:var(--verde-escuro); }
+  .carrossel-seta.ant{ left:2.2rem; }
+  .carrossel-seta.prox{ right:2.2rem; }
   .carrossel-pontos{ display:flex; justify-content:center; gap:1.1rem; padding:1.6rem 0 0; }
   .ponto{
     width:2.4rem; height:2.4rem; border-radius:50%; cursor:pointer;
@@ -203,9 +215,12 @@
     .container{ width:100%; max-width:none; padding:0 22px; }
 
     .carrossel{ margin-top:0; }
-    .slides{ height:auto; overflow:hidden; }
-    .slide{ position:relative; inset:auto; display:none; opacity:1; visibility:visible; }
-    .slide.ativo{ display:block; }
+    .slides{ height:auto; }
+    .slide{ height:auto; }
+    .carrossel-seta{ width:32px; height:32px; }
+    .carrossel-seta svg{ width:11px; height:11px; }
+    .carrossel-seta.ant{ left:6px; }
+    .carrossel-seta.prox{ right:6px; }
     .slide .container{ padding:70px 22px 90px; height:auto; overflow:hidden; }
     .slide-podcast .container, .slide-diario .container{ width:100%; max-width:none; margin-left:0; padding:0 22px; grid-template-columns:1fr; gap:0; }
     .podcast-foto{ width:95%; margin:0 auto 28px; transform:rotate(-1.5deg); }
@@ -276,8 +291,9 @@
 <!-- ============ CARROSSEL ============ -->
 <section id="inicio" class="carrossel">
   <div class="slides">
+  <div class="trilha" id="trilha">
 
-    <div class="slide slide-podcast ativo" data-slide="0">
+    <div class="slide slide-podcast" data-slide="0">
       <div class="slide-recorte"></div>
       <div class="container">
         <div class="podcast-foto">
@@ -324,6 +340,13 @@
       </div>
     </div>
 
+  </div>
+  <button class="carrossel-seta ant" id="slideAnt" aria-label="Slide anterior">
+    <svg viewBox="0 0 24 24"><path d="M15.4 4.6L8 12l7.4 7.4 1.4-1.4L10.8 12l6-6z"/></svg>
+  </button>
+  <button class="carrossel-seta prox" id="slideProx" aria-label="Próximo slide">
+    <svg viewBox="0 0 24 24"><path d="M8.6 4.6L16 12l-7.4 7.4-1.4-1.4L13.2 12l-6-6z"/></svg>
+  </button>
   </div>
   <div class="carrossel-pontos">
     <button class="ponto ativo" data-ir="0" aria-label="Slide 1"></button>
@@ -424,16 +447,20 @@
 <script src="assets/supabase-client.js"></script>
 <script>
   // carrossel infinito: roda sozinho, sem precisar clicar
+  const trilha = document.getElementById('trilha');
   const slides = document.querySelectorAll('.slide');
   const pontos = document.querySelectorAll('.ponto');
   let atual = 0, timer;
   function mostrar(i){
     atual = (i + slides.length) % slides.length;
-    slides.forEach((s,n) => s.classList.toggle('ativo', n === atual));
+    trilha.style.transform = 'translateX(-' + (atual * (100 / slides.length)) + '%)';
     pontos.forEach((p,n) => p.classList.toggle('ativo', n === atual));
   }
   function iniciar(){ clearInterval(timer); timer = setInterval(() => mostrar(atual + 1), 7000); }
   pontos.forEach(p => p.addEventListener('click', () => { mostrar(Number(p.dataset.ir)); iniciar(); }));
+  document.getElementById('slideAnt').addEventListener('click', () => { mostrar(atual - 1); iniciar(); });
+  document.getElementById('slideProx').addEventListener('click', () => { mostrar(atual + 1); iniciar(); });
+  mostrar(0);
   iniciar();
 
   let tocando = false;

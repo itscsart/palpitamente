@@ -172,7 +172,8 @@
       msg.className = 'auth-msg error';
       return;
     }
-    // Se a confirmação de e-mail estiver desativada no Supabase, já loga direto
+    // Se a confirmação de e-mail estiver desativada no Supabase, já loga direto.
+    // Conta nova ainda não tem o diário liberado, então volta para a página de compra.
     if (data.session) {
       window.location.href = 'produtos.html';
     } else {
