@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palpitamente — Episódios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  /* ---------- FAIXA VERDE DE ABERTURA ---------- */
+  .capa{
+    position:relative; height:35rem; margin-top:7.6rem;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .capa-recorte{
+    position:absolute; inset:0; z-index:0;
+    background-color:#86964D; background-image:url('assets/partes/faixa-verde-claro.png');
+    background-repeat:repeat; background-size:31.25rem 31.25rem;
+  }
+  .capa-conteudo{ position:relative; z-index:2; text-align:center; padding:0 6rem; }
+  .capa h1{
+    font-family:var(--font-title); font-size:3.4rem; line-height:1.12;
+    color:#fff; text-transform:uppercase;
+  }
+  .capa h1 .grifado{ position:relative; display:inline-block; padding:0 0.9rem; color:var(--tinta); }
+  .capa h1 .grifado::before{
+    content:""; position:absolute; inset:0.2rem -0.3rem -0.2rem;
+    background-image:url('assets/partes/ultimos-palpites-grifado.png');
+    background-size:100% 100%; background-repeat:no-repeat; z-index:-1;
+  }
+  .capa p{
+    margin-top:1.6rem; font-size:1.45rem; line-height:1.55;
+    color:#EFF1E2; max-width:46rem; margin-inline:auto;
+  }
+
+  /* ---------- LISTA ---------- */
+  .lista{ padding:8rem 0 9rem; }
+  .episodio{
+    display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);
+    gap:4rem; align-items:center;
+    padding-bottom:5rem; margin-bottom:5rem;
+    border-bottom:1px dashed #DCD0C2;
+  }
+  .episodio:last-child{ border-bottom:none; margin-bottom:0; padding-bottom:0; }
+  .episodio:nth-child(even) .ep-media{ order:2; }
+
+  .ep-media{ position:relative; width:100%; aspect-ratio:16/9; border-radius:1rem; overflow:hidden; background:var(--amarelo); }
+  .ep-media iframe{ width:100%; height:100%; border:0; display:block; }
+  .ep-media.em-breve{ display:flex; align-items:center; justify-content:center; }
+  .ep-media.em-breve span{
+    font-family:var(--font-title); font-size:2rem; color:var(--verde-escuro);
+    text-transform:uppercase; letter-spacing:0.04em; text-align:center; padding:0 2rem;
+  }
+
+  .ep-tag{
+    position:relative; display:inline-block; padding:0.5rem 1rem 0.6rem;
+    font-family:var(--font-title); font-size:1.6rem; color:var(--tinta); margin-bottom:1.4rem;
+  }
+  .ep-tag::before{
+    content:""; position:absolute; inset:0;
+    background-image:url('assets/partes/numero-01-grifado.png');
+    background-size:100% 100%; background-repeat:no-repeat; z-index:-1;
+  }
+  .ep-info h2{
+    font-family:var(--font-title); font-size:2.6rem; line-height:1.12;
+    color:var(--tinta); text-transform:uppercase; margin-bottom:1.2rem;
+  }
+  .ep-info p{ font-size:1.45rem; line-height:1.75; color:#3A3A2C; max-width:40rem; }
+  .ep-duracao{ display:flex; align-items:center; gap:0.65rem; font-size:1.35rem; color:#5A5A48; margin-top:1.4rem; }
+  .ep-duracao svg{ width:1.6rem; height:1.6rem; stroke:#5A5A48; fill:none; stroke-width:1.7; }
+
+  /* onde ouvir */
+  .ep-plataformas{ display:flex; align-items:center; gap:1.1rem; margin-top:2.2rem; flex-wrap:wrap; }
+  .ep-plataformas a{
+    display:inline-flex; align-items:center; gap:0.7rem;
+    background:var(--verde-escuro); color:#fff;
+    font-size:1.2rem; font-weight:700; letter-spacing:0.03em;
+    padding:0.85rem 1.6rem; border-radius:2rem;
+    transition:background .2s ease;
+  }
+  .ep-plataformas a:hover{ background:#4b4d2e; }
+  .ep-plataformas img{ height:1.3rem; width:auto; filter:brightness(0) invert(1); }
+  .ep-plataformas .indisponivel{
+    background:transparent; color:#8A8A72; border:1px dashed #C8BCAE;
+    cursor:default; font-weight:500;
+  }
+  .ep-plataformas .indisponivel:hover{ background:transparent; }
+
+  @media (max-width:900px){
+    .capa{ height:auto; padding:70px 22px 80px; margin-top:0; }
+    .capa h1{ font-size:clamp(24px,6.2vw,32px); }
+    .capa p{ font-size:14.5px; margin-top:14px; }
+    .lista{ padding:50px 0 60px; }
+    .episodio{ grid-template-columns:1fr; gap:22px; padding-bottom:34px; margin-bottom:34px; }
+    .episodio:nth-child(even) .ep-media{ order:0; }
+    .ep-info h2{ font-size:20px; }
+    .ep-info p{ font-size:14.5px; }
+    .ep-tag{ font-size:15px; margin-bottom:10px; }
+    .ep-duracao{ font-size:13.5px; }
+    .ep-plataformas{ gap:8px; margin-top:16px; }
+    .ep-plataformas a{ font-size:12.5px; padding:10px 16px; }
+    .ep-media.em-breve span{ font-size:16px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="navbar compacto">
+  <div class="container">
+    <a href="index.html"><img src="assets/partes/header-logo-colorido.png" alt="Palpitamente" class="logo"></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Início
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+      <li><a href="sobre.html">Sobre nós
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+      <li><a href="produtos.html">Diário Digital
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+      <li><a href="index.html#contato">Contato
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+      <li><a href="login.html" id="navEntrar">Entrar
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+    </ul>
+    <div class="nav-social">
+      <a href="#" aria-label="Instagram"><img src="assets/partes/header-instagram-colorido.png" alt="Instagram"></a>
+      <a href="#" aria-label="YouTube"><img src="assets/partes/header-youtube-colorido.png" alt="YouTube"></a>
+      <a href="#" aria-label="TikTok"><img src="assets/partes/header-tiktok-colorido.png" alt="TikTok"></a>
+      <a href="#" aria-label="Spotify"><img src="assets/partes/header-spotify-colorido.png" alt="Spotify"></a>
+      <a href="#" class="ic-wide" aria-label="SoundCloud"><img src="assets/partes/header-soundcloud-colorido.png" alt="SoundCloud"></a>
+    </div>
+  </div>
+</nav>
+
+<section class="capa">
+  <div class="capa-recorte"></div>
+  <div class="capa-conteudo">
+    <h1>Todos os <span class="grifado">palpites</span></h1>
+    <p>Cada conversa que a gente já teve, reunida em um lugar só. Ouça por onde preferir.</p>
+  </div>
+</section>
+
+<section class="lista">
+  <div class="container" id="listaEpisodios"></div>
+</section>
+
+<footer id="contato">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <img src="assets/partes/footer-logo-branco.png" alt="Palpitamente" class="footer-logo">
+      </div>
+      <div class="footer-col">
+        <h4>Navegação</h4>
+        <ul>
+          <li><a href="index.html">Início</a></li>
+          <li><a href="sobre.html">Sobre nós</a></li>
+          <li><a href="produtos.html">Diário digital</a></li>
+          <li><a href="tel:+5511957895463">(11) 95789-5463</a></li>
+          <li><a href="mailto:contato@palpitamente.com">contato@palpitamente.com</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Siga-Nos</h4>
+        <div class="footer-social">
+          <a href="#" aria-label="Instagram"><img src="assets/partes/footer-instagram-branco.png" alt="Instagram"></a>
+          <a href="#" aria-label="YouTube"><img src="assets/partes/footer-youtube-branco.png" alt="YouTube"></a>
+          <a href="#" aria-label="TikTok"><img src="assets/partes/footer-tiktok-branco.png" alt="TikTok"></a>
+          <a href="#" aria-label="Spotify"><img src="assets/partes/footer-spotify-branco.png" alt="Spotify"></a>
+          <a href="#" class="ic-wide" aria-label="SoundCloud"><img src="assets/partes/footer-soundcloud-branco.png" alt="SoundCloud"></a>
+        </div>
+        <ul><li><a href="#">@palpitamente</a></li></ul>
+      </div>
+      <div class="footer-col">
+        <h4>Formas de Pagamento</h4>
+        <div class="footer-pagamento">
+          <div class="pagamento-linha"><img src="assets/partes/pag-boleto.png" alt=""> Boleto</div>
+          <div class="pagamento-linha"><img src="assets/partes/pag-pix.png" alt=""> PIX</div>
+          <div class="pagamento-linha"><img src="assets/partes/pag-cartao.png" alt=""> Cartão</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024 Palpitamente. Todos os direitos reservados.</span>
+      <span><a href="#">Política de Privacidade</a><a href="#">Termos de Uso</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/episodios.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+  (function montarLista(){
+    const alvo = document.getElementById('listaEpisodios');
+    if (!alvo || typeof EPISODIOS === 'undefined') return;
+
+    alvo.innerHTML = EPISODIOS.map(ep => {
+      const link = linkDoEpisodio(ep);
+
+      const media = link
+        ? `<div class="ep-media">
+             <iframe src="https://www.youtube.com/embed/${ep.youtube}"
+                     title="${ep.titulo}" loading="lazy" allowfullscreen
+                     allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+           </div>`
+        : `<div class="ep-media em-breve"><span>Lançamento em breve</span></div>`;
+
+      const plataformas = link ? `
+        <div class="ep-plataformas">
+          <a href="${link}" target="_blank" rel="noopener">
+            <img src="assets/partes/footer-youtube-branco.png" alt=""> Ouvir no YouTube
+          </a>
+          ${ep.spotify
+            ? `<a href="${ep.spotify}" target="_blank" rel="noopener"><img src="assets/partes/footer-spotify-branco.png" alt=""> Spotify</a>`
+            : `<span class="indisponivel">Em breve no Spotify</span>`}
+          ${ep.soundcloud
+            ? `<a href="${ep.soundcloud}" target="_blank" rel="noopener"><img src="assets/partes/footer-soundcloud-branco.png" alt=""> SoundCloud</a>`
+            : `<span class="indisponivel">Em breve no SoundCloud</span>`}
+        </div>` : '';
+
+      const duracao = ep.duracao ? `
+        <span class="ep-duracao">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> ${ep.duracao}
+        </span>` : '';
+
+      return `<article class="episodio">
+                ${media}
+                <div class="ep-info">
+                  <span class="ep-tag">#${ep.numero}</span>
+                  <h2>${ep.titulo || 'Em breve'}</h2>
+                  <p>${ep.descricao || 'Esse episódio ainda está sendo preparado. Acompanhe a gente para não perder.'}</p>
+                  ${duracao}
+                  ${plataformas}
+                </div>
+              </article>`;
+    }).join('');
+  })();
+
+  (async () => {
+    const user = await getUsuarioLogado();
+    if (user) {
+      const link = document.getElementById('navEntrar');
+      link.childNodes[0].nodeValue = 'Minha conta';
+      link.href = 'diario.html';
+    }
+  })();
+</script>
+</body>
+</html>
