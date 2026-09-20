@@ -111,13 +111,17 @@
   .diario-texto{ margin-top:1rem; font-size:1.5rem; line-height:1.55; color:#EDF2F6; max-width:31rem; }
   .diario-frase{ margin-top:1.4rem; font-size:1.5rem; font-style:italic; font-weight:700; color:#fff; }
   .diario-cta{ margin-top:1.9rem; font-size:1.4rem; padding:1.05rem 2.1rem; }
-  .colagem{ position:relative; width:100%; height:88%; align-self:center; }
-  .colagem img{ position:absolute; }
-  .colagem .papel-1{ width:26%; left:8%;  top:36%; }
-  .colagem .papel-2{ width:22%; right:20%; top:52%; }
-  .colagem .rabisco{ width:30%; right:0;  top:42%; }
-  .colagem .notebook{ width:54%; left:16%; top:30%; }
-  .colagem .olho{ width:32%; right:12%; top:2%; }
+  .colagem{ position:relative; width:100%; height:100%; align-self:center; }
+  .colagem img{
+    position:absolute; height:auto; object-fit:contain; object-position:center;
+  }
+  /* as pecas respeitam a largura E a altura da faixa, para nao vazarem
+     quando a tela fica muito larga */
+  .colagem .papel-1{ width:26%; max-height:46%; left:0%;  top:34%; }
+  .colagem .papel-2{ width:22%; max-height:40%; right:12%; top:52%; }
+  .colagem .rabisco{ width:30%; max-height:48%; right:-4%; top:34%; }
+  .colagem .notebook{ width:80%; max-height:78%; left:4%;  top:17%; }
+  .colagem .olho{ width:36%; max-height:44%; right:3%; top:1%; }
 
   .carrossel-seta{
     position:absolute; top:50%; transform:translateY(-50%); z-index:6;
