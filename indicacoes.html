@@ -35,9 +35,6 @@
     margin-top:1.8rem; font-size:1.45rem; line-height:1.55;
     color:#FBF3EF; max-width:48rem; margin-inline:auto;
   }
-  .capa-livro, .capa-camera{ position:absolute; z-index:2; max-height:56%; width:auto; }
-  .capa-livro{ left:5%; top:40%; }
-  .capa-camera{ right:5%; top:44%; }
 
   /* ---------- GRUPOS ---------- */
   .indicacoes{ padding:8rem 0 9rem; }
@@ -54,22 +51,50 @@
     background-image:url('assets/partes/ultimos-palpites-grifado.png');
     background-size:100% 100%; background-repeat:no-repeat; z-index:-1;
   }
-  .grupo-lista{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:2.4rem; }
+  /* filtro de genero */
+  .filtros{ display:flex; flex-wrap:wrap; gap:0.9rem; margin-bottom:3rem; }
+  .filtro{
+    font-family:var(--font-body); font-size:1.2rem; font-weight:600;
+    color:var(--verde-escuro); background:transparent;
+    border:0.15rem solid var(--verde-escuro); border-radius:2rem;
+    padding:0.7rem 1.6rem; cursor:pointer;
+    transition:background .18s ease, color .18s ease;
+  }
+  .filtro:hover{ background:rgba(94,96,58,0.1); }
+  .filtro.ativo{ background:var(--verde-escuro); color:#fff; }
+  .filtro .conta{ opacity:0.65; margin-left:0.45rem; font-weight:500; }
+
+  .grupo-lista{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:2.2rem; }
   .indicacao{
-    background:#FBF7F1; border-radius:1rem;
-    padding:2.4rem 2.2rem;
-    border-left:0.5rem solid var(--rosa);
-    box-shadow:0 0.4rem 1.6rem rgba(0,0,0,0.05);
+    background:#FBF7F1; border-radius:1rem; overflow:hidden;
+    box-shadow:0 0.4rem 1.6rem rgba(0,0,0,0.06);
+    display:flex; flex-direction:column;
   }
+  /* capa */
+  .ind-capa{
+    width:100%; aspect-ratio:2/3; position:relative; overflow:hidden;
+    background:var(--rosa);
+  }
+  .ind-capa img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .ind-capa.sem-imagem{
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    padding:2rem 1.6rem;
+    background:linear-gradient(160deg, #CA8F82 0%, #B57F73 100%);
+  }
+  .ind-capa.sem-imagem svg{ width:38%; height:auto; opacity:0.35; fill:none; stroke:#fff; stroke-width:1.4; }
+  .ind-texto{ padding:1.6rem 1.5rem 1.8rem; display:flex; flex-direction:column; flex:1; }
   .indicacao h3{
-    font-family:var(--font-title); font-size:1.85rem; line-height:1.2;
-    color:var(--tinta); text-transform:uppercase; margin-bottom:0.7rem;
+    font-family:var(--font-title); font-size:1.5rem; line-height:1.22;
+    color:var(--tinta); text-transform:uppercase; margin-bottom:0.55rem;
   }
-  .indicacao .autor{
-    font-size:1.3rem; font-weight:600; color:var(--rosa);
-    letter-spacing:0.02em;
+  .indicacao .autor{ font-size:1.2rem; font-weight:600; color:var(--rosa); letter-spacing:0.02em; }
+  .indicacao .genero{
+    display:inline-block; align-self:flex-start; margin-top:1rem;
+    font-size:1.05rem; font-weight:600; color:#6A6A52;
+    background:#EFE6DA; border-radius:1.4rem; padding:0.4rem 0.9rem;
   }
-  .indicacao .nota{ margin-top:1.1rem; font-size:1.3rem; line-height:1.7; color:#4A4A38; }
+  .indicacao .nota{ margin-top:1rem; font-size:1.2rem; line-height:1.65; color:#4A4A38; }
+  .sem-resultado{ font-size:1.4rem; color:#7A7A62; font-style:italic; padding:1.5rem 0; }
   .grupo-vazio{
     font-size:1.4rem; color:#7A7A62; font-style:italic;
     padding:2.2rem 0 0;
@@ -79,16 +104,18 @@
     .capa{ height:auto; padding:70px 22px 80px; margin-top:0; }
     .capa h1{ font-size:clamp(24px,6.2vw,32px); }
     .capa p{ font-size:14.5px; margin-top:14px; }
-    .capa-livro, .capa-camera{ position:relative; left:auto; right:auto; top:auto;
-                               max-height:none; width:96px; margin:22px auto 0; display:block; }
     .indicacoes{ padding:50px 0 60px; }
     .grupo{ margin-bottom:44px; }
     .grupo-titulo{ font-size:19px; padding:11px 24px 14px; margin-bottom:22px; }
-    .grupo-lista{ grid-template-columns:1fr; gap:16px; }
-    .indicacao{ padding:18px 16px; border-left-width:5px; }
-    .indicacao h3{ font-size:17px; }
-    .indicacao .autor{ font-size:13.5px; }
-    .indicacao .nota{ font-size:13.5px; }
+    .filtros{ gap:7px; margin-bottom:20px; }
+    .filtro{ font-size:12px; padding:8px 13px; border-width:2px; }
+    .grupo-lista{ grid-template-columns:repeat(2, minmax(0,1fr)); gap:14px; }
+    .ind-texto{ padding:12px 12px 14px; }
+    .ind-capa.sem-imagem svg{ width:42%; }
+    .indicacao h3{ font-size:14px; }
+    .indicacao .autor{ font-size:12px; }
+    .indicacao .genero{ font-size:10.5px; padding:4px 8px; margin-top:8px; }
+    .indicacao .nota{ font-size:12px; }
     .grupo-vazio{ font-size:14px; }
   }
 </style>
@@ -122,8 +149,6 @@
 
 <section class="capa">
   <div class="capa-recorte"></div>
-  <img src="assets/partes/ver-ler-pensar-livro.png" alt="" class="capa-livro">
-  <img src="assets/partes/ver-ler-pensar-camera.png" alt="" class="capa-camera">
   <div class="capa-conteudo">
     <h1>Para ver, ler e <span class="grifado">pensar</span></h1>
     <p>Livros, filmes e outras indicações que fazem parte das nossas conversas e também da nossa vida.</p>
@@ -180,25 +205,75 @@
 <script src="assets/indicacoes.js"></script>
 <script src="assets/supabase-client.js"></script>
 <script>
+  // simbolo usado enquanto nao ha imagem de capa
+  const SEM_CAPA = `<svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 5.5C3 4.7 3.7 4 4.5 4H10c1.1 0 2 .9 2 2v13c0-1.1-.9-2-2-2H4.5C3.7 17 3 16.3 3 15.5v-10z"/>
+      <path d="M21 5.5c0-.8-.7-1.5-1.5-1.5H14c-1.1 0-2 .9-2 2v13c0-1.1.9-2 2-2h5.5c.8 0 1.5-.7 1.5-1.5v-10z"/>
+    </svg>`;
+
   (function montarIndicacoes(){
     const alvo = document.getElementById('listaIndicacoes');
     if (!alvo || typeof INDICACOES === 'undefined') return;
 
+    function cartao(i){
+      const capa = capaDaIndicacao(i);
+      const imagem = capa
+        ? `<div class="ind-capa"><img src="${capa}" alt="Capa de ${i.titulo}" loading="lazy"
+             onerror="this.parentElement.classList.add('sem-imagem'); this.outerHTML=SEM_CAPA"></div>`
+        : `<div class="ind-capa sem-imagem">${SEM_CAPA}</div>`;
+      return `<article class="indicacao" data-genero="${i.genero || ''}">
+                ${imagem}
+                <div class="ind-texto">
+                  <h3>${i.titulo}</h3>
+                  <span class="autor">${i.autor}</span>
+                  ${i.genero ? `<span class="genero">${i.genero}</span>` : ''}
+                  ${i.nota ? `<p class="nota">${i.nota}</p>` : ''}
+                </div>
+              </article>`;
+    }
+
     alvo.innerHTML = GRUPOS.map(g => {
       const itens = INDICACOES.filter(i => i.tipo === g.tipo);
-      const conteudo = itens.length
-        ? `<div class="grupo-lista">` + itens.map(i => `
-             <article class="indicacao">
-               <h3>${i.titulo}</h3>
-               <span class="autor">${i.autor}</span>
-               ${i.nota ? `<p class="nota">${i.nota}</p>` : ''}
-             </article>`).join('') + `</div>`
-        : `<p class="grupo-vazio">${g.vazio}</p>`;
-      return `<div class="grupo">
+      if (!itens.length) {
+        return `<div class="grupo"><span class="grupo-titulo">${g.titulo}</span>
+                  <p class="grupo-vazio">${g.vazio}</p></div>`;
+      }
+      const generos = generosDoTipo(g.tipo);
+      // so mostra o filtro se houver mais de um genero
+      const filtros = generos.length > 1
+        ? `<div class="filtros" data-tipo="${g.tipo}">
+             <button class="filtro ativo" data-genero="todos">Todos<span class="conta">${itens.length}</span></button>
+             ${generos.map(ge => {
+                const n = itens.filter(i => i.genero === ge).length;
+                return `<button class="filtro" data-genero="${ge}">${ge}<span class="conta">${n}</span></button>`;
+             }).join('')}
+           </div>`
+        : '';
+      return `<div class="grupo" data-tipo="${g.tipo}">
                 <span class="grupo-titulo">${g.titulo}</span>
-                ${conteudo}
+                ${filtros}
+                <div class="grupo-lista">${itens.map(cartao).join('')}</div>
+                <p class="sem-resultado" hidden>Nenhuma indicação nesse gênero ainda.</p>
               </div>`;
     }).join('');
+
+    // ----- filtragem -----
+    alvo.addEventListener('click', e => {
+      const btn = e.target.closest('.filtro');
+      if (!btn) return;
+      const grupo = btn.closest('.grupo');
+      const escolhido = btn.dataset.genero;
+
+      grupo.querySelectorAll('.filtro').forEach(b => b.classList.toggle('ativo', b === btn));
+
+      let visiveis = 0;
+      grupo.querySelectorAll('.indicacao').forEach(card => {
+        const mostra = (escolhido === 'todos') || (card.dataset.genero === escolhido);
+        card.hidden = !mostra;
+        if (mostra) visiveis++;
+      });
+      grupo.querySelector('.sem-resultado').hidden = visiveis > 0;
+    });
   })();
 
   (async () => {

@@ -1,0 +1,14 @@
+Coloque aqui as imagens de capa dos livros, filmes e series.
+
+Use nomes simples, sem acento e sem espaco, por exemplo:
+  tudo-e-rio.jpg
+  os-abismos.jpg
+
+Depois, em assets/indicacoes.js, escreva o nome do arquivo no
+campo "capa" da obra correspondente:
+
+  { tipo:'livro', titulo:'Tudo e Rio', ..., capa:'tudo-e-rio.jpg', ... }
+
+Formato sugerido: proporcao 2x3 (ex.: 400 x 600 pixels), em JPG.
+Se o arquivo nao existir, o site mostra o simbolo de livro no lugar,
+sem quebrar nada.
