@@ -100,7 +100,15 @@
   .opcao .conta{ margin-left:auto; font-size:1rem; color:#9A917F; }
   .opcao.zerada{ opacity:0.4; }
 
-  .lista-generos{ max-height:32rem; overflow-y:auto; padding-right:0.4rem; }
+  .sub-generos{ margin-bottom:1.6rem; }
+  .sub-generos:last-child{ margin-bottom:0; }
+  .sub-generos > h4{
+    font-family:var(--font-body); font-size:0.95rem; font-weight:700;
+    color:#9A917F; text-transform:uppercase; letter-spacing:0.09em;
+    margin-bottom:0.6rem; padding-bottom:0.45rem;
+    border-bottom:0.1rem dashed #DCD0C2;
+  }
+  .lista-generos{ max-height:24rem; overflow-y:auto; padding-right:0.5rem; }
   .lista-generos::-webkit-scrollbar{ width:0.5rem; }
   .lista-generos::-webkit-scrollbar-thumb{ background:#D6CABB; border-radius:1rem; }
 
@@ -232,7 +240,8 @@
     .opcao{ font-size:13.5px; padding:6px 0; }
     .opcao input{ width:17px; height:17px; }
     .opcao input:checked::after{ left:5px; top:2px; width:4px; height:8px; }
-    .lista-generos{ max-height:230px; }
+    .lista-generos{ max-height:200px; }
+    .sub-generos > h4{ font-size:10px; }
 
     .resultados-topo{ margin-bottom:14px; gap:10px; }
     .contagem{ font-size:13px; }
@@ -414,14 +423,31 @@
       return opcao('tipo', g.tipo, pluralTipo[g.tipo], n);
     }).join('');
 
-    // generos de todos os tipos, sem repetir, na ordem das listas oficiais
-    const todosGeneros = [];
-    ['livro','filme','serie'].forEach(t => generosDoTipo(t).forEach(g => {
-      if (!todosGeneros.includes(g)) todosGeneros.push(g);
-    }));
-    elGen.innerHTML = '<h3>Gênero</h3><div class="lista-generos">' +
-      todosGeneros.map(g => opcao('genero', g, g, INDICACOES.filter(i => i.genero === g).length)).join('') +
-      '</div>';
+    // as duas listas completas de genero, uma para livros e outra para tela
+    function listaGeneros(generos, tipos){
+      return generos.map(g => {
+        const n = INDICACOES.filter(i => tipos.includes(i.tipo) && i.genero === g).length;
+        return opcao('genero', g, g, n);
+      }).join('');
+    }
+    elGen.innerHTML = '<h3>Gênero</h3>' +
+      `<div class="sub-generos" data-para="livro">
+         <h4>Livros</h4>
+         <div class="lista-generos">${listaGeneros(GENEROS_LIVRO, ['livro'])}</div>
+       </div>` +
+      `<div class="sub-generos" data-para="tela">
+         <h4>Filmes e séries</h4>
+         <div class="lista-generos">${listaGeneros(GENEROS_TELA, ['filme','serie'])}</div>
+       </div>`;
+
+    // a lista de genero acompanha o tipo escolhido
+    function ajustarBlocos(){
+      const soLivro = escolhidos.tipo.has('livro');
+      const soTela  = escolhidos.tipo.has('filme') || escolhidos.tipo.has('serie');
+      const nenhum  = escolhidos.tipo.size === 0;
+      elGen.querySelector('[data-para="livro"]').hidden = !(nenhum || soLivro);
+      elGen.querySelector('[data-para="tela"]').hidden  = !(nenhum || soTela);
+    }
 
     // ---------- cards ----------
     function cartao(i){
@@ -463,6 +489,7 @@
         `<button type="button" class="marcador" data-grupo="${a.g}" data-valor="${a.v}">
            ${a.txt} <span>&times;</span></button>`).join('');
       btnLimpar.disabled = ativos.length === 0;
+      ajustarBlocos();
     }
 
     document.querySelector('.lateral').addEventListener('change', e => {
@@ -470,6 +497,9 @@
       if (!cb) return;
       const conj = escolhidos[cb.dataset.grupo];
       cb.checked ? conj.add(cb.value) : conj.delete(cb.value);
+      // o mesmo genero aparece nas duas listas: manter em sincronia
+      document.querySelectorAll(`input[data-grupo="${cb.dataset.grupo}"][value="${CSS.escape(cb.value)}"]`)
+        .forEach(o => o.checked = cb.checked);
       aplicar();
     });
 
@@ -477,8 +507,8 @@
       const m = e.target.closest('.marcador');
       if (!m) return;
       escolhidos[m.dataset.grupo].delete(m.dataset.valor);
-      const cb = document.querySelector(`input[data-grupo="${m.dataset.grupo}"][value="${m.dataset.valor}"]`);
-      if (cb) cb.checked = false;
+      document.querySelectorAll(`input[data-grupo="${m.dataset.grupo}"][value="${m.dataset.valor}"]`)
+        .forEach(cb => cb.checked = false);
       aplicar();
     });
 
