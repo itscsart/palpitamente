@@ -9,41 +9,89 @@
 <link rel="stylesheet" href="assets/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+  /* ---------- faixa verde texturizada ---------- */
   .auth-wrap{
-    min-height:calc(100vh - 90px);
-    display:flex; align-items:center; justify-content:center;
-    background:var(--verde-claro);
-    padding:60px 6vw;
+    position:relative; margin-top:7.6rem;
+    min-height:48rem; display:flex; align-items:center; justify-content:center;
+    padding:7rem 0;
   }
+  .auth-fundo{
+    position:absolute; inset:0; z-index:0;
+    background-color:#86964D; background-image:url('assets/partes/faixa-verde-claro.png');
+    background-repeat:repeat; background-size:31.25rem 31.25rem;
+  }
+
+  /* ---------- cartão ---------- */
   .auth-card{
     position:relative; z-index:2;
-    background:var(--creme);
-    width:100%; max-width:420px;
-    padding:44px 38px;
-    border-radius:6px;
-    box-shadow:12px 16px 0 rgba(0,0,0,0.14);
+    background:#FBF7F1;
+    width:min(38rem, 100%);
+    padding:3.4rem 3.2rem 3.6rem;
+    border-radius:1.6rem;
+    box-shadow:0 1.2rem 3rem rgba(0,0,0,0.18);
   }
-  .auth-tabs{ display:flex; gap:8px; margin-bottom:28px; }
+  .auth-tabs{ display:flex; gap:0.7rem; margin-bottom:2.6rem; }
   .auth-tab{
-    flex:1; text-align:center; padding:12px; border-radius:30px;
-    font-weight:700; font-size:14px; cursor:pointer; border:none;
-    background:transparent; color:var(--tinta); transition:all .2s ease;
+    flex:1; text-align:center; padding:0.95rem 1rem;
+    border-radius:2rem; border:none; cursor:pointer;
+    font-family:var(--font-body); font-size:1.25rem; font-weight:700;
+    background:transparent; color:#6A6A52;
+    transition:background .18s ease, color .18s ease;
   }
+  .auth-tab:hover{ background:#EFE6DA; }
   .auth-tab.active{ background:var(--verde-escuro); color:#fff; }
-  .auth-title{ font-size:26px; text-transform:uppercase; margin-bottom:6px; }
-  .auth-sub{ font-size:13.5px; color:#5a5a48; margin-bottom:24px; }
-  .field{ margin-bottom:16px; }
-  .field label{ display:block; font-size:13px; font-weight:700; margin-bottom:6px; }
-  .field input{
-    width:100%; padding:13px 14px; border-radius:8px; border:1.5px solid #ddd4c2;
-    font-family:inherit; font-size:14px; background:#fff;
+
+  .auth-title{
+    font-family:var(--font-title); font-size:2.5rem; line-height:1.14;
+    color:var(--tinta); text-transform:uppercase; margin-bottom:0.5rem;
   }
-  .field input:focus{ outline:none; border-color:var(--verde-escuro); }
-  .auth-submit{ width:100%; margin-top:8px; text-align:center; }
-  .auth-msg{ margin-top:14px; font-size:13px; text-align:center; min-height:18px; }
-  .auth-msg.error{ color:#b5473c; }
+  .auth-sub{ font-size:1.3rem; line-height:1.55; color:#5A5A48; margin-bottom:2.4rem; }
+
+  .field{ margin-bottom:1.5rem; }
+  .field label{
+    display:block; font-size:1.15rem; font-weight:700;
+    color:var(--tinta); margin-bottom:0.55rem; letter-spacing:0.01em;
+  }
+  .field input{
+    width:100%; padding:1.15rem 1.3rem;
+    border-radius:0.8rem; border:0.13rem solid #DDD4C2;
+    font-family:inherit; font-size:1.3rem; color:var(--tinta);
+    background:#fff; transition:border-color .18s ease, box-shadow .18s ease;
+  }
+  .field input::placeholder{ color:#A9A192; }
+  .field input:focus{
+    outline:none; border-color:var(--verde-escuro);
+    box-shadow:0 0 0 0.25rem rgba(94,96,58,0.12);
+  }
+
+  .auth-submit{
+    width:100%; text-align:center; margin-top:0.8rem;
+    font-size:1.35rem; padding:1.2rem 2rem;
+  }
+  .auth-msg{ margin-top:1.3rem; font-size:1.2rem; text-align:center; min-height:1.7rem; }
+  .auth-msg.error{ color:#B5473C; }
   .auth-msg.ok{ color:var(--verde-escuro); }
-  .back-home{ display:block; text-align:center; margin-top:20px; font-size:13px; font-weight:600; color:var(--verde-escuro); }
+  .back-home{
+    display:block; text-align:center; margin-top:2rem;
+    font-size:1.2rem; font-weight:600; color:var(--verde-escuro);
+  }
+  .back-home:hover{ color:#4b4d2e; }
+
+  @media (max-width:900px){
+    .auth-wrap{ margin-top:0; min-height:0; padding:50px 22px 60px; }
+    .auth-fundo{ background-size:250px 250px; }
+    .auth-card{ width:100%; max-width:420px; padding:26px 22px 30px; border-radius:16px; }
+    .auth-tabs{ gap:6px; margin-bottom:20px; }
+    .auth-tab{ font-size:13px; padding:11px 8px; }
+    .auth-title{ font-size:22px; }
+    .auth-sub{ font-size:13.5px; margin-bottom:18px; }
+    .field{ margin-bottom:13px; }
+    .field label{ font-size:12.5px; }
+    .field input{ font-size:14px; padding:12px 13px; border-width:2px; }
+    .auth-submit{ font-size:13.5px; padding:14px 20px; }
+    .auth-msg{ font-size:12.5px; }
+    .back-home{ font-size:12.5px; margin-top:16px; }
+  }
 </style>
 </head>
 <body>
@@ -76,7 +124,7 @@
 </nav>
 
 <div class="auth-wrap">
-  <div class="grain"></div>
+  <div class="auth-fundo"></div>
   <div class="auth-card">
     <div class="auth-tabs">
       <button class="auth-tab active" id="tabEntrar">Entrar</button>
@@ -120,6 +168,50 @@
     <a href="index.html" class="back-home">← Voltar para o início</a>
   </div>
 </div>
+
+
+<footer id="contato">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <img src="assets/partes/footer-logo-branco.png" alt="Palpitamente" class="footer-logo">
+      </div>
+      <div class="footer-col">
+        <h4>Navegação</h4>
+        <ul>
+          <li><a href="index.html">Início</a></li>
+          <li><a href="sobre.html">Sobre nós</a></li>
+          <li><a href="produtos.html">Diário digital</a></li>
+          <li><a href="tel:+5511957895463">(11) 95789-5463</a></li>
+          <li><a href="mailto:contato@palpitamente.com">contato@palpitamente.com</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Siga-Nos</h4>
+        <div class="footer-social">
+          <a href="https://www.instagram.com/palpitamente" target="_blank" rel="noopener" aria-label="Instagram"><img src="assets/partes/footer-instagram-branco.png" alt="Instagram"></a>
+          <a href="https://www.youtube.com/@PalpitamentePodcast" target="_blank" rel="noopener" aria-label="YouTube"><img src="assets/partes/footer-youtube-branco.png" alt="YouTube"></a>
+          <a href="https://www.tiktok.com/@palpitamente" target="_blank" rel="noopener" aria-label="TikTok"><img src="assets/partes/footer-tiktok-branco.png" alt="TikTok"></a>
+          <a href="https://open.spotify.com/show/4Nqvxvfy1jntHZeC2VltgI" target="_blank" rel="noopener" aria-label="Spotify"><img src="assets/partes/footer-spotify-branco.png" alt="Spotify"></a>
+          <a href="https://on.soundcloud.com/6PZZUpQEnQgUUDeTgH" target="_blank" rel="noopener" class="ic-wide" aria-label="SoundCloud"><img src="assets/partes/footer-soundcloud-branco.png" alt="SoundCloud"></a>
+        </div>
+        <ul><li><a href="https://www.instagram.com/palpitamente" target="_blank" rel="noopener">@palpitamente</a></li></ul>
+      </div>
+      <div class="footer-col">
+        <h4>Formas de Pagamento</h4>
+        <div class="footer-pagamento">
+          <div class="pagamento-linha"><img src="assets/partes/pag-boleto.png" alt=""> Boleto</div>
+          <div class="pagamento-linha"><img src="assets/partes/pag-pix.png" alt=""> PIX</div>
+          <div class="pagamento-linha"><img src="assets/partes/pag-cartao.png" alt=""> Cartão</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024 Palpitamente. Todos os direitos reservados.</span>
+      <span><a href="#">Política de Privacidade</a><a href="#">Termos de Uso</a></span>
+    </div>
+  </div>
+</footer>
 
 <script src="assets/supabase-client.js"></script>
 <script>
