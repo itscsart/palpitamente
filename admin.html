@@ -178,7 +178,7 @@
     <div class="abas">
       <button class="aba ativa" data-painel="episodios">Episódios</button>
       <button class="aba" data-painel="indicacoes">Indicações</button>
-      <button class="aba" data-painel="config">Textos e preços</button>
+      <span id="abasPaginas"></span>
       <button class="aba" data-painel="equipe">Equipe</button>
     </div>
 
@@ -295,32 +295,7 @@
     </div>
 
     <!-- ============ TEXTOS E PREÇOS ============ -->
-    <div class="painel" id="painel-config">
-      <div class="form" id="formConfig" hidden>
-        <h3 id="tituloFormCfg">Editar</h3>
-        <div class="grade-campos">
-          <div class="campo largo" id="campoCfgArea">
-            <label id="rotuloCfg"></label>
-            <input type="text" id="cfgValor">
-            <textarea id="cfgValorLongo" hidden></textarea>
-            <small id="dicaCfg"></small>
-          </div>
-        </div>
-        <div class="form-acoes">
-          <button class="bt principal" id="btSalvarCfg">Salvar</button>
-          <button class="bt" id="btCancelarCfg">Cancelar</button>
-          <span class="recado" id="recadoConfig"></span>
-        </div>
-      </div>
-
-      <div class="acoes-topo">
-        <span class="contagem" id="contConfig"></span>
-        <div class="campo" style="min-width:20rem">
-          <select id="filtroGrupo"><option value="">Todos os grupos</option></select>
-        </div>
-      </div>
-      <div class="lista" id="listaConfig"></div>
-    </div>
+    <div id="paineisPaginas"></div>
 
     <!-- ============ EQUIPE ============ -->
     <div class="painel" id="painel-equipe">
@@ -413,13 +388,18 @@ function codigoYoutube(v){
 })();
 
 function ligarAbas(){
-  $$('.aba').forEach(b => b.addEventListener('click', () => {
-    $$('.aba').forEach(x => x.classList.toggle('ativa', x === b));
-    $$('.painel').forEach(p => p.classList.toggle('ativo', p.id === 'painel-' + b.dataset.painel));
-    location.hash = b.dataset.painel;
-  }));
+  $$('.aba').forEach(b => {
+    if (b.dataset.ligado) return;          // evita ouvinte repetido
+    b.dataset.ligado = '1';
+    b.addEventListener('click', () => {
+      $$('.aba').forEach(x => x.classList.toggle('ativa', x === b));
+      $$('.painel').forEach(p => p.classList.toggle('ativo', p.id === 'painel-' + b.dataset.painel));
+      location.hash = b.dataset.painel;
+    });
+  });
   const alvo = (location.hash||'').replace('#','');
-  if (alvo) $(`.aba[data-painel="${alvo}"]`)?.click();
+  if (alvo && !document.querySelector('.aba.ativa[data-painel="'+alvo+'"]'))
+    $(`.aba[data-painel="${alvo}"]`)?.click();
 }
 
 // ============================================================
@@ -660,78 +640,76 @@ async function carregarConfig(){
   if (error) { console.error(error); return; }
   configs = data || [];
 
-  const grupos = [...new Set(configs.map(c => c.grupo))];
-  const atual = $('#filtroGrupo').value;
-  $('#filtroGrupo').innerHTML = '<option value="">Todos os grupos</option>' +
-    grupos.map(g => `<option${g===atual?' selected':''}>${escapar(g)}</option>`).join('');
+  // uma aba e um painel por página, montados a partir dos grupos
+  const paginas = [...new Set(configs.map(c => c.grupo))];
+  const abaAtiva = document.querySelector('.aba.ativa')?.dataset.painel;
 
-  desenharConfig();
-}
+  document.getElementById('abasPaginas').innerHTML = paginas.map(g =>
+    `<button class="aba" data-painel="pg-${chaveDe(g)}">${escapar(g)}</button>`).join('');
 
-function desenharConfig(){
-  const g = $('#filtroGrupo').value;
-  const lista = g ? configs.filter(c => c.grupo === g) : configs;
-  $('#contConfig').innerHTML = `<strong>${lista.length}</strong> ${lista.length===1?'item':'itens'} para editar`;
-
-  $('#listaConfig').innerHTML = lista.map(c => {
-    const vazio = !c.valor;
-    const previa = vazio ? 'sem conteúdo' : (c.valor.length > 90 ? c.valor.slice(0,90) + '...' : c.valor);
-    return `<div class="linha" data-chave="${c.chave}">
-      <span class="ident" style="font-size:1rem">${escapar(c.grupo)}</span>
-      <div class="resumo">
-        <b>${escapar(c.rotulo || c.chave)}</b>
-        <small style="${vazio?'font-style:italic; opacity:0.6':''}">${escapar(previa)}</small>
+  document.getElementById('paineisPaginas').innerHTML = paginas.map(g => {
+    const campos = configs.filter(c => c.grupo === g);
+    return `<div class="painel" id="painel-pg-${chaveDe(g)}">
+      <p style="font-size:1.25rem; color:#6A6A52; margin-bottom:1.8rem;">
+        ${campos.length} ${campos.length === 1 ? 'texto editável' : 'textos editáveis'} nesta página.
+        Altere e clique em salvar no fim.
+      </p>
+      <div class="form">
+        <div class="grade-campos">
+          ${campos.map(c => `
+            <div class="campo${c.tipo === 'texto_longo' ? ' largo' : ''}">
+              <label>${escapar(c.rotulo || c.chave)}</label>
+              ${c.tipo === 'texto_longo'
+                ? `<textarea data-chave="${c.chave}">${escapar(c.valor)}</textarea>`
+                : `<input type="${c.tipo === 'link' ? 'url' : 'text'}" data-chave="${c.chave}" value="${escapar(c.valor)}">`}
+              ${DICAS[c.chave] ? `<small>${escapar(DICAS[c.chave])}</small>` : ''}
+            </div>`).join('')}
+        </div>
+        <div class="form-acoes">
+          <button class="bt principal" data-salvar="${chaveDe(g)}">Salvar alterações</button>
+          <span class="recado" data-recado="${chaveDe(g)}"></span>
+        </div>
       </div>
-      <div class="botoes"><button class="bt" data-acao="editar">Editar</button></div>
     </div>`;
   }).join('');
+
+  ligarAbas();
+  if (abaAtiva) $(`.aba[data-painel="${abaAtiva}"]`)?.click();
+}
+
+/* "Sobre nós" vira "sobre-nos", para virar id de elemento */
+function chaveDe(texto){
+  return texto.normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+              .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 }
 
 function ligarConfig(){
-  $('#filtroGrupo').addEventListener('change', desenharConfig);
-  $('#btCancelarCfg').addEventListener('click', () => { $('#formConfig').hidden = true; editandoCfg = null; });
-  $('#btSalvarCfg').addEventListener('click', salvarConfig);
+  document.getElementById('paineisPaginas').addEventListener('click', async e => {
+    const bt = e.target.closest('[data-salvar]');
+    if (!bt) return;
+    const painel = bt.closest('.painel');
+    const recadoEl = painel.querySelector('[data-recado]');
+    const campos = [...painel.querySelectorAll('[data-chave]')];
 
-  $('#listaConfig').addEventListener('click', e => {
-    const bt = e.target.closest('[data-acao="editar"]'); if (!bt) return;
-    const chave = bt.closest('.linha').dataset.chave;
-    abrirFormCfg(configs.find(c => c.chave === chave));
+    recadoEl.textContent = 'Salvando...'; recadoEl.className = 'recado';
+    let mudou = 0;
+    for (const el of campos) {
+      const antes = configs.find(c => c.chave === el.dataset.chave);
+      if (antes && antes.valor === el.value) continue;   // só grava o que mudou
+      const { error } = await supabaseClient.from('config_site')
+        .update({ valor: el.value }).eq('chave', el.dataset.chave);
+      if (error) {
+        recadoEl.textContent = error.message; recadoEl.className = 'recado erro'; return;
+      }
+      mudou++;
+    }
+    recadoEl.textContent = mudou
+      ? `${mudou} ${mudou === 1 ? 'texto atualizado' : 'textos atualizados'}. Já está no site.`
+      : 'Nada foi alterado.';
+    recadoEl.className = 'recado ok';
+    setTimeout(() => { recadoEl.textContent = ''; }, 4000);
+    await carregarConfig();
   });
-}
-
-function abrirFormCfg(c){
-  editandoCfg = c.chave;
-  $('#tituloFormCfg').textContent = c.rotulo || c.chave;
-  $('#rotuloCfg').textContent = c.rotulo || c.chave;
-  $('#dicaCfg').textContent = DICAS[c.chave] || '';
-
-  const longo = c.tipo === 'texto_longo';
-  $('#cfgValor').hidden = longo;
-  $('#cfgValorLongo').hidden = !longo;
-  if (longo) $('#cfgValorLongo').value = c.valor || '';
-  else {
-    $('#cfgValor').type = (c.tipo === 'link') ? 'url' : 'text';
-    $('#cfgValor').value = c.valor || '';
-  }
-
-  $('#formConfig').hidden = false;
-  $('#formConfig').scrollIntoView({ behavior:'smooth', block:'center' });
-  (longo ? $('#cfgValorLongo') : $('#cfgValor')).focus();
-}
-
-async function salvarConfig(){
-  if (!editandoCfg) return;
-  const c = configs.find(x => x.chave === editandoCfg);
-  const valor = (c.tipo === 'texto_longo') ? $('#cfgValorLongo').value : $('#cfgValor').value;
-
-  recado('#recadoConfig','Salvando...');
-  const { error } = await supabaseClient.from('config_site')
-    .update({ valor }).eq('chave', editandoCfg);
-  if (error) return recado('#recadoConfig', error.message, 'erro');
-
-  recado('#recadoConfig','Salvo. Já está no site.','ok');
-  $('#formConfig').hidden = true; editandoCfg = null;
-  await carregarConfig();
 }
 
 // ============================================================

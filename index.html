@@ -255,13 +255,22 @@
     .container{ width:100%; max-width:none; padding:0 22px; }
 
     .carrossel{ margin-top:0; }
-    .slides{ height:auto; }
+    /* No trilho flexível os dois slides ficam com a altura do mais alto.
+       No celular isso esticava a faixa: 688px para 437px de conteúdo.
+       Limitando a colagem, os dois passam a ter altura parecida. */
+    .slides{ height:auto; transition:height .35s ease; }
     .slide{ height:auto; }
-    .carrossel-seta{ width:40px; height:40px; }
-    .carrossel-seta svg{ width:11px; height:11px; }
-    .carrossel-seta.ant{ left:6px; }
-    .carrossel-seta.prox{ right:6px; }
-    .slide .container{ padding:70px 22px 90px; height:auto; overflow:hidden; }
+    .trilha{ align-items:flex-start; }
+    .colagem img{ max-height:210px; }
+    .podcast-foto{ max-width:330px; }
+
+    /* setas embaixo, nos cantos: no meio elas cobriam o texto */
+    .carrossel-seta{ width:38px; height:38px; top:auto; bottom:10px; transform:none; }
+    .carrossel-seta:hover{ transform:none; }
+    .carrossel-seta svg{ width:13px; height:13px; }
+    .carrossel-seta.ant{ left:10px; }
+    .carrossel-seta.prox{ right:10px; }
+    .slide .container{ padding:44px 22px 68px; height:auto; overflow:hidden; }
     .slide-podcast .container, .slide-diario .container{ width:100%; max-width:none; margin-left:0; padding:0 22px; grid-template-columns:1fr; gap:0; }
     .podcast-foto{ width:95%; max-width:none; margin:0 auto 28px; transform:rotate(-1.5deg); }
     .podcast-copy{ width:100%; }
@@ -513,11 +522,27 @@
   const slides = document.querySelectorAll('.slide');
   const pontos = document.querySelectorAll('.ponto');
   let atual = 0, timer;
+  const caixaSlides = document.querySelector('.slides');
+
+  /* No celular a faixa tem altura automática, e o trilho flexível deixa
+     os dois slides com a altura do mais alto. O verde ficava com quase
+     200px de vazio. Aqui a faixa passa a seguir só o slide visível. */
+  function ajustarAltura(){
+    if (window.innerWidth > 900) { caixaSlides.style.height = ''; return; }
+    const ativo = slides[atual];
+    const dentro = ativo.querySelector('.container');
+    if (dentro) caixaSlides.style.height = dentro.offsetHeight + 'px';
+  }
+
   function mostrar(i){
     atual = (i + slides.length) % slides.length;
     trilha.style.transform = 'translateX(-' + (atual * (100 / slides.length)) + '%)';
     pontos.forEach((p,n) => p.classList.toggle('ativo', n === atual));
+    ajustarAltura();
   }
+
+  window.addEventListener('resize', ajustarAltura);
+  window.addEventListener('load', ajustarAltura);
   function iniciar(){ clearInterval(timer); timer = setInterval(() => mostrar(atual + 1), 7000); }
   pontos.forEach(p => p.addEventListener('click', () => { mostrar(Number(p.dataset.ir)); iniciar(); }));
   document.getElementById('slideAnt').addEventListener('click', () => { mostrar(atual - 1); iniciar(); });
