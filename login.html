@@ -68,6 +68,18 @@
     width:100%; text-align:center; margin-top:0.8rem;
     font-size:1.35rem; padding:1.2rem 2rem;
   }
+  .label-linha{ display:flex; align-items:baseline; justify-content:space-between; }
+  .ver-senha{
+    background:none; border:none; cursor:pointer; padding:0;
+    font-family:inherit; font-size:1.05rem; font-weight:600; color:var(--rosa);
+  }
+  .ver-senha:hover{ color:#B5766A; }
+  .link-esqueci{
+    display:block; width:100%; text-align:center; margin-top:1.2rem;
+    background:none; border:none; cursor:pointer;
+    font-family:inherit; font-size:1.2rem; font-weight:600; color:var(--verde-escuro);
+  }
+  .link-esqueci:hover{ color:#4b4d2e; text-decoration:underline; }
   .auth-msg{ margin-top:1.3rem; font-size:1.2rem; text-align:center; min-height:1.7rem; }
   .auth-msg.error{ color:#B5473C; }
   .auth-msg.ok{ color:var(--verde-escuro); }
@@ -90,6 +102,8 @@
     .field input{ font-size:14px; padding:12px 13px; border-width:2px; }
     .auth-submit{ font-size:13.5px; padding:14px 20px; }
     .auth-msg{ font-size:12.5px; }
+    .link-esqueci{ font-size:12.5px; margin-top:10px; }
+    .ver-senha{ font-size:11.5px; }
     .back-home{ font-size:12.5px; margin-top:16px; }
   }
 </style>
@@ -139,11 +153,15 @@
         <input type="email" id="emailEntrar" placeholder="voce@email.com">
       </div>
       <div class="field">
-        <label>Senha</label>
+        <div class="label-linha">
+          <label>Senha</label>
+          <button type="button" class="ver-senha" id="verSenha">mostrar</button>
+        </div>
         <input type="password" id="senhaEntrar" placeholder="••••••••">
       </div>
       <button class="btn-primary auth-submit" id="btnEntrar">Entrar</button>
       <p class="auth-msg" id="msgEntrar"></p>
+      <button type="button" class="link-esqueci" id="linkEsqueci">Esqueci minha senha</button>
     </div>
 
     <div id="painelCadastrar" style="display:none;">
@@ -163,6 +181,36 @@
       </div>
       <button class="btn-primary auth-submit" id="btnCadastrar">Criar conta</button>
       <p class="auth-msg" id="msgCadastrar"></p>
+    </div>
+
+    <div id="painelRecuperar" style="display:none;">
+      <h1 class="auth-title">Recuperar senha</h1>
+      <p class="auth-sub">Digite seu e-mail. A gente manda um link para você criar uma senha nova.</p>
+      <div class="field">
+        <label>E-mail</label>
+        <input type="email" id="emailRecuperar" placeholder="voce@email.com">
+      </div>
+      <button class="btn-primary auth-submit" id="btnRecuperar">Enviar link</button>
+      <p class="auth-msg" id="msgRecuperar"></p>
+      <button type="button" class="link-esqueci" id="voltarEntrar">Voltar para o login</button>
+    </div>
+
+    <div id="painelNovaSenha" style="display:none;">
+      <h1 class="auth-title">Criar senha nova</h1>
+      <p class="auth-sub">Escolha uma senha para a sua conta.</p>
+      <div class="field">
+        <div class="label-linha">
+          <label>Nova senha</label>
+          <button type="button" class="ver-senha" id="verSenhaNova">mostrar</button>
+        </div>
+        <input type="password" id="senhaNova" placeholder="mínimo 6 caracteres">
+      </div>
+      <div class="field">
+        <label>Repita a senha</label>
+        <input type="password" id="senhaNova2" placeholder="digite de novo">
+      </div>
+      <button class="btn-primary auth-submit" id="btnSalvarSenha">Salvar senha</button>
+      <p class="auth-msg" id="msgNovaSenha"></p>
     </div>
 
     <a href="index.html" class="back-home">← Voltar para o início</a>
@@ -228,6 +276,72 @@
     tabCadastrar.classList.add('active'); tabEntrar.classList.remove('active');
     painelCadastrar.style.display = 'block'; painelEntrar.style.display = 'none';
   });
+
+  const painelRecuperar = document.getElementById('painelRecuperar');
+  const painelNovaSenha = document.getElementById('painelNovaSenha');
+  const abas = document.querySelector('.auth-tabs');
+
+  function mostrarPainel(qual){
+    [painelEntrar, painelCadastrar, painelRecuperar, painelNovaSenha]
+      .forEach(p => p.style.display = 'none');
+    qual.style.display = 'block';
+    abas.style.display = (qual === painelEntrar || qual === painelCadastrar) ? 'flex' : 'none';
+  }
+
+  // olhinho de mostrar senha
+  function ligarVerSenha(botao, campo){
+    document.getElementById(botao).addEventListener('click', () => {
+      const c = document.getElementById(campo);
+      const escondida = c.type === 'password';
+      c.type = escondida ? 'text' : 'password';
+      document.getElementById(botao).textContent = escondida ? 'ocultar' : 'mostrar';
+    });
+  }
+  ligarVerSenha('verSenha', 'senhaEntrar');
+  ligarVerSenha('verSenhaNova', 'senhaNova');
+
+  document.getElementById('linkEsqueci').addEventListener('click', () => {
+    document.getElementById('emailRecuperar').value = document.getElementById('emailEntrar').value.trim();
+    mostrarPainel(painelRecuperar);
+  });
+  document.getElementById('voltarEntrar').addEventListener('click', () => mostrarPainel(painelEntrar));
+
+  // pede o link de recuperação
+  document.getElementById('btnRecuperar').addEventListener('click', async () => {
+    const email = document.getElementById('emailRecuperar').value.trim();
+    const msg = document.getElementById('msgRecuperar');
+    if (!email) { msg.textContent = 'Digite seu e-mail.'; msg.className = 'auth-msg error'; return; }
+
+    msg.textContent = 'Enviando...'; msg.className = 'auth-msg';
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/login.html'
+    });
+    if (error) { msg.textContent = error.message; msg.className = 'auth-msg error'; return; }
+    // não confirmamos se o e-mail existe: isso revelaria quem tem conta no site
+    msg.textContent = 'Se esse e-mail tiver conta aqui, o link chega em instantes. Olhe também o spam.';
+    msg.className = 'auth-msg ok';
+  });
+
+  // salva a senha nova
+  document.getElementById('btnSalvarSenha').addEventListener('click', async () => {
+    const a = document.getElementById('senhaNova').value;
+    const b2 = document.getElementById('senhaNova2').value;
+    const msg = document.getElementById('msgNovaSenha');
+    if (a.length < 6)  { msg.textContent = 'A senha precisa ter pelo menos 6 caracteres.'; msg.className = 'auth-msg error'; return; }
+    if (a !== b2)      { msg.textContent = 'As duas senhas não são iguais.'; msg.className = 'auth-msg error'; return; }
+
+    msg.textContent = 'Salvando...'; msg.className = 'auth-msg';
+    const { error } = await supabaseClient.auth.updateUser({ password: a });
+    if (error) { msg.textContent = error.message; msg.className = 'auth-msg error'; return; }
+    msg.textContent = 'Senha trocada! Entrando...'; msg.className = 'auth-msg ok';
+    setTimeout(() => window.location.href = 'diario.html', 1200);
+  });
+
+  // quando a usuária volta pelo link do e-mail, o Supabase avisa aqui
+  supabaseClient.auth.onAuthStateChange((evento) => {
+    if (evento === 'PASSWORD_RECOVERY') mostrarPainel(painelNovaSenha);
+  });
+  if (window.location.hash.includes('type=recovery')) mostrarPainel(painelNovaSenha);
 
   document.getElementById('btnEntrar').addEventListener('click', async () => {
     const email = document.getElementById('emailEntrar').value.trim();
