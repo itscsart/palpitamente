@@ -112,6 +112,20 @@
   .sticker-bt:hover{ transform:scale(1.08); border-color:var(--verde-claro); }
   .sticker-bt.bloqueado{ opacity:0.3; cursor:not-allowed; filter:grayscale(1); }
   .sticker-bt.bloqueado:hover{ transform:none; }
+  .sticker-bt img{ width:80%; height:80%; object-fit:contain; }
+  .sticker-meu{ position:relative; }
+  .sticker-meu .apagar{
+    position:absolute; top:-0.4rem; right:-0.4rem;
+    width:1.7rem; height:1.7rem; border-radius:50%; border:none; cursor:pointer;
+    background:var(--tinta); color:#fff; font-size:1rem; line-height:1;
+    display:none; align-items:center; justify-content:center; padding:0;
+  }
+  .sticker-meu:hover .apagar{ display:flex; }
+  .pacote-equipe{ margin-bottom:1rem; }
+  .pacote-equipe > span{
+    display:block; font-size:0.95rem; font-weight:700; color:#9A917F;
+    margin-bottom:0.5rem;
+  }
   .aviso-fer{ font-size:1rem; color:#9A917F; line-height:1.5; margin-top:0.8rem; }
 
   /* ---------- a página em si ---------- */
@@ -620,7 +634,20 @@
 
           <!-- stickers -->
           <div class="fer-bloco" data-bloco="stickers">
-            <h4>Desbloqueados</h4>
+            <h4>Meus stickers</h4>
+            <label class="subir" style="padding:1.1rem 0.8rem">
+              <input type="file" id="subirSticker" accept="image/png,image/webp,image/jpeg">
+              Subir um sticker meu<br>
+              <small>PNG com fundo transparente, até 300 KB</small>
+            </label>
+            <div class="grade-stickers" id="meusStickers" style="margin-top:0.9rem"></div>
+
+            <div id="secaoEquipe" hidden>
+              <h4 id="tituloEquipe">Pacotes do Palpitamente</h4>
+              <div id="pacotesEquipe"></div>
+            </div>
+
+            <h4>Conquistados</h4>
             <div class="grade-stickers" id="gradeStickers"></div>
             <p class="aviso-fer" id="avisoStickers"></p>
           </div>
@@ -758,6 +785,7 @@
   </div>
 </section>
 
+<script src="assets/stickers.js"></script>
 <script src="assets/supabase-client.js"></script>
 <script>
 // ============================================================
@@ -831,6 +859,9 @@ const $$ = s => [...document.querySelectorAll(s)];
   setInterval(carregarNotificacoes, 60000);   // confere a cada minuto
   montarStickers();
   montarPremios();
+  montarPacotesEquipe();
+  ligarStickersEnviados();
+  await carregarMeusStickers();
 })();
 
 function hoje(){ return new Date().toISOString().slice(0,10); }
@@ -1176,6 +1207,77 @@ function montarStickers(){
   };
 }
 
+// ---------- stickers enviados pela usuária ----------
+let meusStickers = [];
+
+async function carregarMeusStickers(){
+  const { data, error } = await supabaseClient
+    .from('stickers_usuaria').select('*')
+    .eq('user_id', usuaria.id).order('created_at', { ascending:false });
+  if (error) { console.warn('stickers:', error.message); return; }
+  meusStickers = data || [];
+  desenharMeusStickers();
+}
+
+function desenharMeusStickers(){
+  const cx = $('#meusStickers');
+  cx.innerHTML = meusStickers.map(st => `
+    <div class="sticker-meu">
+      <button class="sticker-bt" data-imagem="${st.imagem}" title="${escapar(st.nome||'')}">
+        <img src="${st.imagem}" alt="">
+      </button>
+      <button class="apagar" data-apagar="${st.id}" title="Apagar">&times;</button>
+    </div>`).join('');
+}
+
+function montarPacotesEquipe(){
+  if (typeof PACOTES_EQUIPE === 'undefined') return;
+  const liberados = pacotesLiberados(perfil.pages_written || 0);
+  $('#secaoEquipe').hidden = liberados.length === 0;
+  $('#pacotesEquipe').innerHTML = liberados.map(pk => `
+    <div class="pacote-equipe">
+      <span>${escapar(pk.nome)}</span>
+      <div class="grade-stickers">
+        ${pk.arquivos.map(a => `
+          <button class="sticker-bt" data-imagem="${caminhoSticker(a)}">
+            <img src="${caminhoSticker(a)}" alt="" onerror="this.parentElement.remove()">
+          </button>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function ligarStickersEnviados(){
+  // subir um sticker
+  $('#subirSticker').addEventListener('change', async e => {
+    const arq = e.target.files[0];
+    if (!arq) return;
+    if (arq.size > 300*1024) { alert('O sticker precisa ter no máximo 300 KB.'); e.target.value=''; return; }
+    const leitor = new FileReader();
+    leitor.onload = async () => {
+      const { error } = await supabaseClient.from('stickers_usuaria')
+        .insert({ user_id:usuaria.id, nome:arq.name.replace(/\.[^.]+$/,''), imagem:leitor.result });
+      e.target.value = '';
+      if (error) { alert(error.message); return; }
+      await carregarMeusStickers();
+    };
+    leitor.readAsDataURL(arq);
+  });
+
+  // usar ou apagar
+  document.addEventListener('click', async e => {
+    const apagar = e.target.closest('[data-apagar]');
+    if (apagar) {
+      e.stopPropagation();
+      if (!confirm('Apagar este sticker? Ele some das próximas páginas, mas continua nas já salvas.')) return;
+      await supabaseClient.from('stickers_usuaria').delete().eq('id', apagar.dataset.apagar);
+      await carregarMeusStickers();
+      return;
+    }
+    const usar = e.target.closest('.sticker-bt[data-imagem]');
+    if (usar) inserirItem({ tipo:'foto', src:usar.dataset.imagem, w:14 });
+  });
+}
+
 function montarPremios(){
   const feitas = perfil.pages_written || 0;
   $('#gradePremios').innerHTML = PREMIOS.map(p => {
@@ -1338,6 +1440,7 @@ async function carregarPaginas(){
   atualizarProgresso();
   montarStickers();
   montarPremios();
+  montarPacotesEquipe();
   desenharPaginas();
 }
 

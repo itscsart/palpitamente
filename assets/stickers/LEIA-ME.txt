@@ -1,0 +1,9 @@
+Coloque aqui os PNG dos stickers da equipe.
+
+Recomendado:
+  - fundo transparente
+  - 400 x 400 pixels
+  - ate 150 KB por arquivo
+  - nome sem acento e sem espaco (ex.: coracao-rosa.png)
+
+Depois, registre o pacote em assets/stickers.js.
