@@ -34,11 +34,16 @@
   }
   .slide-podcast .slide-recorte{ background-color:#86964D; background-image:url('assets/partes/faixa-verde-claro.png'); }
   .slide-diario  .slide-recorte{ background-color:#5D85A6; background-image:url('assets/partes/faixa-azul.png'); }
-  .slide .container{ position:relative; z-index:2; height:100%; }
+  .slide .container{
+    position:relative; z-index:2; height:100%;
+    display:grid; align-items:center;
+  }
+  .slide-podcast .container{ grid-template-columns:minmax(0,1.08fr) minmax(0,1fr); gap:5%; }
+  .slide-diario  .container{ grid-template-columns:minmax(0,1fr) minmax(0,1.3fr); gap:3%; }
 
   /* --- slide 1 --- */
   .podcast-foto{
-    position:absolute; left:0; top:6.5rem; width:47rem;
+    width:100%; justify-self:start; align-self:center;
     transform:rotate(-1.5deg);
     /* moldura de papel em volta da foto */
     padding:1.1rem;
@@ -51,8 +56,8 @@
     background:linear-gradient(#BEE2F4 0%, #DBEFF8 60%, #E9F5D7 60%, #E9F5D7 100%);
   }
   .podcast-foto-inner img{ width:100%; height:100%; object-fit:cover; display:block; }
-  .podcast-copy{ position:absolute; left:50rem; top:10rem; width:38rem; }
-  .podcast-seta{ position:absolute; top:-8.4rem; left:-4rem; width:18rem; }
+  .podcast-copy{ position:relative; align-self:center; }
+  .podcast-seta{ position:absolute; top:-8.4rem; left:-4rem; width:18rem; max-width:45%; }
   .podcast-titulo{
     font-family:var(--font-title); font-size:4.25rem; line-height:1.02;
     color:#fff; text-transform:uppercase;
@@ -63,7 +68,7 @@
     background-image:url('assets/partes/podcast-destaque-reais.png');
     background-size:100% 100%; background-repeat:no-repeat; z-index:-1;
   }
-  .podcast-sub{ margin-top:1.7rem; font-size:1.6rem; line-height:1.5; color:#F2F3E5; }
+  .podcast-sub{ margin-top:1.7rem; font-size:1.6rem; line-height:1.5; color:#F2F3E5; max-width:34rem; }
   .podcast-cta{ margin-top:3.2rem; display:flex; align-items:center; gap:1.1rem; }
   .play-circulo{
     width:3.9rem; height:3.9rem; border-radius:50%; background:var(--amarelo);
@@ -75,7 +80,7 @@
   .btn-play{ font-size:1.5rem; padding:1.15rem 2.4rem; }
 
   /* --- slide 2 --- */
-  .diario-copy{ position:absolute; left:0; top:8rem; width:37rem; }
+  .diario-copy{ position:relative; align-self:center; }
   .diario-eyebrow{
     font-family:var(--font-title); font-size:2.35rem; color:#fff;
     letter-spacing:0.03em; text-transform:uppercase;
@@ -92,11 +97,11 @@
     background-image:url('assets/partes/diario-fundo-azul.png');
     background-size:100% 100%; background-repeat:no-repeat; z-index:-1;
   }
-  .diario-lead{ margin-top:2.2rem; font-size:1.55rem; font-weight:700; line-height:1.5; color:#fff; max-width:26rem; }
-  .diario-texto{ margin-top:1rem; font-size:1.5rem; line-height:1.55; color:#EDF2F6; max-width:27rem; }
+  .diario-lead{ margin-top:2.2rem; font-size:1.55rem; font-weight:700; line-height:1.5; color:#fff; max-width:30rem; }
+  .diario-texto{ margin-top:1rem; font-size:1.5rem; line-height:1.55; color:#EDF2F6; max-width:31rem; }
   .diario-frase{ margin-top:1.4rem; font-size:1.5rem; font-style:italic; font-weight:700; color:#fff; }
   .diario-cta{ margin-top:1.9rem; font-size:1.4rem; padding:1.05rem 2.1rem; }
-  .colagem{ position:absolute; right:-2rem; top:1.5rem; width:53rem; height:46rem; }
+  .colagem{ position:relative; width:100%; aspect-ratio:53/46; align-self:center; }
   .colagem img{ position:absolute; }
   .colagem .papel-1{ width:26%; left:8%;  top:36%; }
   .colagem .papel-2{ width:22%; right:20%; top:52%; }
@@ -113,7 +118,7 @@
   .ponto.ativo{ background:var(--verde-escuro); }
 
   /* ---------------- ÚLTIMOS PALPITES ---------------- */
-  .palpites{ padding:14rem 0 0; }
+  .palpites{ padding:11.2rem 0 0; }
   .palpites-topo{ display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:4rem; }
   .palpites-titulo{
     font-family:var(--font-title); font-size:4.1rem;
@@ -193,8 +198,9 @@
     .slide{ position:relative; inset:auto; display:none; opacity:1; visibility:visible; }
     .slide.ativo{ display:block; }
     .slide .container{ padding:70px 22px 90px; height:auto; overflow:hidden; }
-    .podcast-foto{ position:relative; left:auto; top:auto; width:95%; margin:0 auto 28px; overflow:hidden; transform:rotate(-1.5deg); }
-    .podcast-copy{ position:relative; left:auto; top:auto; width:100%; }
+    .slide-podcast .container, .slide-diario .container{ grid-template-columns:1fr; gap:0; }
+    .podcast-foto{ width:95%; margin:0 auto 28px; transform:rotate(-1.5deg); }
+    .podcast-copy{ width:100%; }
     .podcast-seta{ display:none; }
     .podcast-titulo{ font-size:clamp(26px,6.6vw,34px); line-height:1.1; }
     .podcast-sub{ font-size:15px; margin-top:14px; }
@@ -202,12 +208,12 @@
     .play-circulo{ width:42px; height:42px; }
     .play-circulo svg{ width:14px; height:14px; }
     .btn-play{ font-size:13px; padding:13px 24px; }
-    .diario-copy{ position:relative; left:auto; top:auto; width:100%; }
+    .diario-copy{ width:100%; }
     .diario-eyebrow{ font-size:20px; }
     .diario-badge{ width:225px; height:50px; font-size:20px; }
     .diario-lead,.diario-texto,.diario-frase{ font-size:14.5px; max-width:46ch; }
     .diario-cta{ font-size:13px; padding:13px 24px; }
-    .colagem{ position:relative; right:auto; top:auto; width:100%; height:auto; aspect-ratio:1/0.74; margin-top:24px; }
+    .colagem{ width:100%; aspect-ratio:1/0.74; margin-top:24px; }
     .carrossel-pontos{ padding:16px 0 0; gap:10px; }
     .ponto{ width:13px; height:13px; border-width:2px; }
 
