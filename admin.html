@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel — Palpitamente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  [hidden]{ display:none !important; }
+
+  .adm{ padding:3rem 0 6rem; }
+  .adm-topo{ display:flex; align-items:center; justify-content:space-between; gap:2rem;
+             flex-wrap:wrap; margin-bottom:2.4rem; }
+  .adm-titulo{ font-family:var(--font-title); font-size:3rem; color:var(--tinta); text-transform:uppercase; }
+  .adm-sub{ font-size:1.3rem; color:#6A6A52; margin-top:0.4rem; }
+
+  .barreira{ max-width:44rem; margin:8rem auto; text-align:center; }
+  .barreira h2{ font-family:var(--font-title); font-size:2.6rem; color:var(--tinta);
+                text-transform:uppercase; margin-bottom:1rem; }
+  .barreira p{ font-size:1.4rem; line-height:1.7; color:#5A5A48; margin-bottom:2rem; }
+
+  .abas{ display:flex; gap:0.6rem; flex-wrap:wrap; border-bottom:0.13rem solid #DCD0C2; margin-bottom:2.6rem; }
+  .aba{ font-family:var(--font-body); font-size:1.3rem; font-weight:700; color:#7A7A62;
+        background:none; border:none; cursor:pointer; padding:1rem 1.6rem;
+        border-bottom:0.25rem solid transparent; margin-bottom:-0.13rem; }
+  .aba:hover{ color:var(--verde-escuro); }
+  .aba.ativa{ color:var(--verde-escuro); border-bottom-color:var(--verde-escuro); }
+  .painel{ display:none; }
+  .painel.ativo{ display:block; }
+
+  .acoes-topo{ display:flex; align-items:center; justify-content:space-between;
+               gap:1.4rem; flex-wrap:wrap; margin-bottom:1.8rem; }
+  .contagem{ font-size:1.25rem; color:#6A6A52; }
+  .contagem strong{ color:var(--tinta); }
+
+  /* ---------- tabela editável ---------- */
+  .lista{ display:flex; flex-direction:column; gap:1.2rem; }
+  .linha{
+    background:#FBF7F1; border-radius:0.9rem; padding:1.4rem 1.6rem;
+    box-shadow:0 0.3rem 1rem rgba(0,0,0,0.06);
+    display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:1.4rem; align-items:center;
+  }
+  .linha .ident{
+    font-family:var(--font-title); font-size:1.5rem; color:var(--rosa);
+    min-width:4rem; text-align:center;
+  }
+  .linha .resumo{ min-width:0; }
+  .linha .resumo b{ font-size:1.35rem; color:var(--tinta); display:block; }
+  .linha .resumo small{ font-size:1.1rem; color:#7A7A62; }
+  .linha .botoes{ display:flex; gap:0.5rem; }
+  .bt{
+    border:none; border-radius:0.6rem; cursor:pointer; font-family:inherit;
+    font-size:1.1rem; font-weight:600; padding:0.65rem 1.2rem;
+    background:#EFE6DA; color:var(--tinta);
+  }
+  .bt:hover{ background:#E2D5C4; }
+  .bt.perigo:hover{ background:#F0CFC9; color:#A0463A; }
+  .bt.principal{ background:var(--verde-escuro); color:#fff; }
+  .bt.principal:hover{ background:#4b4d2e; }
+  .tag{ font-size:0.95rem; font-weight:700; padding:0.25rem 0.7rem; border-radius:1rem; margin-left:0.6rem; }
+  .tag.on{ background:#DDE8C8; color:#4A5B2A; }
+  .tag.off{ background:#E7DDD2; color:#7A7A62; }
+
+  /* ---------- formulário ---------- */
+  .form{ background:#FBF7F1; border-radius:1rem; padding:2.2rem 2.4rem 2.4rem;
+         box-shadow:0 0.3rem 1.2rem rgba(0,0,0,0.06); margin-bottom:2rem; }
+  .form h3{ font-family:var(--font-title); font-size:1.8rem; color:var(--tinta);
+            text-transform:uppercase; margin-bottom:1.6rem; }
+  .grade-campos{ display:grid; grid-template-columns:repeat(auto-fit, minmax(20rem,1fr)); gap:1.4rem; }
+  .campo{ display:flex; flex-direction:column; }
+  .campo.largo{ grid-column:1/-1; }
+  .campo label{ font-size:1.1rem; font-weight:700; color:#6A6A52;
+                text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.5rem; }
+  .campo small{ font-size:1rem; color:#9A917F; margin-top:0.4rem; line-height:1.4; }
+  .campo input, .campo select, .campo textarea{
+    width:100%; padding:0.95rem 1.1rem; border:0.12rem solid #DDD4C2;
+    border-radius:0.7rem; font-family:inherit; font-size:1.25rem;
+    background:#fff; color:var(--tinta);
+  }
+  .campo textarea{ resize:vertical; min-height:9rem; line-height:1.6; }
+  .campo input:focus, .campo select:focus, .campo textarea:focus{
+    outline:none; border-color:var(--verde-escuro);
+  }
+  .campo.chave{ flex-direction:row; align-items:center; gap:0.9rem; }
+  .campo.chave input{ width:auto; }
+  .form-acoes{ display:flex; gap:0.9rem; align-items:center; flex-wrap:wrap; margin-top:1.8rem; }
+  .recado{ font-size:1.2rem; min-height:1.6rem; }
+  .recado.ok{ color:var(--verde-escuro); }
+  .recado.erro{ color:#B5473C; }
+
+  .previa-capa{ display:flex; align-items:center; gap:1.2rem; margin-top:0.7rem; }
+  .previa-capa img{ width:6rem; height:9rem; object-fit:cover; border-radius:0.5rem; background:var(--rosa); }
+
+  .grupo-config{ margin-bottom:2.6rem; }
+  .grupo-config > h3{ font-family:var(--font-title); font-size:1.7rem; color:var(--tinta);
+                      text-transform:uppercase; margin-bottom:1.2rem; }
+
+  .vazio{ padding:3.4rem 0; text-align:center; font-size:1.4rem; color:#7A7A62; font-style:italic; }
+
+  @media (max-width:900px){
+    .adm{ padding:22px 0 46px; }
+    .adm-titulo{ font-size:23px; }
+    .abas{ overflow-x:auto; margin-bottom:18px; }
+    .aba{ font-size:13px; padding:10px 12px; white-space:nowrap; }
+    .linha{ grid-template-columns:1fr; gap:10px; padding:14px; }
+    .linha .ident{ text-align:left; font-size:14px; }
+    .linha .botoes{ flex-wrap:wrap; }
+    .form{ padding:16px 14px 18px; }
+    .grade-campos{ grid-template-columns:1fr; gap:12px; }
+    .campo input, .campo select, .campo textarea{ font-size:14px; padding:11px 12px; }
+    .bt{ font-size:12.5px; padding:9px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="navbar compacto">
+  <div class="container">
+    <a href="index.html"><img src="assets/partes/header-logo-colorido.png" alt="Palpitamente" class="logo"></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Início
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+      <li><a href="episodios.html">Episódios
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+      <li><a href="indicacoes.html">Indicações
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+      <li><a href="diario.html">Pausa para Mim
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+      <li><a href="admin.html" class="active">Painel
+        <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
+    </ul>
+    <div class="nav-social">
+      <button class="sair" onclick="logout()">Sair</button>
+    </div>
+  </div>
+</nav>
+
+<section class="adm" id="barreira" hidden>
+  <div class="container">
+    <div class="barreira">
+      <h2 id="barreiraTitulo">Acesso restrito</h2>
+      <p id="barreiraTexto">Esta área é só para a equipe do Palpitamente.</p>
+      <a href="login.html" class="btn-primary" id="barreiraBotao">Entrar</a>
+    </div>
+  </div>
+</section>
+
+<section class="adm" id="painelAdm" hidden>
+  <div class="container">
+
+    <div class="adm-topo">
+      <div>
+        <h1 class="adm-titulo">Painel do site</h1>
+        <p class="adm-sub" id="admSaudacao"></p>
+      </div>
+      <a href="index.html" class="bt">Ver o site</a>
+    </div>
+
+    <div class="abas">
+      <button class="aba ativa" data-painel="episodios">Episódios</button>
+      <button class="aba" data-painel="indicacoes">Indicações</button>
+      <button class="aba" data-painel="config">Textos e preços</button>
+      <button class="aba" data-painel="equipe">Equipe</button>
+    </div>
+
+    <!-- ============ EPISÓDIOS ============ -->
+    <div class="painel ativo" id="painel-episodios">
+      <div class="form" id="formEpisodio" hidden>
+        <h3 id="tituloFormEp">Novo episódio</h3>
+        <div class="grade-campos">
+          <div class="campo">
+            <label>Número</label>
+            <input type="text" id="epNumero" placeholder="04">
+          </div>
+          <div class="campo">
+            <label>Duração</label>
+            <input type="text" id="epDuracao" placeholder="30 Min">
+          </div>
+          <div class="campo largo">
+            <label>Título</label>
+            <input type="text" id="epTitulo" placeholder="Nome do episódio">
+          </div>
+          <div class="campo largo">
+            <label>Descrição</label>
+            <textarea id="epDescricao" placeholder="Uma ou duas linhas sobre o episódio."></textarea>
+          </div>
+          <div class="campo">
+            <label>Código do YouTube</label>
+            <input type="text" id="epYoutube" placeholder="VUO2XyGrVpw">
+            <small>Cole a URL inteira que eu extraio o código sozinho.</small>
+          </div>
+          <div class="campo">
+            <label>Link do Spotify</label>
+            <input type="text" id="epSpotify" placeholder="https://open.spotify.com/episode/...">
+          </div>
+          <div class="campo">
+            <label>Link do SoundCloud</label>
+            <input type="text" id="epSoundcloud" placeholder="https://soundcloud.com/...">
+          </div>
+          <div class="campo chave">
+            <input type="checkbox" id="epPublicado">
+            <label style="margin:0">Publicado (aparece no site)</label>
+          </div>
+        </div>
+        <div class="form-acoes">
+          <button class="bt principal" id="btSalvarEp">Salvar</button>
+          <button class="bt" id="btCancelarEp">Cancelar</button>
+          <span class="recado" id="recadoEp"></span>
+        </div>
+      </div>
+
+      <div class="acoes-topo">
+        <span class="contagem" id="contEpisodios"></span>
+        <button class="bt principal" id="btNovoEp">+ Novo episódio</button>
+      </div>
+      <div class="lista" id="listaEpisodios"></div>
+      <p class="vazio" id="vazioEp" hidden>Nenhum episódio cadastrado ainda.</p>
+    </div>
+
+    <!-- ============ INDICAÇÕES ============ -->
+    <div class="painel" id="painel-indicacoes">
+      <div class="form" id="formIndicacao" hidden>
+        <h3 id="tituloFormInd">Nova indicação</h3>
+        <div class="grade-campos">
+          <div class="campo">
+            <label>Tipo</label>
+            <select id="indTipo">
+              <option value="livro">Livro</option>
+              <option value="filme">Filme</option>
+              <option value="serie">Série</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label>Gênero</label>
+            <select id="indGenero"></select>
+          </div>
+          <div class="campo largo">
+            <label>Título</label>
+            <input type="text" id="indTitulo" placeholder="Nome da obra">
+          </div>
+          <div class="campo largo">
+            <label id="rotuloAutor">Autoria</label>
+            <input type="text" id="indAutor" placeholder="Nome de quem escreveu">
+          </div>
+          <div class="campo largo">
+            <label>Sinopse</label>
+            <textarea id="indSinopse" placeholder="Aparece quando alguém clica no card."></textarea>
+          </div>
+          <div class="campo largo">
+            <label>Nota de vocês</label>
+            <input type="text" id="indNota" placeholder="Por que vocês indicaram (opcional)">
+          </div>
+          <div class="campo largo">
+            <label>Capa</label>
+            <input type="file" id="indCapaArquivo" accept="image/*">
+            <small>Até 400 KB. Proporção 2x3, tipo 400x600 px.</small>
+            <div class="previa-capa" id="previaCapa" hidden>
+              <img id="imgCapa" alt="">
+              <button class="bt perigo" id="btTirarCapa">Remover capa</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-acoes">
+          <button class="bt principal" id="btSalvarInd">Salvar</button>
+          <button class="bt" id="btCancelarInd">Cancelar</button>
+          <span class="recado" id="recadoInd"></span>
+        </div>
+      </div>
+
+      <div class="acoes-topo">
+        <span class="contagem" id="contIndicacoes"></span>
+        <button class="bt principal" id="btNovaInd">+ Nova indicação</button>
+      </div>
+      <div class="lista" id="listaIndicacoes"></div>
+      <p class="vazio" id="vazioInd" hidden>Nenhuma indicação cadastrada ainda.</p>
+    </div>
+
+    <!-- ============ TEXTOS E PREÇOS ============ -->
+    <div class="painel" id="painel-config">
+      <div id="gruposConfig"></div>
+      <div class="form-acoes">
+        <button class="bt principal" id="btSalvarConfig">Salvar tudo</button>
+        <span class="recado" id="recadoConfig"></span>
+      </div>
+    </div>
+
+    <!-- ============ EQUIPE ============ -->
+    <div class="painel" id="painel-equipe">
+      <div class="form">
+        <h3>Dar acesso ao painel</h3>
+        <p style="font-size:1.25rem; line-height:1.7; color:#5A5A48; margin-bottom:1.6rem;">
+          A pessoa precisa já ter conta no site. Digite o e-mail dela para liberar ou tirar o acesso.
+        </p>
+        <div class="grade-campos">
+          <div class="campo largo">
+            <label>E-mail</label>
+            <input type="email" id="emailAdmin" placeholder="pessoa@email.com">
+          </div>
+        </div>
+        <div class="form-acoes">
+          <button class="bt principal" id="btDarAcesso">Dar acesso</button>
+          <button class="bt perigo" id="btTirarAcesso">Tirar acesso</button>
+          <span class="recado" id="recadoEquipe"></span>
+        </div>
+      </div>
+      <div class="acoes-topo"><span class="contagem" id="contEquipe"></span></div>
+      <div class="lista" id="listaEquipe"></div>
+    </div>
+
+  </div>
+</section>
+
+<script src="assets/indicacoes.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+// ============================================================
+// PAINEL DE ADMINISTRAÇÃO
+// ============================================================
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+
+let usuaria = null, perfil = null;
+let episodios = [], indicacoes = [], configs = [], equipe = [];
+let editandoEp = null, editandoInd = null, capaAtual = '';
+
+function escapar(t){
+  return String(t||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function recado(el, txt, tipo){
+  const e = $(el); e.textContent = txt; e.className = 'recado ' + (tipo||'');
+  if (txt) setTimeout(() => { if (e.textContent === txt) e.textContent = ''; }, 4000);
+}
+// aceita a URL inteira do YouTube e devolve só o código
+function codigoYoutube(v){
+  if (!v) return '';
+  const m = v.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : v.trim();
+}
+
+// ============================================================
+// PORTA DE ENTRADA
+// ============================================================
+(async function iniciar(){
+  usuaria = await getUsuarioLogado();
+  if (!usuaria) {
+    $('#barreiraTitulo').textContent = 'Você precisa entrar';
+    $('#barreiraTexto').textContent = 'Faça login com a conta da equipe para abrir o painel.';
+    $('#barreira').hidden = false;
+    return;
+  }
+
+  const { data } = await supabaseClient.from('profiles').select('*').eq('id', usuaria.id).single();
+  perfil = data || {};
+
+  if (!perfil.is_admin) {
+    $('#barreiraTitulo').textContent = 'Acesso restrito';
+    $('#barreiraTexto').textContent = 'Sua conta não tem permissão para abrir o painel. Se isso for um engano, peça para alguém da equipe liberar.';
+    $('#barreiraBotao').textContent = 'Voltar ao início';
+    $('#barreiraBotao').href = 'index.html';
+    $('#barreira').hidden = false;
+    return;
+  }
+
+  $('#painelAdm').hidden = false;
+  $('#admSaudacao').textContent =
+    `Oi, ${(perfil.nome||'').split(' ')[0] || 'equipe'}. O que você alterar aqui aparece no site na hora.`;
+
+  ligarAbas();
+  ligarEpisodios();
+  ligarIndicacoes();
+  ligarEquipe();
+  $('#btSalvarConfig').addEventListener('click', salvarConfig);
+
+  await Promise.all([carregarEpisodios(), carregarIndicacoes(), carregarConfig(), carregarEquipe()]);
+})();
+
+function ligarAbas(){
+  $$('.aba').forEach(b => b.addEventListener('click', () => {
+    $$('.aba').forEach(x => x.classList.toggle('ativa', x === b));
+    $$('.painel').forEach(p => p.classList.toggle('ativo', p.id === 'painel-' + b.dataset.painel));
+    location.hash = b.dataset.painel;
+  }));
+  const alvo = (location.hash||'').replace('#','');
+  if (alvo) $(`.aba[data-painel="${alvo}"]`)?.click();
+}
+
+// ============================================================
+// EPISÓDIOS
+// ============================================================
+async function carregarEpisodios(){
+  const { data, error } = await supabaseClient.from('episodios').select('*').order('ordem');
+  if (error) { console.error(error); return; }
+  episodios = data || [];
+  $('#vazioEp').hidden = episodios.length > 0;
+  $('#contEpisodios').innerHTML = `<strong>${episodios.length}</strong> ${episodios.length===1?'episódio':'episódios'}`;
+  $('#listaEpisodios').innerHTML = episodios.map(e => `
+    <div class="linha" data-id="${e.id}">
+      <span class="ident">#${escapar(e.numero)}</span>
+      <div class="resumo">
+        <b>${escapar(e.titulo) || 'Sem título'}
+          <span class="tag ${e.publicado?'on':'off'}">${e.publicado?'no ar':'rascunho'}</span></b>
+        <small>${escapar(e.descricao) || 'Sem descrição'}</small>
+      </div>
+      <div class="botoes">
+        <button class="bt" data-acao="editar">Editar</button>
+        <button class="bt perigo" data-acao="excluir">Excluir</button>
+      </div>
+    </div>`).join('');
+}
+
+function ligarEpisodios(){
+  $('#btNovoEp').addEventListener('click', () => abrirFormEp(null));
+  $('#btCancelarEp').addEventListener('click', () => { $('#formEpisodio').hidden = true; editandoEp = null; });
+  $('#btSalvarEp').addEventListener('click', salvarEpisodio);
+
+  $('#listaEpisodios').addEventListener('click', async e => {
+    const bt = e.target.closest('[data-acao]'); if (!bt) return;
+    const id = bt.closest('.linha').dataset.id;
+    const ep = episodios.find(x => x.id === id);
+    if (bt.dataset.acao === 'editar') return abrirFormEp(ep);
+    if (!confirm(`Excluir o episódio #${ep.numero}?`)) return;
+    const { error } = await supabaseClient.from('episodios').delete().eq('id', id);
+    if (error) return alert(error.message);
+    await carregarEpisodios();
+  });
+}
+
+function abrirFormEp(ep){
+  editandoEp = ep ? ep.id : null;
+  $('#tituloFormEp').textContent = ep ? `Editando episódio #${ep.numero}` : 'Novo episódio';
+  $('#epNumero').value    = ep?.numero || String(episodios.length + 1).padStart(2,'0');
+  $('#epTitulo').value    = ep?.titulo || '';
+  $('#epDescricao').value = ep?.descricao || '';
+  $('#epDuracao').value   = ep?.duracao || '';
+  $('#epYoutube').value   = ep?.youtube || '';
+  $('#epSpotify').value   = ep?.spotify || '';
+  $('#epSoundcloud').value= ep?.soundcloud || '';
+  $('#epPublicado').checked = ep ? !!ep.publicado : true;
+  $('#formEpisodio').hidden = false;
+  $('#formEpisodio').scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+async function salvarEpisodio(){
+  const reg = {
+    numero:     $('#epNumero').value.trim(),
+    titulo:     $('#epTitulo').value.trim() || null,
+    descricao:  $('#epDescricao').value.trim() || null,
+    duracao:    $('#epDuracao').value.trim() || null,
+    youtube:    codigoYoutube($('#epYoutube').value),
+    spotify:    $('#epSpotify').value.trim() || null,
+    soundcloud: $('#epSoundcloud').value.trim() || null,
+    publicado:  $('#epPublicado').checked
+  };
+  if (!reg.numero) return recado('#recadoEp','O número é obrigatório.','erro');
+
+  recado('#recadoEp','Salvando...');
+  let erro;
+  if (editandoEp) ({ error: erro } = await supabaseClient.from('episodios').update(reg).eq('id', editandoEp));
+  else {
+    reg.ordem = episodios.length + 1;
+    ({ error: erro } = await supabaseClient.from('episodios').insert(reg));
+  }
+  if (erro) return recado('#recadoEp', erro.message, 'erro');
+  recado('#recadoEp','Salvo. Já está no site.','ok');
+  $('#formEpisodio').hidden = true; editandoEp = null;
+  await carregarEpisodios();
+}
+
+// ============================================================
+// INDICAÇÕES
+// ============================================================
+async function carregarIndicacoes(){
+  const { data, error } = await supabaseClient.from('indicacoes').select('*').order('ordem');
+  if (error) { console.error(error); return; }
+  indicacoes = data || [];
+  $('#vazioInd').hidden = indicacoes.length > 0;
+  $('#contIndicacoes').innerHTML = `<strong>${indicacoes.length}</strong> ${indicacoes.length===1?'indicação':'indicações'}`;
+  const rotulo = { livro:'Livro', filme:'Filme', serie:'Série' };
+  $('#listaIndicacoes').innerHTML = indicacoes.map(i => `
+    <div class="linha" data-id="${i.id}">
+      <span class="ident" style="font-size:1.1rem">${rotulo[i.tipo]}</span>
+      <div class="resumo">
+        <b>${escapar(i.titulo)}${i.capa?'<span class="tag on">com capa</span>':''}</b>
+        <small>${escapar(i.autor)||'Sem autoria'} · ${escapar(i.genero)||'sem gênero'}</small>
+      </div>
+      <div class="botoes">
+        <button class="bt" data-acao="editar">Editar</button>
+        <button class="bt perigo" data-acao="excluir">Excluir</button>
+      </div>
+    </div>`).join('');
+}
+
+function generosDoTipoSelecionado(){
+  const tipo = $('#indTipo').value;
+  const lista = (tipo === 'livro')
+    ? (typeof GENEROS_LIVRO !== 'undefined' ? GENEROS_LIVRO : [])
+    : (typeof GENEROS_TELA  !== 'undefined' ? GENEROS_TELA  : []);
+  const atual = $('#indGenero').value;
+  $('#indGenero').innerHTML = '<option value="">Sem gênero</option>' +
+    lista.map(g => `<option${g===atual?' selected':''}>${g}</option>`).join('');
+  $('#rotuloAutor').textContent =
+    tipo === 'livro' ? 'Autoria' : tipo === 'filme' ? 'Direção' : 'Criação';
+}
+
+function ligarIndicacoes(){
+  $('#indTipo').addEventListener('change', generosDoTipoSelecionado);
+  $('#btNovaInd').addEventListener('click', () => abrirFormInd(null));
+  $('#btCancelarInd').addEventListener('click', () => { $('#formIndicacao').hidden = true; editandoInd = null; });
+  $('#btSalvarInd').addEventListener('click', salvarIndicacao);
+  $('#btTirarCapa').addEventListener('click', () => {
+    capaAtual = ''; $('#previaCapa').hidden = true; $('#indCapaArquivo').value = '';
+  });
+
+  $('#indCapaArquivo').addEventListener('change', e => {
+    const arq = e.target.files[0]; if (!arq) return;
+    if (arq.size > 400*1024) { alert('A capa precisa ter no máximo 400 KB.'); e.target.value=''; return; }
+    const leitor = new FileReader();
+    leitor.onload = () => {
+      capaAtual = leitor.result;
+      $('#imgCapa').src = capaAtual;
+      $('#previaCapa').hidden = false;
+    };
+    leitor.readAsDataURL(arq);
+  });
+
+  $('#listaIndicacoes').addEventListener('click', async e => {
+    const bt = e.target.closest('[data-acao]'); if (!bt) return;
+    const id = bt.closest('.linha').dataset.id;
+    const it = indicacoes.find(x => x.id === id);
+    if (bt.dataset.acao === 'editar') return abrirFormInd(it);
+    if (!confirm(`Excluir "${it.titulo}"?`)) return;
+    const { error } = await supabaseClient.from('indicacoes').delete().eq('id', id);
+    if (error) return alert(error.message);
+    await carregarIndicacoes();
+  });
+}
+
+function abrirFormInd(it){
+  editandoInd = it ? it.id : null;
+  $('#tituloFormInd').textContent = it ? `Editando "${it.titulo}"` : 'Nova indicação';
+  $('#indTipo').value    = it?.tipo || 'livro';
+  generosDoTipoSelecionado();
+  $('#indGenero').value  = it?.genero || '';
+  $('#indTitulo').value  = it?.titulo || '';
+  $('#indAutor').value   = it?.autor || '';
+  $('#indSinopse').value = it?.sinopse || '';
+  $('#indNota').value    = it?.nota || '';
+  capaAtual = it?.capa || '';
+  $('#previaCapa').hidden = !capaAtual;
+  if (capaAtual) $('#imgCapa').src = capaAtual;
+  $('#indCapaArquivo').value = '';
+  $('#formIndicacao').hidden = false;
+  $('#formIndicacao').scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+async function salvarIndicacao(){
+  const reg = {
+    tipo:    $('#indTipo').value,
+    titulo:  $('#indTitulo').value.trim(),
+    autor:   $('#indAutor').value.trim() || null,
+    genero:  $('#indGenero').value || null,
+    sinopse: $('#indSinopse').value.trim() || null,
+    nota:    $('#indNota').value.trim() || null,
+    capa:    capaAtual || null
+  };
+  if (!reg.titulo) return recado('#recadoInd','O título é obrigatório.','erro');
+
+  recado('#recadoInd','Salvando...');
+  let erro;
+  if (editandoInd) ({ error: erro } = await supabaseClient.from('indicacoes').update(reg).eq('id', editandoInd));
+  else {
+    reg.ordem = indicacoes.length + 1;
+    ({ error: erro } = await supabaseClient.from('indicacoes').insert(reg));
+  }
+  if (erro) return recado('#recadoInd', erro.message, 'erro');
+  recado('#recadoInd','Salvo. Já está no site.','ok');
+  $('#formIndicacao').hidden = true; editandoInd = null;
+  await carregarIndicacoes();
+}
+
+// ============================================================
+// TEXTOS E PREÇOS
+// ============================================================
+async function carregarConfig(){
+  const { data, error } = await supabaseClient.from('config_site').select('*').order('grupo').order('ordem');
+  if (error) { console.error(error); return; }
+  configs = data || [];
+
+  const grupos = [...new Set(configs.map(c => c.grupo))];
+  $('#gruposConfig').innerHTML = grupos.map(g => `
+    <div class="grupo-config">
+      <h3>${escapar(g)}</h3>
+      <div class="form">
+        <div class="grade-campos">
+          ${configs.filter(c => c.grupo === g).map(c => `
+            <div class="campo${c.tipo === 'texto_longo' ? ' largo' : ''}">
+              <label>${escapar(c.rotulo || c.chave)}</label>
+              ${c.tipo === 'texto_longo'
+                ? `<textarea data-chave="${c.chave}">${escapar(c.valor)}</textarea>`
+                : `<input type="${c.tipo === 'link' ? 'url' : 'text'}" data-chave="${c.chave}" value="${escapar(c.valor)}">`}
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+async function salvarConfig(){
+  recado('#recadoConfig','Salvando...');
+  const campos = $$('#gruposConfig [data-chave]');
+  for (const el of campos) {
+    const antes = configs.find(c => c.chave === el.dataset.chave);
+    if (antes && antes.valor === el.value) continue;      // só grava o que mudou
+    const { error } = await supabaseClient.from('config_site')
+      .update({ valor: el.value }).eq('chave', el.dataset.chave);
+    if (error) return recado('#recadoConfig', error.message, 'erro');
+  }
+  await carregarConfig();
+  recado('#recadoConfig','Salvo. Já está no site.','ok');
+}
+
+// ============================================================
+// EQUIPE
+// ============================================================
+async function carregarEquipe(){
+  const { data, error } = await supabaseClient
+    .from('profiles').select('id, nome, is_admin').eq('is_admin', true);
+  if (error) { console.warn(error.message); return; }
+  equipe = data || [];
+  $('#contEquipe').innerHTML =
+    `<strong>${equipe.length}</strong> ${equipe.length===1?'pessoa com acesso':'pessoas com acesso'}`;
+  $('#listaEquipe').innerHTML = equipe.map(p => `
+    <div class="linha">
+      <span class="ident" style="font-size:1.2rem">ADM</span>
+      <div class="resumo">
+        <b>${escapar(p.nome) || 'Sem nome'}${p.id === usuaria.id ? ' <span class="tag on">você</span>' : ''}</b>
+        <small>${p.id}</small>
+      </div>
+      <div class="botoes"></div>
+    </div>`).join('');
+}
+
+function ligarEquipe(){
+  $('#btDarAcesso').addEventListener('click',  () => mudarAcesso(true));
+  $('#btTirarAcesso').addEventListener('click', () => mudarAcesso(false));
+}
+
+async function mudarAcesso(liberar){
+  const email = $('#emailAdmin').value.trim().toLowerCase();
+  if (!email) return recado('#recadoEquipe','Digite o e-mail.','erro');
+
+  recado('#recadoEquipe','Procurando...');
+  const { data, error } = await supabaseClient.rpc('definir_admin', { alvo_email: email, liberar });
+  if (error) return recado('#recadoEquipe', error.message, 'erro');
+  if (data === false) return recado('#recadoEquipe','Não achei conta com esse e-mail. Ela precisa se cadastrar antes.','erro');
+
+  recado('#recadoEquipe', liberar ? 'Acesso liberado.' : 'Acesso retirado.', 'ok');
+  $('#emailAdmin').value = '';
+  await carregarEquipe();
+}
+</script>
+</body>
+</html>

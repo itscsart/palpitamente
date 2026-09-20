@@ -183,3 +183,12 @@ footer{
 .nav-right{ display:flex; align-items:center; gap:22px; }
 .nav-user{ font-size:14px; font-weight:700; color:var(--verde-escuro); }
 .nav-cta{ font-weight:700; font-size:15px; }
+
+/* atalho para o painel, só aparece para quem é da equipe */
+.bt-painel{
+  font-family:var(--font-body); font-size:1.1rem; font-weight:700;
+  color:#fff; background:var(--rosa); border-radius:2rem;
+  padding:0.55rem 1.2rem; white-space:nowrap; margin-left:0.6rem;
+}
+.bt-painel:hover{ background:#B5766A; }
+@media (max-width:900px){ .bt-painel{ font-size:11px; padding:7px 12px; } }

@@ -283,6 +283,7 @@
         <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
     </ul>
     <div class="nav-social">
+      <a href="admin.html" id="linkPainel" class="bt-painel" hidden>Painel</a>
       <a href="https://www.instagram.com/palpitamente" target="_blank" rel="noopener" aria-label="Instagram"><img src="assets/partes/header-instagram-colorido.png" alt="Instagram"></a>
       <a href="https://www.youtube.com/@PalpitamentePodcast" target="_blank" rel="noopener" aria-label="YouTube"><img src="assets/partes/header-youtube-colorido.png" alt="YouTube"></a>
       <a href="https://www.tiktok.com/@palpitamente" target="_blank" rel="noopener" aria-label="TikTok"><img src="assets/partes/header-tiktok-colorido.png" alt="TikTok"></a>
@@ -387,6 +388,7 @@
 
 <script src="assets/indicacoes.js"></script>
 <script src="assets/supabase-client.js"></script>
+<script src="assets/conteudo.js"></script>
 <script>
   // simbolo usado enquanto nao ha imagem de capa
   const SEM_CAPA = `<svg viewBox="0 0 24 24" aria-hidden="true">
@@ -394,9 +396,20 @@
       <path d="M21 5.5c0-.8-.7-1.5-1.5-1.5H14c-1.1 0-2 .9-2 2v13c0-1.1.9-2 2-2h5.5c.8 0 1.5-.7 1.5-1.5v-10z"/>
     </svg>`;
 
-  (function montarIndicacoes(){
+  (async function montarIndicacoes(){
     const grade   = document.getElementById('grade');
-    if (!grade || typeof INDICACOES === 'undefined') return;
+    if (!grade) return;
+    const DADOS = await buscarIndicacoes();
+
+    // os gêneros em uso vêm dos dados do banco, não mais do arquivo
+    function generosDoTipo(tipo){
+      const oficial = (tipo === 'livro')
+        ? (typeof GENEROS_LIVRO !== 'undefined' ? GENEROS_LIVRO : [])
+        : (typeof GENEROS_TELA  !== 'undefined' ? GENEROS_TELA  : []);
+      const usados = new Set(DADOS.filter(i => i.tipo === tipo).map(i => i.genero));
+      return [...oficial.filter(g => usados.has(g)),
+              ...[...usados].filter(g => g && !oficial.includes(g))];
+    }
 
     const elTipo  = document.getElementById('filtrosTipo');
     const elGen   = document.getElementById('filtrosGenero');
@@ -406,7 +419,7 @@
 
     const rotuloTipo = { livro:'Livro', filme:'Filme', serie:'Série' };
     const pluralTipo = { livro:'Livros', filme:'Filmes', serie:'Séries' };
-    INDICACOES.forEach((it, n) => it._id = n);
+    DADOS.forEach((it, n) => it._id = n);
 
     const escolhidos = { tipo:new Set(), genero:new Set() };
 
@@ -419,14 +432,14 @@
     }
 
     elTipo.innerHTML = '<h3>Tipo</h3>' + GRUPOS.map(g => {
-      const n = INDICACOES.filter(i => i.tipo === g.tipo).length;
+      const n = DADOS.filter(i => i.tipo === g.tipo).length;
       return opcao('tipo', g.tipo, pluralTipo[g.tipo], n);
     }).join('');
 
     // as duas listas completas de genero, uma para livros e outra para tela
     function listaGeneros(generos, tipos){
       return generos.map(g => {
-        const n = INDICACOES.filter(i => tipos.includes(i.tipo) && i.genero === g).length;
+        const n = DADOS.filter(i => tipos.includes(i.tipo) && i.genero === g).length;
         return opcao('genero', g, g, n);
       }).join('');
     }
@@ -464,13 +477,13 @@
                 </div>
               </button>`;
     }
-    grade.innerHTML = INDICACOES.map(cartao).join('') +
+    grade.innerHTML = DADOS.map(cartao).join('') +
       '<p class="vazio-geral" id="vazioGeral" hidden>Nenhuma indicação encontrada com esses filtros.</p>';
 
     // ---------- aplicar filtros ----------
     function aplicar(){
       let visiveis = 0;
-      INDICACOES.forEach(i => {
+      DADOS.forEach(i => {
         const okTipo = !escolhidos.tipo.size   || escolhidos.tipo.has(i.tipo);
         const okGen  = !escolhidos.genero.size || escolhidos.genero.has(i.genero);
         const mostra = okTipo && okGen;
@@ -481,7 +494,7 @@
 
       document.getElementById('vazioGeral').hidden = visiveis > 0;
       elCont.innerHTML = `<strong>${visiveis}</strong> ${visiveis === 1 ? 'indicação' : 'indicações'}` +
-        (visiveis !== INDICACOES.length ? ` de ${INDICACOES.length}` : '');
+        (visiveis !== DADOS.length ? ` de ${DADOS.length}` : '');
 
       const ativos = [...escolhidos.tipo].map(t => ({g:'tipo', v:t, txt:pluralTipo[t]}))
         .concat([...escolhidos.genero].map(g => ({g:'genero', v:g, txt:g})));
@@ -567,7 +580,7 @@
     grade.addEventListener('click', e => {
       const card = e.target.closest('.indicacao');
       if (!card) return;
-      abrir(INDICACOES.find(i => String(i._id) === card.dataset.id));
+      abrir(DADOS.find(i => String(i._id) === card.dataset.id));
     });
     document.getElementById('modalFechar').addEventListener('click', fechar);
     modal.addEventListener('click', e => { if (e.target === modal) fechar(); });

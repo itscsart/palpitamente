@@ -310,6 +310,7 @@
         <img src="assets/partes/header-menu-selecao.png" alt="" class="marca-ativa"></a></li>
     </ul>
     <div class="nav-social">
+      <a href="admin.html" id="linkPainel" class="bt-painel" hidden>Painel</a>
       <a href="https://www.instagram.com/palpitamente" target="_blank" rel="noopener" aria-label="Instagram"><img src="assets/partes/header-instagram-colorido.png" alt="Instagram"></a>
       <a href="https://www.youtube.com/@PalpitamentePodcast" target="_blank" rel="noopener" aria-label="YouTube"><img src="assets/partes/header-youtube-colorido.png" alt="YouTube"></a>
       <a href="https://www.tiktok.com/@palpitamente" target="_blank" rel="noopener" aria-label="TikTok"><img src="assets/partes/header-tiktok-colorido.png" alt="TikTok"></a>
@@ -447,13 +448,15 @@
 
 <script src="assets/episodios.js"></script>
 <script src="assets/supabase-client.js"></script>
+<script src="assets/conteudo.js"></script>
 <script>
   // ----- Ultimos Palpites: monta os cards a partir de assets/episodios.js -----
-  (function montarPalpites(){
+  (async function montarPalpites(){
     const alvo = document.getElementById('palpitesLista');
-    if (!alvo || typeof EPISODIOS === 'undefined') return;
+    if (!alvo) return;
+    const lista = await buscarEpisodios();
     const tags = ['t1','t2','t3'];
-    alvo.innerHTML = EPISODIOS.slice(0,3).map((ep, i) => {
+    alvo.innerHTML = lista.slice(0,3).map((ep, i) => {
       const capa = capaDoEpisodio(ep);
       const link = linkDoEpisodio(ep);
       const corpo = capa
@@ -479,6 +482,8 @@
     }).join('');
   })();
 
+  aplicarConfig();
+
   // carrossel infinito: roda sozinho, sem precisar clicar
   const trilha = document.getElementById('trilha');
   const slides = document.querySelectorAll('.slide');
@@ -497,9 +502,9 @@
   iniciar();
 
   // "DA O PLAY" aponta para o episodio mais recente publicado
-  (function ligarPlay(){
-    if (typeof EPISODIOS === 'undefined') return;
-    const recente = EPISODIOS.find(e => linkDoEpisodio(e));
+  (async function ligarPlay(){
+    const lista = await buscarEpisodios();
+    const recente = lista.find(e => linkDoEpisodio(e));
     const destino = recente ? linkDoEpisodio(recente) : 'episodios.html';
     ['btnPlay','btnPlayLabel'].forEach(id => {
       const el = document.getElementById(id);
