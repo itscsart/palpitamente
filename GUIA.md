@@ -1,5 +1,18 @@
 # Guia do site Palpitamente
 
+## Antes de tudo: use o painel
+
+Episódios, indicações, preço, textos e links das redes agora se editam
+pelo **painel do site**, em `palpitamente.vercel.app/admin.html`.
+
+Entre com uma conta da equipe e o botão rosa **Painel** aparece no topo.
+O que você salvar lá vale na hora, sem CMD e sem deploy.
+
+Este guia serve para o que ainda vive nos arquivos: fotos, stickers,
+recompensas e textos fixos das páginas.
+
+---
+
 Onde mexer em cada coisa, sem precisar pedir ajuda.
 
 Regra geral: **arquivos `.js` dentro de `assets/` guardam conteúdo**
@@ -17,6 +30,17 @@ git push origin main
 ---
 
 ## 1. Episódios do podcast
+
+**Agora é pelo painel:** aba **Episódios**.
+
+Criar, editar, excluir, marcar como publicado ou rascunho. No campo do
+YouTube você pode colar a URL inteira que o painel extrai o código.
+
+O arquivo `assets/episodios.js` continua no projeto, mas só como rede de
+segurança: se o banco não responder, o site cai nele. Não edite mais por lá.
+
+<details>
+<summary>Formato antigo, caso precise</summary>
 
 **Arquivo:** `assets/episodios.js`
 
@@ -47,9 +71,19 @@ A capa vem sozinha da miniatura do YouTube. Você não precisa subir imagem.
 A home mostra os três primeiros. A página `episodios.html` mostra todos.
 O botão "DÁ O PLAY" do carrossel aponta sozinho para o episódio mais recente.
 
+</details>
+
 ---
 
 ## 2. Indicações de livros, filmes e séries
+
+**Agora é pelo painel:** aba **Indicações**.
+
+Tem upload de capa direto do computador e o campo de gênero muda sozinho
+conforme o tipo: 36 opções para livro, 41 para filme e série.
+
+<details>
+<summary>Formato antigo, caso precise</summary>
 
 **Arquivo:** `assets/indicacoes.js`
 
@@ -76,9 +110,16 @@ diferentes para o mesmo gênero.
 
 O filtro da página se monta sozinho e só mostra gêneros que têm obra.
 
+</details>
+
 ---
 
 ## 3. Preço do Diário Digital
+
+**Agora é pelo painel:** aba **Textos e preços**, grupo "Diário Digital".
+
+<details>
+<summary>Onde fica no arquivo, se precisar</summary>
 
 **Arquivo:** `produtos.html`
 
@@ -92,6 +133,8 @@ Para mudar o texto dos benefícios, procure pelas linhas dentro de
 
 Os três blocos numerados (01, 02, 03) no fim da página também estão
 nesse arquivo, procure por `beneficio-num`.
+
+</details>
 
 ---
 
@@ -128,6 +171,11 @@ Formato: quadrado para os retratos, 560x560 px. A do grupo é larga,
 
 ## 6. Links das redes sociais
 
+**Agora é pelo painel:** aba **Textos e preços**, grupo "Redes".
+
+<details>
+<summary>Onde ficam nos arquivos</summary>
+
 Estão em **todas** as páginas `.html`, no topo e no rodapé.
 
 A forma mais segura de trocar é usar "Substituir tudo" no editor,
@@ -146,6 +194,8 @@ https://on.soundcloud.com/6PZZUpQEnQgUUDeTgH
 
 Telefone e e-mail também estão no rodapé de cada página, procure por
 `95789-5463` e `contato@palpitamente.com`.
+
+</details>
 
 ---
 
@@ -202,6 +252,22 @@ se precisar recriar o projeto do zero. Nesse caso, rode na ordem:
 4. `schema-v4.sql`
 5. `schema-v5.sql`
 6. `schema-v6.sql`
+7. `schema-v7.sql`
+
+---
+
+## 11. Dar acesso ao painel
+
+**Pelo painel:** aba **Equipe**, digite o e-mail e clique em "Dar acesso".
+A pessoa precisa já ter conta no site.
+
+**Pela primeira vez**, quando ainda não há nenhuma administradora, é pelo
+SQL Editor do Supabase:
+
+```sql
+update public.profiles set is_admin = true
+ where id = (select id from auth.users where lower(email) = 'palpitamente@gmail.com');
+```
 
 ---
 

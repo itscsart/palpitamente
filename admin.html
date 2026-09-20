@@ -281,11 +281,30 @@
 
     <!-- ============ TEXTOS E PREÇOS ============ -->
     <div class="painel" id="painel-config">
-      <div id="gruposConfig"></div>
-      <div class="form-acoes">
-        <button class="bt principal" id="btSalvarConfig">Salvar tudo</button>
-        <span class="recado" id="recadoConfig"></span>
+      <div class="form" id="formConfig" hidden>
+        <h3 id="tituloFormCfg">Editar</h3>
+        <div class="grade-campos">
+          <div class="campo largo" id="campoCfgArea">
+            <label id="rotuloCfg"></label>
+            <input type="text" id="cfgValor">
+            <textarea id="cfgValorLongo" hidden></textarea>
+            <small id="dicaCfg"></small>
+          </div>
+        </div>
+        <div class="form-acoes">
+          <button class="bt principal" id="btSalvarCfg">Salvar</button>
+          <button class="bt" id="btCancelarCfg">Cancelar</button>
+          <span class="recado" id="recadoConfig"></span>
+        </div>
       </div>
+
+      <div class="acoes-topo">
+        <span class="contagem" id="contConfig"></span>
+        <div class="campo" style="min-width:20rem">
+          <select id="filtroGrupo"><option value="">Todos os grupos</option></select>
+        </div>
+      </div>
+      <div class="lista" id="listaConfig"></div>
     </div>
 
     <!-- ============ EQUIPE ============ -->
@@ -373,7 +392,7 @@ function codigoYoutube(v){
   ligarEpisodios();
   ligarIndicacoes();
   ligarEquipe();
-  $('#btSalvarConfig').addEventListener('click', salvarConfig);
+  ligarConfig();
 
   await Promise.all([carregarEpisodios(), carregarIndicacoes(), carregarConfig(), carregarEquipe()]);
 })();
@@ -585,41 +604,101 @@ async function salvarIndicacao(){
 // ============================================================
 // TEXTOS E PREÇOS
 // ============================================================
+let editandoCfg = null;
+
+const DICAS = {
+  preco_atual:      'Aparece no cartão da página Diário Digital. Escreva com o "R$".',
+  preco_antigo:     'Preço riscado ao lado do atual. Deixe vazio para não mostrar.',
+  diario_titulo:    'Título grande da página Diário Digital.',
+  diario_descricao: 'Parágrafo abaixo do título, na página Diário Digital.',
+  hero_titulo:      'Título do primeiro slide do carrossel da home.',
+  hero_subtitulo:   'Frase abaixo do título, no primeiro slide da home.',
+  contato_email:    'Aparece no rodapé de todas as páginas.',
+  contato_telefone: 'Aparece no rodapé de todas as páginas.',
+  rede_instagram:   'Endereço completo, começando com https://',
+  rede_youtube:     'Endereço completo do canal.',
+  rede_tiktok:      'Endereço completo do perfil.',
+  rede_spotify:     'Endereço completo do programa no Spotify.',
+  rede_soundcloud:  'Endereço completo do perfil no SoundCloud.'
+};
+
 async function carregarConfig(){
   const { data, error } = await supabaseClient.from('config_site').select('*').order('grupo').order('ordem');
   if (error) { console.error(error); return; }
   configs = data || [];
 
   const grupos = [...new Set(configs.map(c => c.grupo))];
-  $('#gruposConfig').innerHTML = grupos.map(g => `
-    <div class="grupo-config">
-      <h3>${escapar(g)}</h3>
-      <div class="form">
-        <div class="grade-campos">
-          ${configs.filter(c => c.grupo === g).map(c => `
-            <div class="campo${c.tipo === 'texto_longo' ? ' largo' : ''}">
-              <label>${escapar(c.rotulo || c.chave)}</label>
-              ${c.tipo === 'texto_longo'
-                ? `<textarea data-chave="${c.chave}">${escapar(c.valor)}</textarea>`
-                : `<input type="${c.tipo === 'link' ? 'url' : 'text'}" data-chave="${c.chave}" value="${escapar(c.valor)}">`}
-            </div>`).join('')}
-        </div>
+  const atual = $('#filtroGrupo').value;
+  $('#filtroGrupo').innerHTML = '<option value="">Todos os grupos</option>' +
+    grupos.map(g => `<option${g===atual?' selected':''}>${escapar(g)}</option>`).join('');
+
+  desenharConfig();
+}
+
+function desenharConfig(){
+  const g = $('#filtroGrupo').value;
+  const lista = g ? configs.filter(c => c.grupo === g) : configs;
+  $('#contConfig').innerHTML = `<strong>${lista.length}</strong> ${lista.length===1?'item':'itens'} para editar`;
+
+  $('#listaConfig').innerHTML = lista.map(c => {
+    const vazio = !c.valor;
+    const previa = vazio ? 'sem conteúdo' : (c.valor.length > 90 ? c.valor.slice(0,90) + '...' : c.valor);
+    return `<div class="linha" data-chave="${c.chave}">
+      <span class="ident" style="font-size:1rem">${escapar(c.grupo)}</span>
+      <div class="resumo">
+        <b>${escapar(c.rotulo || c.chave)}</b>
+        <small style="${vazio?'font-style:italic; opacity:0.6':''}">${escapar(previa)}</small>
       </div>
-    </div>`).join('');
+      <div class="botoes"><button class="bt" data-acao="editar">Editar</button></div>
+    </div>`;
+  }).join('');
+}
+
+function ligarConfig(){
+  $('#filtroGrupo').addEventListener('change', desenharConfig);
+  $('#btCancelarCfg').addEventListener('click', () => { $('#formConfig').hidden = true; editandoCfg = null; });
+  $('#btSalvarCfg').addEventListener('click', salvarConfig);
+
+  $('#listaConfig').addEventListener('click', e => {
+    const bt = e.target.closest('[data-acao="editar"]'); if (!bt) return;
+    const chave = bt.closest('.linha').dataset.chave;
+    abrirFormCfg(configs.find(c => c.chave === chave));
+  });
+}
+
+function abrirFormCfg(c){
+  editandoCfg = c.chave;
+  $('#tituloFormCfg').textContent = c.rotulo || c.chave;
+  $('#rotuloCfg').textContent = c.rotulo || c.chave;
+  $('#dicaCfg').textContent = DICAS[c.chave] || '';
+
+  const longo = c.tipo === 'texto_longo';
+  $('#cfgValor').hidden = longo;
+  $('#cfgValorLongo').hidden = !longo;
+  if (longo) $('#cfgValorLongo').value = c.valor || '';
+  else {
+    $('#cfgValor').type = (c.tipo === 'link') ? 'url' : 'text';
+    $('#cfgValor').value = c.valor || '';
+  }
+
+  $('#formConfig').hidden = false;
+  $('#formConfig').scrollIntoView({ behavior:'smooth', block:'center' });
+  (longo ? $('#cfgValorLongo') : $('#cfgValor')).focus();
 }
 
 async function salvarConfig(){
+  if (!editandoCfg) return;
+  const c = configs.find(x => x.chave === editandoCfg);
+  const valor = (c.tipo === 'texto_longo') ? $('#cfgValorLongo').value : $('#cfgValor').value;
+
   recado('#recadoConfig','Salvando...');
-  const campos = $$('#gruposConfig [data-chave]');
-  for (const el of campos) {
-    const antes = configs.find(c => c.chave === el.dataset.chave);
-    if (antes && antes.valor === el.value) continue;      // só grava o que mudou
-    const { error } = await supabaseClient.from('config_site')
-      .update({ valor: el.value }).eq('chave', el.dataset.chave);
-    if (error) return recado('#recadoConfig', error.message, 'erro');
-  }
-  await carregarConfig();
+  const { error } = await supabaseClient.from('config_site')
+    .update({ valor }).eq('chave', editandoCfg);
+  if (error) return recado('#recadoConfig', error.message, 'erro');
+
   recado('#recadoConfig','Salvo. Já está no site.','ok');
+  $('#formConfig').hidden = true; editandoCfg = null;
+  await carregarConfig();
 }
 
 // ============================================================

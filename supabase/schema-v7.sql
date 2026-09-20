@@ -144,11 +144,31 @@ insert into public.config_site (chave, valor, rotulo, grupo, tipo, ordem) values
 on conflict (chave) do nothing;
 
 -- ------------------------------------------------------------
--- 6) TORNE-SE ADMINISTRADORA
---    Troque o e-mail abaixo pelo seu e rode esta linha.
+-- 6) QUEM TEM ACESSO AO PAINEL
+--
+--    ATENÇÃO: a conta precisa JÁ EXISTIR no site. Cadastre o
+--    e-mail em login.html antes de rodar esta parte, senão o
+--    comando não encontra ninguém e não faz nada.
+--
+--    Para liberar mais gente depois, use a aba "Equipe" do
+--    próprio painel. Não precisa voltar aqui.
 -- ------------------------------------------------------------
 update public.profiles set is_admin = true
- where id = (select id from auth.users where email = 'contato.camilapaivasouza@gmail.com');
+ where id in (
+   select id from auth.users
+    where lower(email) in (
+      'palpitamente@gmail.com',
+      'contato.camilapaivasouza@gmail.com'
+      -- acrescente outros e-mails aqui, um por linha, com vírgula
+    )
+ );
+
+-- Confira o resultado: deve listar quem virou administradora.
+-- Se voltar vazio, a conta ainda não existe no site.
+select u.email, p.nome, p.is_admin
+  from public.profiles p
+  join auth.users u on u.id = p.id
+ where p.is_admin = true;
 
 -- ------------------------------------------------------------
 -- 7) Dar e tirar acesso pelo painel, buscando pelo e-mail

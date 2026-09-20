@@ -72,6 +72,12 @@ function capaDaIndicacao(item){
     : `assets/capas/${item.capa}`;
 }
 
+/* Aplica as configurações em TODA página que carregar este arquivo.
+   Antes isso dependia de cada página chamar aplicarConfig() por conta
+   própria, e a de produtos não chamava: o preço nunca atualizava. */
+document.addEventListener('DOMContentLoaded', aplicarConfig);
+if (document.readyState !== 'loading') aplicarConfig();
+
 /* mostra o atalho do painel só para quem é da equipe */
 (async function mostrarAtalhoPainel(){
   const link = document.getElementById('linkPainel');
