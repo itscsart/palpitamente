@@ -233,6 +233,13 @@ footer{
   input[type="date"], input[type="file"]{
     min-height:44px;
   }
+  /* elementos redondos ou de tamanho próprio ficam de fora:
+     a altura mínima os transformava em elipses */
+  .ponto, .carrossel-seta, .play-circulo, .palpite-play, .ao-topo,
+  .cor, .sticker-bt, .item-acoes button, .modal-fechar, .opcao input,
+  .bt-sino, .compor-previa button{
+    min-height:0;
+  }
   /* o iOS dá zoom sozinho em campo com fonte abaixo de 16px */
   input, select, textarea{ font-size:16px !important; }
 }

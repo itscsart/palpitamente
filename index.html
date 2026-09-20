@@ -264,12 +264,12 @@
     .colagem img{ max-height:210px; }
     .podcast-foto{ max-width:330px; }
 
-    /* setas embaixo, nos cantos: no meio elas cobriam o texto */
-    .carrossel-seta{ width:38px; height:38px; top:auto; bottom:10px; transform:none; }
-    .carrossel-seta:hover{ transform:none; }
-    .carrossel-seta svg{ width:13px; height:13px; }
-    .carrossel-seta.ant{ left:10px; }
-    .carrossel-seta.prox{ right:10px; }
+    /* No celular as setas cobriam o botão do slide. Somem, e a troca
+       passa a ser por arrastar o dedo, que é o gesto esperado ali. */
+    .carrossel-seta{ display:none; }
+    .carrossel-pontos{ align-items:center; padding:14px 0 0; gap:0; }
+    .ponto{ width:11px; height:11px; margin:0 9px; flex:0 0 auto; }
+    .slides{ touch-action:pan-y; }
     .slide .container{ padding:44px 22px 68px; height:auto; overflow:hidden; }
     .slide-podcast .container, .slide-diario .container{ width:100%; max-width:none; margin-left:0; padding:0 22px; grid-template-columns:1fr; gap:0; }
     .podcast-foto{ width:95%; max-width:none; margin:0 auto 28px; transform:rotate(-1.5deg); }
@@ -543,6 +543,27 @@
 
   window.addEventListener('resize', ajustarAltura);
   window.addEventListener('load', ajustarAltura);
+
+  /* arrastar o dedo para trocar de slide */
+  (function arrastar(){
+    const area = document.querySelector('.slides');
+    let x0 = null, y0 = null;
+    area.addEventListener('touchstart', e => {
+      x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+    }, { passive:true });
+    area.addEventListener('touchend', e => {
+      if (x0 === null) return;
+      const dx = e.changedTouches[0].clientX - x0;
+      const dy = e.changedTouches[0].clientY - y0;
+      // só conta como troca se o gesto for mais horizontal que vertical,
+      // senão a pessoa rolando a página trocaria de slide sem querer
+      if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+        mostrar(atual + (dx < 0 ? 1 : -1));
+        iniciar();
+      }
+      x0 = y0 = null;
+    }, { passive:true });
+  })();
   function iniciar(){ clearInterval(timer); timer = setInterval(() => mostrar(atual + 1), 7000); }
   pontos.forEach(p => p.addEventListener('click', () => { mostrar(Number(p.dataset.ir)); iniciar(); }));
   document.getElementById('slideAnt').addEventListener('click', () => { mostrar(atual - 1); iniciar(); });
