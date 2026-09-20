@@ -78,14 +78,18 @@ function capaDaIndicacao(item){
 document.addEventListener('DOMContentLoaded', aplicarConfig);
 if (document.readyState !== 'loading') aplicarConfig();
 
-/* mostra o atalho do painel só para quem é da equipe */
+/* Atalho do painel: só aparece depois de confirmar, no banco, que a
+   conta logada é administradora. Visitante deslogado nunca vê. */
 (async function mostrarAtalhoPainel(){
   const link = document.getElementById('linkPainel');
-  if (!link || typeof getUsuarioLogado !== 'function') return;
+  if (!link) return;
+  link.hidden = true;                       // parte escondido, sempre
+  if (typeof getUsuarioLogado !== 'function') return;
   try {
     const u = await getUsuarioLogado();
     if (!u) return;
-    const { data } = await supabaseClient.from('profiles').select('is_admin').eq('id', u.id).single();
-    if (data?.is_admin) link.hidden = false;
-  } catch(_) {}
+    const { data, error } = await supabaseClient
+      .from('profiles').select('is_admin').eq('id', u.id).single();
+    if (!error && data && data.is_admin === true) link.hidden = false;
+  } catch(_) { /* na dúvida, continua escondido */ }
 })();
