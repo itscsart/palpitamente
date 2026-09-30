@@ -896,6 +896,7 @@ const $$ = s => [...document.querySelectorAll(s)];
   montarPacotesEquipe();
   ligarStickersEnviados();
   await carregarMeusStickers();
+  await carregarPacotesEquipe();
 })();
 
 function hoje(){ return new Date().toISOString().slice(0,10); }
@@ -1264,7 +1265,24 @@ function desenharMeusStickers(){
     </div>`).join('');
 }
 
+// Pacotes vindos do banco, subidos pelo painel. O arquivo
+// assets/stickers.js continua valendo como reserva, caso o banco falhe.
+let pacotesDoBanco = null;
+
+async function carregarPacotesEquipe(){
+  const { data, error } = await supabaseClient
+    .from('stickers_equipe').select('*').order('pacote').order('ordem');
+  if (error || !data) { console.warn('pacotes da equipe:', error?.message); return; }
+  const porPacote = {};
+  data.forEach(s => {
+    (porPacote[s.pacote] ||= { nome:s.pacote, liberadoEm:s.liberado_em, imagens:[] }).imagens.push(s.imagem);
+  });
+  pacotesDoBanco = Object.values(porPacote);
+  montarPacotesEquipe();
+}
+
 function montarPacotesEquipe(){
+  if (pacotesDoBanco) return montarPacotesDoBanco();
   if (typeof PACOTES_EQUIPE === 'undefined') return;
   const liberados = pacotesLiberados(perfil.pages_written || 0);
   $('#secaoEquipe').hidden = liberados.length === 0;
@@ -1275,6 +1293,22 @@ function montarPacotesEquipe(){
         ${pk.arquivos.map(a => `
           <button class="sticker-bt" data-imagem="${caminhoSticker(a)}">
             <img src="${caminhoSticker(a)}" alt="" onerror="this.parentElement.remove()">
+          </button>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function montarPacotesDoBanco(){
+  const paginas = perfil.pages_written || 0;
+  const liberados = pacotesDoBanco.filter(p => paginas >= (p.liberadoEm || 0));
+  $('#secaoEquipe').hidden = liberados.length === 0;
+  $('#pacotesEquipe').innerHTML = liberados.map(pk => `
+    <div class="pacote-equipe">
+      <span>${escapar(pk.nome)}</span>
+      <div class="grade-stickers">
+        ${pk.imagens.map(src => `
+          <button class="sticker-bt" data-imagem="${src}">
+            <img src="${src}" alt="">
           </button>`).join('')}
       </div>
     </div>`).join('');

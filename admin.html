@@ -96,6 +96,25 @@
 
   .previa-capa{ display:flex; align-items:center; gap:1.2rem; margin-top:0.7rem; }
   .previa-imagem{ display:flex; align-items:center; gap:1.4rem; margin-top:0.9rem; }
+  .pacote-bloco{ margin-bottom:2.4rem; }
+  .pacote-bloco > h3{
+    font-family:var(--font-title); font-size:1.7rem; color:var(--tinta);
+    text-transform:uppercase; margin-bottom:0.4rem;
+  }
+  .pacote-bloco > p{ font-size:1.15rem; color:#7A7A62; margin-bottom:1.2rem; }
+  .grade-st{ display:grid; grid-template-columns:repeat(auto-fill, minmax(11rem,1fr)); gap:1.2rem; }
+  .st-item{
+    position:relative; background:#FBF7F1; border-radius:0.8rem; padding:1.2rem;
+    display:flex; flex-direction:column; align-items:center; gap:0.7rem;
+    box-shadow:0 0.2rem 0.8rem rgba(0,0,0,0.06);
+  }
+  .st-item img{ width:6.4rem; height:6.4rem; object-fit:contain; }
+  .st-item span{ font-size:1rem; color:#7A7A62; text-align:center; word-break:break-word; }
+  .st-item .apagar{
+    position:absolute; top:-0.5rem; right:-0.5rem;
+    width:2.2rem; height:2.2rem; border-radius:50%; border:none; cursor:pointer;
+    background:var(--tinta); color:#fff; font-size:1.2rem; line-height:1; padding:0;
+  }
   .previa-imagem img{ width:12rem; height:auto; max-height:16rem; object-fit:contain;
     border-radius:0.6rem; background:#EFE6DA; }
   .previa-capa img{ width:6rem; height:9rem; object-fit:cover; border-radius:0.5rem; background:var(--rosa); }
@@ -182,6 +201,7 @@
       <button class="aba ativa" data-painel="episodios">Episódios</button>
       <button class="aba" data-painel="indicacoes">Indicações</button>
       <span id="abasPaginas"></span>
+      <button class="aba" data-painel="stickers">Stickers</button>
       <button class="aba" data-painel="equipe">Equipe</button>
     </div>
 
@@ -300,6 +320,47 @@
     <!-- ============ TEXTOS E PREÇOS ============ -->
     <div id="paineisPaginas"></div>
 
+    <!-- ============ STICKERS DA EQUIPE ============ -->
+    <div class="painel" id="painel-stickers">
+      <div class="form">
+        <h3>Subir stickers</h3>
+        <p style="font-size:1.25rem; line-height:1.7; color:#5A5A48; margin-bottom:1.6rem;">
+          Os stickers ficam disponíveis para todas as usuárias do diário. Use PNG com fundo
+          transparente, de preferência quadrado. Dá para selecionar vários arquivos de uma vez.
+        </p>
+        <div class="grade-campos">
+          <div class="campo">
+            <label>Pacote</label>
+            <input type="text" id="stPacote" value="Palpitamente" placeholder="Palpitamente">
+            <small>Stickers do mesmo pacote aparecem juntos no diário.</small>
+          </div>
+          <div class="campo">
+            <label>Liberar a partir de</label>
+            <input type="number" id="stLiberado" value="0" min="0" max="365">
+            <small>Páginas escritas para desbloquear. Use 0 para liberar para todas.</small>
+          </div>
+          <div class="campo largo">
+            <label>Arquivos</label>
+            <input type="file" id="stArquivos" accept="image/png,image/webp,image/jpeg" multiple>
+            <small>Até 300 KB cada. O nome do arquivo vira o nome do sticker.</small>
+          </div>
+        </div>
+        <div class="form-acoes">
+          <button class="bt principal" id="btSubirStickers">Subir stickers</button>
+          <span class="recado" id="recadoStickers"></span>
+        </div>
+      </div>
+
+      <div class="acoes-topo">
+        <span class="contagem" id="contStickers"></span>
+        <div class="campo" style="min-width:20rem">
+          <select id="filtroPacote"><option value="">Todos os pacotes</option></select>
+        </div>
+      </div>
+      <div id="listaStickers"></div>
+      <p class="vazio" id="vazioStickers" hidden>Nenhum sticker subido ainda.</p>
+    </div>
+
     <!-- ============ EQUIPE ============ -->
     <div class="painel" id="painel-equipe">
       <div class="form">
@@ -385,9 +446,10 @@ function codigoYoutube(v){
   ligarEpisodios();
   ligarIndicacoes();
   ligarEquipe();
+  ligarStickers();
   ligarConfig();
 
-  await Promise.all([carregarEpisodios(), carregarIndicacoes(), carregarConfig(), carregarEquipe()]);
+  await Promise.all([carregarEpisodios(), carregarIndicacoes(), carregarConfig(), carregarEquipe(), carregarStickers()]);
 })();
 
 function ligarAbas(){
@@ -769,6 +831,93 @@ function ligarConfig(){
     recadoEl.className = 'recado ok';
     setTimeout(() => { recadoEl.textContent = ''; }, 4000);
     await carregarConfig();
+  });
+}
+
+// ============================================================
+// STICKERS DA EQUIPE
+// ============================================================
+let stickersEquipe = [];
+
+async function carregarStickers(){
+  const { data, error } = await supabaseClient
+    .from('stickers_equipe').select('*').order('pacote').order('ordem');
+  if (error) { console.warn('stickers:', error.message); return; }
+  stickersEquipe = data || [];
+
+  const pacotes = [...new Set(stickersEquipe.map(s => s.pacote))];
+  const atual = $('#filtroPacote').value;
+  $('#filtroPacote').innerHTML = '<option value="">Todos os pacotes</option>' +
+    pacotes.map(p => `<option${p===atual?' selected':''}>${escapar(p)}</option>`).join('');
+  desenharStickers();
+}
+
+function desenharStickers(){
+  const filtro = $('#filtroPacote').value;
+  const lista = filtro ? stickersEquipe.filter(s => s.pacote === filtro) : stickersEquipe;
+  $('#vazioStickers').hidden = lista.length > 0;
+  $('#contStickers').innerHTML =
+    `<strong>${lista.length}</strong> ${lista.length === 1 ? 'sticker' : 'stickers'} de ${stickersEquipe.length} no total`;
+
+  const pacotes = [...new Set(lista.map(s => s.pacote))];
+  $('#listaStickers').innerHTML = pacotes.map(p => {
+    const doPacote = lista.filter(s => s.pacote === p);
+    const marco = doPacote[0].liberado_em;
+    return `<div class="pacote-bloco">
+      <h3>${escapar(p)}</h3>
+      <p>${marco > 0 ? `Liberado a partir de ${marco} páginas escritas` : 'Liberado para todas as usuárias'}</p>
+      <div class="grade-st">
+        ${doPacote.map(s => `
+          <div class="st-item">
+            <img src="${s.imagem}" alt="${escapar(s.nome||'')}">
+            <span>${escapar(s.nome || 'sem nome')}</span>
+            <button class="apagar" data-apagar-sticker="${s.id}" title="Apagar">&times;</button>
+          </div>`).join('')}
+      </div></div>`;
+  }).join('');
+}
+
+function ligarStickers(){
+  $('#filtroPacote').addEventListener('change', desenharStickers);
+
+  $('#btSubirStickers').addEventListener('click', async () => {
+    const arquivos = [...$('#stArquivos').files];
+    if (!arquivos.length) return recado('#recadoStickers', 'Escolha pelo menos um arquivo.', 'erro');
+
+    const pacote = $('#stPacote').value.trim() || 'Palpitamente';
+    const liberado = Math.max(0, parseInt($('#stLiberado').value, 10) || 0);
+    const grandes = arquivos.filter(a => a.size > 300*1024);
+    if (grandes.length) {
+      return recado('#recadoStickers',
+        `${grandes.length} arquivo(s) acima de 300 KB: ${grandes.map(a => a.name).join(', ')}`, 'erro');
+    }
+
+    recado('#recadoStickers', `Subindo ${arquivos.length}...`);
+    const base = stickersEquipe.filter(s => s.pacote === pacote).length;
+    let feitos = 0;
+    for (const [i, arq] of arquivos.entries()) {
+      const imagem = await new Promise(ok => {
+        const l = new FileReader(); l.onload = () => ok(l.result); l.readAsDataURL(arq);
+      });
+      const { error } = await supabaseClient.from('stickers_equipe').insert({
+        pacote, liberado_em: liberado, ordem: base + i,
+        nome: arq.name.replace(/\.[^.]+$/, ''), imagem
+      });
+      if (error) return recado('#recadoStickers', error.message, 'erro');
+      feitos++;
+    }
+    $('#stArquivos').value = '';
+    recado('#recadoStickers', `${feitos} sticker(s) no ar. Já aparecem no diário.`, 'ok');
+    await carregarStickers();
+  });
+
+  $('#listaStickers').addEventListener('click', async e => {
+    const bt = e.target.closest('[data-apagar-sticker]');
+    if (!bt) return;
+    if (!confirm('Apagar este sticker? Ele some do painel das usuárias, mas continua nas páginas já salvas.')) return;
+    const { error } = await supabaseClient.from('stickers_equipe').delete().eq('id', bt.dataset.apagarSticker);
+    if (error) return alert(error.message);
+    await carregarStickers();
   });
 }
 
