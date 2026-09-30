@@ -110,6 +110,8 @@
   }
   .st-item img{ width:6.4rem; height:6.4rem; object-fit:contain; }
   .st-item span{ font-size:1rem; color:#7A7A62; text-align:center; word-break:break-word; }
+  .st-item.fora{ opacity:0.35; }
+  .st-item.fora img{ filter:grayscale(1); }
   .st-item .apagar{
     position:absolute; top:-0.5rem; right:-0.5rem;
     width:2.2rem; height:2.2rem; border-radius:50%; border:none; cursor:pointer;
@@ -351,6 +353,57 @@
         </div>
       </div>
 
+      <div class="form">
+        <h3>Subir uma cartela inteira</h3>
+        <p style="font-size:1.25rem; line-height:1.7; color:#5A5A48; margin-bottom:1.6rem;">
+          Tem uma imagem só com vários stickers? Suba ela aqui que o painel recorta cada um.
+          Funciona melhor com PNG de fundo transparente.
+        </p>
+        <div class="grade-campos">
+          <div class="campo">
+            <label>Pacote</label>
+            <input type="text" id="ctPacote" value="Palpitamente">
+          </div>
+          <div class="campo">
+            <label>Liberar a partir de</label>
+            <input type="number" id="ctLiberado" value="0" min="0" max="365">
+          </div>
+          <div class="campo">
+            <label>Como recortar</label>
+            <select id="ctModo">
+              <option value="auto">Automático, pelo fundo transparente</option>
+              <option value="grade">Em grade, informando linhas e colunas</option>
+            </select>
+          </div>
+          <div class="campo" id="campoGrade" hidden>
+            <label>Colunas e linhas</label>
+            <div style="display:flex; gap:1rem; align-items:center">
+              <input type="number" id="ctCols" value="5" min="1" max="12" style="width:9rem">
+              <span style="font-size:1.4rem; color:#7A7A62">×</span>
+              <input type="number" id="ctLinhas" value="4" min="1" max="12" style="width:9rem">
+            </div>
+          </div>
+          <div class="campo largo">
+            <label>Imagem da cartela</label>
+            <input type="file" id="ctArquivo" accept="image/png,image/webp,image/jpeg">
+            <small>Até 8 MB. A imagem é recortada aqui no navegador, e só os recortes vão para o banco.</small>
+          </div>
+        </div>
+        <div class="form-acoes">
+          <button class="bt principal" id="btRecortar">Recortar cartela</button>
+          <span class="recado" id="recadoCartela"></span>
+        </div>
+
+        <div id="previaCartela" hidden>
+          <hr style="border:none; border-top:0.15rem solid #E7DDD2; margin:2rem 0 1.6rem">
+          <div class="acoes-topo">
+            <span class="contagem" id="contRecortes"></span>
+            <button class="bt principal" id="btSubirRecortes">Subir os selecionados</button>
+          </div>
+          <div class="grade-st" id="gradeRecortes"></div>
+        </div>
+      </div>
+
       <div class="acoes-topo">
         <span class="contagem" id="contStickers"></span>
         <div class="campo" style="min-width:20rem">
@@ -447,6 +500,7 @@ function codigoYoutube(v){
   ligarIndicacoes();
   ligarEquipe();
   ligarStickers();
+  ligarCartela();
   ligarConfig();
 
   await Promise.all([carregarEpisodios(), carregarIndicacoes(), carregarConfig(), carregarEquipe(), carregarStickers()]);
@@ -875,6 +929,145 @@ function desenharStickers(){
           </div>`).join('')}
       </div></div>`;
   }).join('');
+}
+
+// ============================================================
+// RECORTE DE CARTELA
+// Tudo acontece no navegador: a imagem grande nunca vai para o banco,
+// só os recortes já reduzidos.
+// ============================================================
+let recortes = [];
+
+function acharPedacos(dados, L, A, alfaMin = 24, areaMin = 0.0006){
+  // Marca o que é desenho e agrupa os pixels vizinhos em pedaços.
+  const visto = new Uint8Array(L * A);
+  const caixas = [];
+  const minPixels = Math.max(80, Math.round(L * A * areaMin));
+  const pilha = new Int32Array(L * A);
+
+  for (let p = 0; p < L * A; p++) {
+    if (visto[p] || dados[p * 4 + 3] < alfaMin) continue;
+    let topo = 0; pilha[topo++] = p; visto[p] = 1;
+    let x0 = L, y0 = A, x1 = 0, y1 = 0, n = 0;
+    while (topo) {
+      const q = pilha[--topo], x = q % L, y = (q / L) | 0;
+      n++;
+      if (x < x0) x0 = x; if (x > x1) x1 = x;
+      if (y < y0) y0 = y; if (y > y1) y1 = y;
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+        const nx = x + dx, ny = y + dy;
+        if (nx < 0 || ny < 0 || nx >= L || ny >= A) continue;
+        const r = ny * L + nx;
+        if (visto[r] || dados[r * 4 + 3] < alfaMin) continue;
+        visto[r] = 1; pilha[topo++] = r;
+      }
+    }
+    if (n >= minPixels) caixas.push({ x0, y0, x1, y1, n });
+  }
+  // ordena de cima para baixo, da esquerda para a direita
+  const alturaLinha = A / 12;
+  caixas.sort((a, b) => Math.abs(a.y0 - b.y0) > alturaLinha ? a.y0 - b.y0 : a.x0 - b.x0);
+  return caixas;
+}
+
+function recortar(img, caixa, lado = 400){
+  const l = caixa.x1 - caixa.x0 + 1, a = caixa.y1 - caixa.y0 + 1;
+  const escala = Math.min(1, lado / Math.max(l, a));
+  const c = document.createElement('canvas');
+  c.width = Math.round(l * escala); c.height = Math.round(a * escala);
+  c.getContext('2d').drawImage(img, caixa.x0, caixa.y0, l, a, 0, 0, c.width, c.height);
+  return c.toDataURL('image/png');
+}
+
+function ligarCartela(){
+  $('#ctModo').addEventListener('change', e => {
+    $('#campoGrade').hidden = e.target.value !== 'grade';
+  });
+
+  $('#btRecortar').addEventListener('click', async () => {
+    const arq = $('#ctArquivo').files[0];
+    if (!arq) return recado('#recadoCartela', 'Escolha a imagem da cartela.', 'erro');
+    if (arq.size > 8*1024*1024) return recado('#recadoCartela', 'A imagem precisa ter no máximo 8 MB.', 'erro');
+
+    recado('#recadoCartela', 'Recortando...');
+    const img = await new Promise((ok, falhou) => {
+      const i = new Image();
+      i.onload = () => ok(i); i.onerror = falhou;
+      i.src = URL.createObjectURL(arq);
+    });
+
+    const c = document.createElement('canvas');
+    c.width = img.naturalWidth; c.height = img.naturalHeight;
+    const ctx = c.getContext('2d', { willReadFrequently:true });
+    ctx.drawImage(img, 0, 0);
+
+    let caixas;
+    if ($('#ctModo').value === 'grade') {
+      const cols = Math.max(1, +$('#ctCols').value), linhas = Math.max(1, +$('#ctLinhas').value);
+      const lc = c.width / cols, la = c.height / linhas;
+      caixas = [];
+      for (let y = 0; y < linhas; y++) for (let x = 0; x < cols; x++)
+        caixas.push({ x0:Math.round(x*lc), y0:Math.round(y*la),
+                      x1:Math.round((x+1)*lc)-1, y1:Math.round((y+1)*la)-1 });
+    } else {
+      const dados = ctx.getImageData(0, 0, c.width, c.height).data;
+      caixas = acharPedacos(dados, c.width, c.height);
+      // Sem fundo transparente, a imagem toda vira um pedaço só.
+      // Nesse caso o recorte automático não tem como funcionar.
+      const inteira = caixas.length === 1 &&
+        (caixas[0].x1 - caixas[0].x0) > c.width * 0.85 &&
+        (caixas[0].y1 - caixas[0].y0) > c.height * 0.85;
+      if (!caixas.length || inteira) {
+        $('#ctModo').value = 'grade'; $('#campoGrade').hidden = false;
+        return recado('#recadoCartela',
+          'Esta imagem não tem fundo transparente, então o recorte automático não funciona. Já mudei para o modo em grade: informe quantas colunas e linhas a cartela tem e recorte de novo.', 'erro');
+      }
+    }
+
+    recortes = caixas.map((cx, i) => ({ id:i, fora:false, imagem:recortar(c, cx) }));
+    desenharRecortes();
+    $('#previaCartela').hidden = false;
+    recado('#recadoCartela', `${recortes.length} recorte(s) encontrados. Confira e suba.`, 'ok');
+  });
+
+  $('#gradeRecortes').addEventListener('click', e => {
+    const bt = e.target.closest('[data-tirar]');
+    if (!bt) return;
+    const r = recortes.find(x => x.id === +bt.dataset.tirar);
+    r.fora = !r.fora;
+    desenharRecortes();
+  });
+
+  $('#btSubirRecortes').addEventListener('click', async () => {
+    const usar = recortes.filter(r => !r.fora);
+    if (!usar.length) return recado('#recadoCartela', 'Nenhum recorte selecionado.', 'erro');
+    const pacote = $('#ctPacote').value.trim() || 'Palpitamente';
+    const liberado = Math.max(0, parseInt($('#ctLiberado').value, 10) || 0);
+    const base = stickersEquipe.filter(s => s.pacote === pacote).length;
+
+    recado('#recadoCartela', `Subindo ${usar.length}...`);
+    for (const [i, r] of usar.entries()) {
+      const { error } = await supabaseClient.from('stickers_equipe').insert({
+        pacote, liberado_em: liberado, ordem: base + i,
+        nome: `${pacote.toLowerCase()}-${base + i + 1}`, imagem: r.imagem
+      });
+      if (error) return recado('#recadoCartela', error.message, 'erro');
+    }
+    recortes = []; $('#previaCartela').hidden = true; $('#ctArquivo').value = '';
+    recado('#recadoCartela', `${usar.length} sticker(s) no ar.`, 'ok');
+    await carregarStickers();
+  });
+}
+
+function desenharRecortes(){
+  const dentro = recortes.filter(r => !r.fora).length;
+  $('#contRecortes').innerHTML =
+    `<strong>${dentro}</strong> de ${recortes.length} selecionados. Clique no x para tirar ou devolver.`;
+  $('#gradeRecortes').innerHTML = recortes.map(r => `
+    <div class="st-item${r.fora ? ' fora' : ''}">
+      <img src="${r.imagem}" alt="">
+      <button class="apagar" data-tirar="${r.id}" title="${r.fora ? 'Devolver' : 'Tirar'}">${r.fora ? '+' : '&times;'}</button>
+    </div>`).join('');
 }
 
 function ligarStickers(){
