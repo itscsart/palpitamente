@@ -158,22 +158,46 @@ footer{
 /* ============ MOBILE ============ */
 @media (max-width:900px){
   .container{ width:100%; max-width:none; padding:0 22px; }
-  /* Topo compacto: antes o menu ocupava três linhas e 230px de tela
-     antes do conteúdo começar. Agora é logo à esquerda, atalhos à
-     direita e os links numa única faixa que rola na horizontal. */
-  .navbar{ padding:14px 0 0; }
-  .navbar .container{ flex-wrap:wrap; gap:10px; justify-content:space-between; align-items:center; }
-  .logo{ height:24px; }
-  .nav-links{
-    order:3; width:100%; margin:0; gap:20px; flex-wrap:nowrap;
-    justify-content:flex-start; overflow-x:auto; padding:2px 22px 0;
-    margin-left:-22px; margin-right:-22px;
-    scrollbar-width:none; -webkit-overflow-scrolling:touch;
+  /* Topo do celular: só o logo e o botão do menu. Os links e os ícones
+     ficam guardados e aparecem juntos quando a pessoa abre. */
+  .navbar{ padding:14px 0 12px; position:relative; }
+  .navbar .container{ flex-wrap:wrap; gap:0 12px; justify-content:space-between; align-items:center; }
+  .logo{ height:26px; order:1; }
+
+  .menu-bt{
+    display:flex; flex-direction:column; justify-content:center; gap:5px;
+    width:46px; height:46px; padding:0 10px; flex:0 0 auto; order:2;
+    background:none; border:none; cursor:pointer;
   }
-  .nav-links::-webkit-scrollbar{ display:none; }
-  .nav-links li{ flex:0 0 auto; }
-  .nav-links li a{ font-size:15px; padding:8px 0 12px; display:inline-block; white-space:nowrap; }
-  .nav-social{ gap:2px; margin:0; }
+  .menu-bt span{
+    display:block; height:2.5px; width:100%; border-radius:2px;
+    background:var(--verde-escuro); transition:transform .2s ease, opacity .2s ease;
+  }
+  .navbar.menu-aberto .menu-bt span:nth-child(1){ transform:translateY(7.5px) rotate(45deg); }
+  .navbar.menu-aberto .menu-bt span:nth-child(2){ opacity:0; }
+  .navbar.menu-aberto .menu-bt span:nth-child(3){ transform:translateY(-7.5px) rotate(-45deg); }
+
+  /* gaveta fechada */
+  /* cada gaveta ocupa uma linha inteira abaixo do logo */
+  .nav-links, .nav-social{
+    flex:0 0 100%; width:100%; margin:0;
+    max-height:0; overflow:hidden; opacity:0;
+    transition:max-height .28s ease, opacity .2s ease;
+  }
+  .nav-links{ order:3; }
+  .nav-social{ order:4; }
+  .nav-links{ flex-direction:column; align-items:stretch; gap:0; padding:0; }
+  .nav-links li{ width:100%; border-bottom:1px solid #E7DDD2; }
+  .nav-links li:last-child{ border-bottom:none; }
+  .nav-links li a{ display:block; width:100%; font-size:16px; padding:15px 2px; }
+  .nav-links li a .marca-ativa{ display:none; }
+  .nav-links li a.active{ color:var(--verde-escuro); font-weight:700; }
+
+  .nav-social{ justify-content:flex-start; gap:4px; padding-top:6px; }
+
+  /* gaveta aberta */
+  .navbar.menu-aberto .nav-links{ max-height:520px; opacity:1; padding-top:8px; }
+  .navbar.menu-aberto .nav-social{ max-height:80px; opacity:1; }
   /* o ícone continua do mesmo tamanho, mas a área clicável cresce:
      abaixo de 36px o dedo erra o alvo */
   .nav-social{ gap:6px; }
@@ -215,6 +239,8 @@ footer{
 
 /* atalho para o painel, só aparece para quem é da equipe */
 .nav-social a.bt-painel{ width:auto; height:auto; display:inline-flex; }
+/* o botão do menu só existe no celular */
+@media (min-width:901px){ .menu-bt{ display:none; } }
 .bt-painel{
   font-family:var(--font-body); font-size:1.1rem; font-weight:700;
   color:#fff; background:var(--rosa); border-radius:2rem;

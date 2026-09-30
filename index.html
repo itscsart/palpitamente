@@ -485,6 +485,18 @@
 <script src="assets/conteudo.js"></script>
 <script>
   // ----- Ultimos Palpites: monta os cards a partir de assets/episodios.js -----
+  /* Nem todo vídeo tem miniatura em 1280x720. A busca desce degrau a
+     degrau até achar uma que exista, em vez de cair direto na menor.
+     Precisa existir antes dos cartões aparecerem, senão o onerror
+     dispara e não encontra a função. */
+  window.capaCaiu = function(img){
+    const escada = ['maxresdefault','sddefault','hqdefault'];
+    const atual = escada.findIndex(n => img.src.includes(n));
+    const proxima = escada[atual + 1];
+    if (!proxima) { img.onerror = null; return; }
+    img.src = `https://img.youtube.com/vi/${img.dataset.id}/${proxima}.jpg`;
+  };
+
   (async function montarPalpites(){
     const alvo = document.getElementById('palpitesLista');
     if (!alvo) return;
@@ -546,7 +558,7 @@
   function ajustarAltura(){
     if (window.innerWidth > 900) { caixaSlides.style.height = ''; return; }
     caixaSlides.style.height = '';
-    const maior = Math.max(...slides.map(s => {
+    const maior = Math.max(...[...slides].map(s => {
       const dentro = s.querySelector('.container');
       return dentro ? dentro.offsetHeight : 0;
     }));
@@ -591,16 +603,6 @@
   iniciar();
 
   // "DA O PLAY" aponta para o episodio mais recente publicado
-  /* Nem todo vídeo tem miniatura em 1280x720. A busca desce degrau a
-     degrau até achar uma que exista, em vez de cair direto na menor. */
-  window.capaCaiu = function(img){
-    const escada = ['maxresdefault','sddefault','hqdefault'];
-    const atual = escada.findIndex(n => img.src.includes(n));
-    const proxima = escada[atual + 1];
-    if (!proxima) { img.onerror = null; return; }
-    img.src = `https://img.youtube.com/vi/${img.dataset.id}/${proxima}.jpg`;
-  };
-
   // O play do carrossel abre o canal do podcast, não um episódio solto.
   // O endereço vem do painel, no grupo Rodapé, para poder mudar sem mexer no código.
   (function ligarPlay(){

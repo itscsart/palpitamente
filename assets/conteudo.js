@@ -133,3 +133,44 @@ function ligarAoTopo(){
 if (document.readyState === 'loading')
   document.addEventListener('DOMContentLoaded', ligarAoTopo);
 else ligarAoTopo();
+
+/* ---------- menu do celular ----------
+   No celular o menu virava uma faixa que deslizava para o lado, e quem
+   não percebesse o gesto nunca via as últimas páginas. Agora é um botão
+   que abre a lista inteira de uma vez. */
+function montarMenuMobile(){
+  const barra = document.querySelector('.navbar');
+  const caixa = barra?.querySelector('.container');
+  const links = barra?.querySelector('.nav-links');
+  if (!barra || !caixa || !links || barra.querySelector('.menu-bt')) return;
+
+  const bt = document.createElement('button');
+  bt.className = 'menu-bt';
+  bt.setAttribute('aria-label', 'Abrir menu');
+  bt.setAttribute('aria-expanded', 'false');
+  bt.innerHTML = '<span></span><span></span><span></span>';
+  caixa.appendChild(bt);
+
+  const fechar = () => {
+    barra.classList.remove('menu-aberto');
+    bt.setAttribute('aria-expanded', 'false');
+    bt.setAttribute('aria-label', 'Abrir menu');
+  };
+
+  bt.addEventListener('click', e => {
+    e.stopPropagation();
+    const abrindo = !barra.classList.contains('menu-aberto');
+    barra.classList.toggle('menu-aberto', abrindo);
+    bt.setAttribute('aria-expanded', String(abrindo));
+    bt.setAttribute('aria-label', abrindo ? 'Fechar menu' : 'Abrir menu');
+  });
+
+  // fecha ao escolher uma página, ao tocar fora ou ao apertar Esc
+  links.addEventListener('click', e => { if (e.target.closest('a')) fechar(); });
+  document.addEventListener('click', e => { if (!e.target.closest('.navbar')) fechar(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') fechar(); });
+  window.addEventListener('resize', () => { if (window.innerWidth > 900) fechar(); });
+}
+if (document.readyState === 'loading')
+  document.addEventListener('DOMContentLoaded', montarMenuMobile);
+else montarMenuMobile();
