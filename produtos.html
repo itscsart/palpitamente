@@ -31,19 +31,26 @@
   /* Sem capa a página fica em duas colunas, como no design original.
      Com capa, a capa entra como primeira coluna e o texto encolhe,
      em vez de a imagem ficar empilhada embaixo do parágrafo. */
-  .venda-grid{ display:grid; grid-template-columns:1.05fr 1fr; gap:5rem; align-items:center; }
-  .venda-grid:has(.venda-capa:not([hidden])){ grid-template-columns:25rem 1fr 31rem; gap:3.4rem; }
-  /* com a capa ocupando uma coluna, o título encolhe para não quebrar */
+  /* Em vez de colunas de largura fixa, os três blocos ficam lado a lado
+     e a sobra de espaço vai para as bordas. Com colunas fixas, um texto
+     curto deixava um vão enorme entre a descrição e o cartão de preço. */
+  .venda-grid{
+    display:flex; align-items:center; justify-content:center;
+    gap:4.5rem; flex-wrap:wrap;
+  }
+  .venda-texto{ flex:1 1 34rem; max-width:44rem; }
+  .cartao{ flex:0 0 31rem; }
+  .venda-capa{ flex:0 0 25rem; }
+  .venda-grid:has(.venda-capa:not([hidden])){ gap:3.6rem; }
   .venda-grid:has(.venda-capa:not([hidden])) h1{ font-size:4.5rem; }
   .venda-grid:has(.venda-capa:not([hidden])) .venda-sub{ font-size:2.1rem; }
-  .venda-grid:has(.venda-capa:not([hidden])) .venda-desc{ max-width:36rem; }
   .venda-texto{ min-width:0; }
   .venda-eyebrow{
     font-family:var(--font-title); font-size:1.65rem;
     color:#fff; text-transform:uppercase; letter-spacing:0.04em;
   }
   .venda h1{
-    font-family:var(--font-title); font-size:5.4rem; line-height:1.04;
+    font-family:var(--font-title); font-size:4.8rem; line-height:1.06;
     color:#fff; text-transform:uppercase; margin-top:0.6rem;
   }
   /* o subtítulo fica claramente abaixo do nome do produto */
@@ -59,7 +66,7 @@
   }
   .venda-desc{
     margin-top:1.8rem; font-size:1.4rem; line-height:1.65;
-    color:#FBF1ED; max-width:34rem;
+    color:#FBF1ED;
   }
 
   /* cartão de preço */
@@ -99,12 +106,12 @@
   @media (max-width:900px){
     .venda{ height:auto; padding:70px 0 80px; margin-top:0; }
 
-    .venda-grid{ grid-template-columns:1fr; gap:30px; }
     .venda-eyebrow{ font-size:15px; }
     .venda h1{ font-size:clamp(32px,9vw,46px); }
     .venda-sub{ font-size:clamp(16px,4.4vw,20px); margin-top:8px; }
-    .venda-grid:has(.venda-capa:not([hidden])){ grid-template-columns:1fr; gap:24px; }
-    .venda-capa{ max-width:230px; margin:0 auto; }
+    .venda-grid{ flex-direction:column; align-items:stretch; gap:24px; }
+    .venda-texto, .cartao{ flex:1 1 auto; max-width:none; }
+    .venda-capa{ flex:0 0 auto; max-width:230px; margin:0 auto; }
     .venda-desc{ font-size:15px; line-height:1.7; margin-top:14px; }
     .cartao{ padding:24px 22px 22px; }
     .cartao-preco{ font-size:28px; }
