@@ -45,7 +45,11 @@ async function aplicarConfig(){
   const cfg = await buscarConfig();
   document.querySelectorAll('[data-config]').forEach(el => {
     const v = cfg[el.dataset.config];
-    if (v === undefined || v === null || v === '') return;
+    if (v === undefined || v === null) return;   // campo não existe no banco
+    // campo existe e foi esvaziado no painel: o elemento some da página,
+    // em vez de continuar mostrando o texto que veio no código
+    if (v === '') { el.hidden = true; return; }
+    el.hidden = false;
     if (el.tagName === 'A' && el.dataset.configAlvo === 'href') el.href = v;
     else el.textContent = v;
   });
