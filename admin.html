@@ -609,7 +609,7 @@ const DICAS = {
   preco_antigo:     'Preço riscado ao lado do atual. Deixe vazio para não mostrar.',
   diario_nome:      'Nome do produto, em letras grandes no topo da página.',
   diario_titulo:    'Frase menor, logo abaixo do nome do produto.',
-  diario_capa:      'Capa do diário, mostrada ao lado do texto. PNG ou JPG até 500 KB.',
+  diario_capa:      'Capa do diário, mostrada ao lado do texto. PNG ou JPG até 2 MB, mas o ideal é abaixo de 600 KB.',
   diario_descricao: 'Parágrafo abaixo do título, na página Diário Digital.',
   hero_titulo:      'Título do primeiro slide do carrossel da home.',
   hero_subtitulo:   'Frase abaixo do título, no primeiro slide da home.',
@@ -703,7 +703,18 @@ function ligarConfig(){
     if (!campo) return;
     const arq = campo.files[0];
     if (!arq) return;
-    if (arq.size > 500*1024) { alert('A imagem precisa ter no máximo 500 KB.'); campo.value=''; return; }
+    if (arq.size > 2*1024*1024) {
+      const mb = (arq.size/1024/1024).toFixed(1);
+      alert(`A imagem tem ${mb} MB e o limite é 2 MB.\n\nReduza em squoosh.app ou tinypng.com: 800px de largura costuma resolver sem perder qualidade na tela.`);
+      campo.value=''; return;
+    }
+    // acima de 600 KB a página de compra começa a demorar no celular
+    if (arq.size > 600*1024) {
+      const mb = (arq.size/1024/1024).toFixed(1);
+      if (!confirm(`A imagem tem ${mb} MB. Ela vai funcionar, mas deixa a página mais lenta no celular.\n\nO ideal é ficar abaixo de 600 KB. Quer subir assim mesmo?`)) {
+        campo.value=''; return;
+      }
+    }
     const chave = campo.dataset.imagemPara;
     const leitor = new FileReader();
     leitor.onload = () => {
