@@ -14,8 +14,12 @@
 <style>
   /* ---------- FAIXA ROSA DE VENDA ---------- */
   .venda{
-    position:relative; height:55.17rem;   /* 662px no design */
+    /* Altura mínima em vez de fixa: o design previa 662px, mas o
+       subtítulo e a capa fazem o bloco crescer, e com altura travada
+       o conteúdo saía para fora da faixa rosa. */
+    position:relative; min-height:55.17rem;
     display:flex; align-items:center;
+    padding:5rem 0;
     margin-top:16.9rem;
   }
   .venda-recorte{
@@ -25,6 +29,7 @@
   }
   .venda .container{ position:relative; z-index:2; }
   .venda-grid{ display:grid; grid-template-columns:1.05fr 1fr; gap:5rem; align-items:center; }
+  .venda-texto{ min-width:0; }
   .venda-eyebrow{
     font-family:var(--font-title); font-size:1.65rem;
     color:#fff; text-transform:uppercase; letter-spacing:0.04em;
@@ -38,7 +43,7 @@
     font-family:var(--font-title); font-size:2.4rem; line-height:1.2;
     color:#FBF1ED; text-transform:uppercase; margin-top:1rem;
   }
-  .venda-capa{ margin-top:2.6rem; max-width:26rem; }
+  .venda-capa{ margin-top:2.4rem; max-width:19rem; }
   .venda-capa img{
     width:100%; height:auto; display:block; border-radius:0.8rem;
     box-shadow:0 1rem 2.6rem rgba(0,0,0,0.26);
