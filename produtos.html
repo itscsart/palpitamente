@@ -28,7 +28,15 @@
     background-repeat:repeat; background-size:31.25rem 31.25rem;
   }
   .venda .container{ position:relative; z-index:2; }
+  /* Sem capa a página fica em duas colunas, como no design original.
+     Com capa, a capa entra como primeira coluna e o texto encolhe,
+     em vez de a imagem ficar empilhada embaixo do parágrafo. */
   .venda-grid{ display:grid; grid-template-columns:1.05fr 1fr; gap:5rem; align-items:center; }
+  .venda-grid:has(.venda-capa:not([hidden])){ grid-template-columns:17.5rem 1fr 32rem; gap:3.4rem; }
+  /* com a capa ocupando uma coluna, o título encolhe para não quebrar */
+  .venda-grid:has(.venda-capa:not([hidden])) h1{ font-size:4.5rem; }
+  .venda-grid:has(.venda-capa:not([hidden])) .venda-sub{ font-size:2.1rem; }
+  .venda-grid:has(.venda-capa:not([hidden])) .venda-desc{ max-width:none; }
   .venda-texto{ min-width:0; }
   .venda-eyebrow{
     font-family:var(--font-title); font-size:1.65rem;
@@ -43,10 +51,11 @@
     font-family:var(--font-title); font-size:2.4rem; line-height:1.2;
     color:#FBF1ED; text-transform:uppercase; margin-top:1rem;
   }
-  .venda-capa{ margin-top:2.4rem; max-width:19rem; }
+  .venda-capa{ align-self:center; }
+  .venda-capa img{ width:100%; height:auto; display:block; }
   .venda-capa img{
-    width:100%; height:auto; display:block; border-radius:0.8rem;
-    box-shadow:0 1rem 2.6rem rgba(0,0,0,0.26);
+    width:100%; height:auto; display:block; border-radius:0.9rem;
+    box-shadow:0 1.4rem 3.2rem rgba(0,0,0,0.28);
   }
   .venda-desc{
     margin-top:1.8rem; font-size:1.4rem; line-height:1.65;
@@ -94,7 +103,8 @@
     .venda-eyebrow{ font-size:15px; }
     .venda h1{ font-size:clamp(32px,9vw,46px); }
     .venda-sub{ font-size:clamp(16px,4.4vw,20px); margin-top:8px; }
-    .venda-capa{ margin-top:18px; max-width:200px; }
+    .venda-grid:has(.venda-capa:not([hidden])){ grid-template-columns:1fr; gap:24px; }
+    .venda-capa{ max-width:170px; margin:0 auto; }
     .venda-desc{ font-size:15px; line-height:1.7; margin-top:14px; }
     .cartao{ padding:24px 22px 22px; }
     .cartao-preco{ font-size:28px; }
@@ -143,14 +153,14 @@
   <div class="venda-recorte"></div>
   <div class="container">
     <div class="venda-grid">
+      <div class="venda-capa" id="capaDiario" data-img-caixa hidden>
+        <img data-config-img="diario_capa" alt="Capa do diário Pausa para Mim">
+      </div>
       <div class="venda-texto">
         <span class="venda-eyebrow">Diário digital</span>
         <h1 data-config="diario_nome">Pausa para Mim</h1>
         <p class="venda-sub" data-config="diario_titulo">Um espaço só seu para escrever</p>
         <p class="venda-desc" data-config="diario_descricao">Frases motivacionais, stickers, área de rabisco livre e um sistema de recompensas que te incentiva a criar o hábito de escrever sobre a sua vida.</p>
-        <div class="venda-capa" id="capaDiario" data-img-caixa hidden>
-          <img data-config-img="diario_capa" alt="Capa do diário Pausa para Mim">
-        </div>
       </div>
       <div class="cartao">
         <div class="cartao-preco" data-config="preco_atual">R$ 0,00</div>
