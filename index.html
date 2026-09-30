@@ -270,9 +270,12 @@
     .carrossel-pontos{ align-items:center; padding:14px 0 0; gap:0; }
     .ponto{ width:11px; height:11px; margin:0 9px; flex:0 0 auto; }
     .slides{ touch-action:pan-y; }
-    .slide .container{ padding:44px 22px 68px; height:auto; overflow:hidden; }
+    /* a moldura de papel é rotacionada e passava do topo da faixa,
+       ficando cortada. O respiro extra em cima resolve. */
+    .slide .container{ padding:34px 22px 62px; height:auto; overflow:visible; }
+    .slides{ overflow:hidden; }
     .slide-podcast .container, .slide-diario .container{ width:100%; max-width:none; margin-left:0; padding:0 22px; grid-template-columns:1fr; gap:0; }
-    .podcast-foto{ width:95%; max-width:none; margin:0 auto 28px; transform:rotate(-1.5deg); }
+    .podcast-foto{ width:95%; max-width:none; margin:14px auto 28px; transform:rotate(-1.5deg); }
     .podcast-copy{ width:100%; }
     .podcast-seta{ display:none; }
     .podcast-titulo{ font-size:clamp(26px,6.6vw,34px); line-height:1.1; }

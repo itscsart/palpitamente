@@ -177,7 +177,20 @@
   .item-acoes{
     position:absolute; top:-2.4rem; right:0; display:none; gap:0.3rem;
     background:#fff; border-radius:0.5rem; padding:0.25rem; box-shadow:0 0.2rem 0.8rem rgba(0,0,0,0.18);
+    z-index:6;
   }
+  /* alça de canto: arrastar redimensiona, como no celular */
+  .item-alca{
+    position:absolute; right:-14px; bottom:-14px; width:34px; height:34px;
+    border-radius:50%; background:#fff; border:2px solid var(--verde-escuro);
+    display:none; align-items:center; justify-content:center; cursor:nwse-resize;
+    box-shadow:0 2px 8px rgba(0,0,0,0.22); touch-action:none; z-index:6;
+  }
+  .item-alca::after{
+    content:''; width:12px; height:12px; border-right:3px solid var(--verde-escuro);
+    border-bottom:3px solid var(--verde-escuro);
+  }
+  .item.selecionado .item-alca{ display:flex; }
   .item.selecionado .item-acoes{ display:flex; }
   .item-acoes button{
     border:none; background:#EFE6DA; border-radius:0.35rem; cursor:pointer;
@@ -423,11 +436,27 @@
     .progresso{ min-width:0; width:100%; }
     .abas{ gap:2px; margin-bottom:20px; overflow-x:auto; }
     .aba{ font-size:14px; padding:13px 14px; white-space:nowrap; }
-    .editor{ grid-template-columns:1fr; gap:16px; }
-    .ferramentas{ position:static; padding:14px 12px; }
+    /* No celular a folha é o que importa. Ela vai para o topo e ocupa
+       a tela toda; o painel de ferramentas desce e vira uma gaveta. */
+    .editor{ grid-template-columns:1fr; gap:14px; }
+    .folha-area{ order:1; padding:10px; }
+    .ferramentas{ order:2; position:static; padding:12px; }
+    .folha{ aspect-ratio:1/1.18; max-height:none; }
+    .folha-cabeca{ gap:8px; margin-bottom:10px; }
+    .folha-cabeca input[type="text"]{ min-width:0; flex:1 1 100%; }
+    .folha-cabeca input[type="date"]{ width:auto; flex:1 1 auto; }
+    .tipo-folha{ margin-left:0; }
+    .camada-texto{ padding:16px 18px; font-size:17px; line-height:26px; }
+
+    /* gaveta: só a aba escolhida fica aberta */
+    .fer-abas{ position:sticky; top:0; background:#FBF7F1; z-index:3; padding-bottom:6px; }
     .fer-aba{ font-size:12px; padding:12px 2px; }
     .fer-bloco h4{ font-size:12px; margin:16px 0 8px; }
     .bt-fer{ font-size:14px; padding:12px 6px; min-height:44px; }
+    /* botões do item com tamanho de dedo */
+    .item-acoes{ top:auto; bottom:-52px; right:auto; left:50%; transform:translateX(-50%); gap:6px; padding:6px; }
+    .item-acoes button{ width:42px; height:42px; font-size:17px; }
+    .item-alca{ width:40px; height:40px; right:-18px; bottom:-18px; }
     .campo-fer{ font-size:16px; padding:12px 12px; }
     .subir{ font-size:13px; padding:18px 12px; }
     .subir small{ font-size:12px; }
@@ -1149,7 +1178,8 @@ function inserirItem(dados){
       <button data-acao="maior" title="Aumentar">+</button>
       <button data-acao="girar" title="Girar">↻</button>
       <button data-acao="remover" title="Remover">×</button>
-    </div>`);
+    </div>
+    <div class="item-alca" title="Arraste para redimensionar"></div>`);
 
   camada.appendChild(el);
   arrastavel(el);
@@ -1163,48 +1193,98 @@ function selecionar(el){
 }
 
 function arrastavel(el){
-  let ox=0, oy=0, ini=null;
+  let ox=0, oy=0, arrastando=false;
+  let pinca=null;                       // dois dedos: guarda distância e ângulo iniciais
   const palco = () => $('#folha').getBoundingClientRect();
+  const larguraAtual = () => parseFloat(el.style.width);
+  const rotacaoAtual = () => parseFloat((el.style.transform.match(/-?\d+(\.\d+)?/) || [0])[0]);
+
+  function aplicarLargura(pct){
+    const nova = Math.max(4, Math.min(100, pct));
+    el.style.width = nova + '%';
+    if (el.dataset.tipo === 'sticker') el.style.fontSize = (nova * 0.78) + 'cqw';
+  }
+  const distancia = (a, b) => Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+  const angulo    = (a, b) => Math.atan2(b.clientY - a.clientY, b.clientX - a.clientX) * 180 / Math.PI;
 
   const comecar = e => {
-    if (e.target.closest('.item-acoes')) return;
+    if (e.target.closest('.item-acoes') || e.target.closest('.item-alca')) return;
     e.preventDefault(); e.stopPropagation();
     selecionar(el);
+
+    // dois dedos na tela: pinça para redimensionar e girar
+    if (e.touches && e.touches.length === 2) {
+      arrastando = false;
+      pinca = { dist: distancia(e.touches[0], e.touches[1]),
+                ang:  angulo(e.touches[0], e.touches[1]),
+                larg: larguraAtual(), rot: rotacaoAtual() };
+      return;
+    }
     const p = e.touches ? e.touches[0] : e;
     const r = el.getBoundingClientRect();
     ox = p.clientX - r.left; oy = p.clientY - r.top;
-    ini = true;
+    arrastando = true;
     el.classList.add('arrastando');
   };
+
   const mover = e => {
-    if (!ini) return;
+    if (pinca && e.touches && e.touches.length === 2) {
+      e.preventDefault();
+      const d = distancia(e.touches[0], e.touches[1]);
+      aplicarLargura(pinca.larg * (d / pinca.dist));
+      const giro = angulo(e.touches[0], e.touches[1]) - pinca.ang;
+      el.style.transform = `rotate(${Math.round(pinca.rot + giro)}deg)`;
+      return;
+    }
+    if (!arrastando) return;
     e.preventDefault();
     const p = e.touches ? e.touches[0] : e;
     const f = palco();
     let x = ((p.clientX - ox - f.left) / f.width) * 100;
     let y = ((p.clientY - oy - f.top) / f.height) * 100;
-    x = Math.max(-5, Math.min(95, x));
-    y = Math.max(-5, Math.min(95, y));
-    el.style.left = x + '%'; el.style.top = y + '%';
+    el.style.left = Math.max(-5, Math.min(95, x)) + '%';
+    el.style.top  = Math.max(-5, Math.min(95, y)) + '%';
   };
-  const parar = () => { ini = false; el.classList.remove('arrastando'); };
+
+  const parar = e => {
+    if (pinca && (!e.touches || e.touches.length < 2)) pinca = null;
+    arrastando = false;
+    el.classList.remove('arrastando');
+  };
 
   ['mousedown','touchstart'].forEach(ev => el.addEventListener(ev, comecar, {passive:false}));
   ['mousemove','touchmove'].forEach(ev => document.addEventListener(ev, mover, {passive:false}));
-  ['mouseup','touchend'].forEach(ev => document.addEventListener(ev, parar));
+  ['mouseup','touchend','touchcancel'].forEach(ev => document.addEventListener(ev, parar));
+
+  // alça de canto: arrastar para redimensionar, sem precisar de dois dedos
+  const alca = el.querySelector('.item-alca');
+  let redim = null;
+  const pegarAlca = e => {
+    e.preventDefault(); e.stopPropagation();
+    selecionar(el);
+    const p = e.touches ? e.touches[0] : e;
+    const r = el.getBoundingClientRect();
+    redim = { x:p.clientX, y:p.clientY, larg:larguraAtual(), diag:Math.hypot(r.width, r.height) };
+  };
+  const moverAlca = e => {
+    if (!redim) return;
+    e.preventDefault();
+    const p = e.touches ? e.touches[0] : e;
+    const delta = ((p.clientX - redim.x) + (p.clientY - redim.y)) / 2;
+    aplicarLargura(redim.larg * (1 + delta / Math.max(40, redim.diag / 2)));
+  };
+  const soltarAlca = () => { redim = null; };
+  ['mousedown','touchstart'].forEach(ev => alca.addEventListener(ev, pegarAlca, {passive:false}));
+  ['mousemove','touchmove'].forEach(ev => document.addEventListener(ev, moverAlca, {passive:false}));
+  ['mouseup','touchend','touchcancel'].forEach(ev => document.addEventListener(ev, soltarAlca));
 
   el.querySelector('.item-acoes').addEventListener('click', e => {
     const bt = e.target.closest('button'); if (!bt) return;
     e.stopPropagation();
-    const larg = parseFloat(el.style.width);
-    const rot  = parseFloat((el.style.transform.match(/-?\d+(\.\d+)?/) || [0])[0]);
-    if (bt.dataset.acao === 'menor')  el.style.width = Math.max(4, larg - 5) + '%';
-    if (bt.dataset.acao === 'maior')  el.style.width = Math.min(100, larg + 5) + '%';
-    if (bt.dataset.acao === 'girar')  el.style.transform = `rotate(${(rot + 15) % 360}deg)`;
+    if (bt.dataset.acao === 'menor')  aplicarLargura(larguraAtual() - 6);
+    if (bt.dataset.acao === 'maior')  aplicarLargura(larguraAtual() + 6);
+    if (bt.dataset.acao === 'girar')  el.style.transform = `rotate(${(rotacaoAtual() + 15) % 360}deg)`;
     if (bt.dataset.acao === 'remover'){ el.remove(); itemSel = null; }
-    if (el.dataset.tipo === 'sticker' && bt.dataset.acao !== 'remover') {
-      el.style.fontSize = (parseFloat(el.style.width) * 0.78) + 'cqw';
-    }
   });
 }
 

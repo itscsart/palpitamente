@@ -158,19 +158,29 @@ footer{
 /* ============ MOBILE ============ */
 @media (max-width:900px){
   .container{ width:100%; max-width:none; padding:0 22px; }
-  .navbar{ padding:26px 0 18px; }
-  .navbar .container{ flex-wrap:wrap; gap:16px; justify-content:center; align-items:center; }
-  .logo{ height:26px; }
-  .nav-links{ order:3; width:100%; justify-content:center; flex-wrap:wrap; gap:18px; margin-top:0; }
-  .nav-links li a{ font-size:15px; padding:9px 4px 14px; display:inline-block; }
-  .nav-social{ gap:14px; margin-top:0; }
+  /* Topo compacto: antes o menu ocupava três linhas e 230px de tela
+     antes do conteúdo começar. Agora é logo à esquerda, atalhos à
+     direita e os links numa única faixa que rola na horizontal. */
+  .navbar{ padding:14px 0 0; }
+  .navbar .container{ flex-wrap:wrap; gap:10px; justify-content:space-between; align-items:center; }
+  .logo{ height:24px; }
+  .nav-links{
+    order:3; width:100%; margin:0; gap:20px; flex-wrap:nowrap;
+    justify-content:flex-start; overflow-x:auto; padding:2px 22px 0;
+    margin-left:-22px; margin-right:-22px;
+    scrollbar-width:none; -webkit-overflow-scrolling:touch;
+  }
+  .nav-links::-webkit-scrollbar{ display:none; }
+  .nav-links li{ flex:0 0 auto; }
+  .nav-links li a{ font-size:15px; padding:8px 0 12px; display:inline-block; white-space:nowrap; }
+  .nav-social{ gap:2px; margin:0; }
   /* o ícone continua do mesmo tamanho, mas a área clicável cresce:
      abaixo de 36px o dedo erra o alvo */
   .nav-social{ gap:6px; }
-  .nav-social a{ width:38px; height:38px; }
-  .nav-social a.ic-wide{ width:46px; }
-  .nav-social img{ max-width:24px; max-height:24px; }
-  .nav-social a.ic-wide img{ max-width:32px; }
+  .nav-social a{ width:34px; height:36px; }
+  .nav-social a.ic-wide{ width:40px; }
+  .nav-social img{ max-width:20px; max-height:20px; }
+  .nav-social a.ic-wide img{ max-width:26px; }
   footer{ padding:70px 0 26px; margin-top:50px; }
   .footer-col ul li{ margin-bottom:4px; }
   .footer-col ul li a{ display:inline-block; padding:11px 0; }
