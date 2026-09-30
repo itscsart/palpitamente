@@ -259,8 +259,11 @@
        No celular isso esticava a faixa: 688px para 437px de conteúdo.
        Limitando a colagem, os dois passam a ter altura parecida. */
     .slides{ height:auto; transition:height .35s ease; }
-    .slide{ height:auto; }
-    .trilha{ align-items:flex-start; }
+    /* o slide estica até a altura da faixa (align-items:stretch no trilho)
+       e o conteúdo fica centralizado dentro dele */
+    .slide{ height:auto; align-self:stretch; }
+    .slide .container{ height:100%; }
+    .trilha{ align-items:stretch; }
     .colagem img{ max-height:210px; }
     .podcast-foto{ max-width:330px; }
 
@@ -272,9 +275,15 @@
     .slides{ touch-action:pan-y; }
     /* a moldura de papel é rotacionada e passava do topo da faixa,
        ficando cortada. O respiro extra em cima resolve. */
-    .slide .container{ padding:34px 22px 62px; height:auto; overflow:visible; }
+    .slide .container{ overflow:visible; }
     .slides{ overflow:hidden; }
-    .slide-podcast .container, .slide-diario .container{ width:100%; max-width:none; margin-left:0; padding:0 22px; grid-template-columns:1fr; gap:0; }
+    /* Esta regra é mais específica e apagava o respiro de cima e de baixo,
+       deixando o botão de play colado na borda da faixa. */
+    .slide-podcast .container, .slide-diario .container{
+      width:100%; max-width:none; margin-left:0;
+      padding:32px 22px 44px; grid-template-columns:1fr; gap:0;
+      align-content:center;
+    }
     .podcast-foto{ width:95%; max-width:none; margin:14px auto 28px; transform:rotate(-1.5deg); }
     .podcast-copy{ width:100%; }
     .podcast-seta{ display:none; }
@@ -531,11 +540,17 @@
   /* No celular a faixa tem altura automática, e o trilho flexível deixa
      os dois slides com a altura do mais alto. O verde ficava com quase
      200px de vazio. Aqui a faixa passa a seguir só o slide visível. */
+  /* No celular a faixa tinha a altura do slide visível, então ela pulava
+     de 451px para 626px ao trocar. Agora mede o mais alto e fixa nos dois,
+     com o conteúdo centralizado dentro. */
   function ajustarAltura(){
     if (window.innerWidth > 900) { caixaSlides.style.height = ''; return; }
-    const ativo = slides[atual];
-    const dentro = ativo.querySelector('.container');
-    if (dentro) caixaSlides.style.height = dentro.offsetHeight + 'px';
+    caixaSlides.style.height = '';
+    const maior = Math.max(...slides.map(s => {
+      const dentro = s.querySelector('.container');
+      return dentro ? dentro.offsetHeight : 0;
+    }));
+    if (maior) caixaSlides.style.height = maior + 'px';
   }
 
   function mostrar(i){
