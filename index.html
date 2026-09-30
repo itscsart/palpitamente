@@ -491,7 +491,8 @@
       const link = linkDoEpisodio(ep);
       const corpo = capa
         ? `<a href="${link}" target="_blank" rel="noopener" class="palpite-capa" aria-label="${ep.titulo}">
-             <img src="${capa}" alt="${ep.titulo}">
+             <img src="${capa}" alt="${ep.titulo}" loading="lazy"
+                  data-id="${ep.youtube}" onerror="capaCaiu(this)">
            </a>`
         : `<div class="palpite-capa em-breve"><span>Lançamento em breve</span></div>`;
       const rodape = capa
@@ -572,13 +573,26 @@
   iniciar();
 
   // "DA O PLAY" aponta para o episodio mais recente publicado
-  (async function ligarPlay(){
-    const lista = await buscarEpisodios();
-    const recente = lista.find(e => linkDoEpisodio(e));
-    const destino = recente ? linkDoEpisodio(recente) : 'episodios.html';
+  /* Nem todo vídeo tem miniatura em 1280x720. A busca desce degrau a
+     degrau até achar uma que exista, em vez de cair direto na menor. */
+  window.capaCaiu = function(img){
+    const escada = ['maxresdefault','sddefault','hqdefault'];
+    const atual = escada.findIndex(n => img.src.includes(n));
+    const proxima = escada[atual + 1];
+    if (!proxima) { img.onerror = null; return; }
+    img.src = `https://img.youtube.com/vi/${img.dataset.id}/${proxima}.jpg`;
+  };
+
+  // O play do carrossel abre o canal do podcast, não um episódio solto.
+  // O endereço vem do painel, no grupo Rodapé, para poder mudar sem mexer no código.
+  (function ligarPlay(){
     ['btnPlay','btnPlayLabel'].forEach(id => {
       const el = document.getElementById(id);
-      if (el) el.href = destino;
+      if (!el) return;
+      el.dataset.configHref = 'rede_youtube';
+      el.href = 'https://www.youtube.com/@PalpitamentePodcast';
+      el.target = '_blank';
+      el.rel = 'noopener';
     });
   })();
 

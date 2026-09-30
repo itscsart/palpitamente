@@ -53,13 +53,30 @@ async function aplicarConfig(){
     const v = cfg[el.dataset.configHref];
     if (v) el.href = v;
   });
+  aplicarImagens(cfg);
   return cfg;
 }
 
-/* capa do episódio a partir do YouTube */
+/* Capa do episódio a partir do YouTube.
+   maxresdefault tem 1280x720; hqdefault só 480x360, e ao ser esticada
+   nos cartões largos da home ficava granulada. Nem todo vídeo tem a
+   versão grande, então o atributo onerror devolve a menor. */
 function capaDoEpisodio(ep){
   if (!ep.publicado || !ep.youtube) return null;
-  return `https://img.youtube.com/vi/${ep.youtube}/hqdefault.jpg`;
+  return `https://img.youtube.com/vi/${ep.youtube}/maxresdefault.jpg`;
+}
+function capaReserva(ep){
+  return ep.youtube ? `https://img.youtube.com/vi/${ep.youtube}/hqdefault.jpg` : '';
+}
+
+/* aplica imagens configuráveis, como a capa do diário */
+function aplicarImagens(cfg){
+  document.querySelectorAll('[data-config-img]').forEach(el => {
+    const v = cfg[el.dataset.configImg];
+    const caixa = el.closest('[data-img-caixa]') || el;
+    if (v) { el.src = v; caixa.hidden = false; }
+    else caixa.hidden = true;
+  });
 }
 function linkDoEpisodio(ep){
   if (!ep.publicado || !ep.youtube) return null;

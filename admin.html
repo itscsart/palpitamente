@@ -95,6 +95,9 @@
   .recado.erro{ color:#B5473C; }
 
   .previa-capa{ display:flex; align-items:center; gap:1.2rem; margin-top:0.7rem; }
+  .previa-imagem{ display:flex; align-items:center; gap:1.4rem; margin-top:0.9rem; }
+  .previa-imagem img{ width:12rem; height:auto; max-height:16rem; object-fit:contain;
+    border-radius:0.6rem; background:#EFE6DA; }
   .previa-capa img{ width:6rem; height:9rem; object-fit:cover; border-radius:0.5rem; background:var(--rosa); }
 
   .grupo-config{ margin-bottom:2.6rem; }
@@ -604,7 +607,9 @@ let editandoCfg = null;
 const DICAS = {
   preco_atual:      'Aparece no cartão da página Diário Digital. Escreva com o "R$".',
   preco_antigo:     'Preço riscado ao lado do atual. Deixe vazio para não mostrar.',
-  diario_titulo:    'Título grande da página Diário Digital.',
+  diario_nome:      'Nome do produto, em letras grandes no topo da página.',
+  diario_titulo:    'Frase menor, logo abaixo do nome do produto.',
+  diario_capa:      'Capa do diário, mostrada ao lado do texto. PNG ou JPG até 500 KB.',
   diario_descricao: 'Parágrafo abaixo do título, na página Diário Digital.',
   hero_titulo:      'Título do primeiro slide do carrossel da home.',
   hero_subtitulo:   'Frase abaixo do título, no primeiro slide da home.',
@@ -657,9 +662,16 @@ async function carregarConfig(){
       <div class="form">
         <div class="grade-campos">
           ${campos.map(c => `
-            <div class="campo${c.tipo === 'texto_longo' ? ' largo' : ''}">
+            <div class="campo${(c.tipo === 'texto_longo' || c.tipo === 'imagem') ? ' largo' : ''}">
               <label>${escapar(c.rotulo || c.chave)}</label>
-              ${c.tipo === 'texto_longo'
+              ${c.tipo === 'imagem'
+                ? `<input type="hidden" data-chave="${c.chave}" value="${escapar(c.valor)}">
+                   <input type="file" accept="image/*" data-imagem-para="${c.chave}">
+                   <div class="previa-imagem" data-previa="${c.chave}" ${c.valor ? '' : 'hidden'}>
+                     <img src="${escapar(c.valor)}" alt="">
+                     <button class="bt perigo" data-tirar-imagem="${c.chave}">Remover imagem</button>
+                   </div>`
+                : c.tipo === 'texto_longo'
                 ? `<textarea data-chave="${c.chave}">${escapar(c.valor)}</textarea>`
                 : `<input type="${c.tipo === 'link' ? 'url' : 'text'}" data-chave="${c.chave}" value="${escapar(c.valor)}">`}
               ${DICAS[c.chave] ? `<small>${escapar(DICAS[c.chave])}</small>` : ''}
@@ -684,7 +696,38 @@ function chaveDe(texto){
 }
 
 function ligarConfig(){
+  // upload de imagem: o arquivo vira base64 e fica no campo escondido,
+  // que é salvo junto com os textos da página
+  document.getElementById('paineisPaginas').addEventListener('change', e => {
+    const campo = e.target.closest('[data-imagem-para]');
+    if (!campo) return;
+    const arq = campo.files[0];
+    if (!arq) return;
+    if (arq.size > 500*1024) { alert('A imagem precisa ter no máximo 500 KB.'); campo.value=''; return; }
+    const chave = campo.dataset.imagemPara;
+    const leitor = new FileReader();
+    leitor.onload = () => {
+      const painel = campo.closest('.painel');
+      painel.querySelector(`[data-chave="${chave}"]`).value = leitor.result;
+      const previa = painel.querySelector(`[data-previa="${chave}"]`);
+      previa.querySelector('img').src = leitor.result;
+      previa.hidden = false;
+    };
+    leitor.readAsDataURL(arq);
+  });
+
   document.getElementById('paineisPaginas').addEventListener('click', async e => {
+    const tirar = e.target.closest('[data-tirar-imagem]');
+    if (tirar) {
+      e.preventDefault();
+      const chave = tirar.dataset.tirarImagem;
+      const painel = tirar.closest('.painel');
+      painel.querySelector(`[data-chave="${chave}"]`).value = '';
+      painel.querySelector(`[data-previa="${chave}"]`).hidden = true;
+      const arquivo = painel.querySelector(`[data-imagem-para="${chave}"]`);
+      if (arquivo) arquivo.value = '';
+      return;
+    }
     const bt = e.target.closest('[data-salvar]');
     if (!bt) return;
     const painel = bt.closest('.painel');
